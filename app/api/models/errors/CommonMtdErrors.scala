@@ -19,8 +19,10 @@ package api.models.errors
 import play.api.http.Status._
 
 // Format Errors
-object NinoFormatError    extends MtdError("FORMAT_NINO", "The provided NINO is invalid", BAD_REQUEST)
-object TaxYearFormatError extends MtdError("FORMAT_TAX_YEAR", "The provided tax year is invalid", BAD_REQUEST)
+object NinoFormatError        extends MtdError("FORMAT_NINO", "The provided NINO is invalid", BAD_REQUEST)
+object TaxYearFormatError     extends MtdError("FORMAT_TAX_YEAR", "The provided tax year is invalid", BAD_REQUEST)
+object FuturesYearFormatError extends MtdError("FORMAT_FUTURE_YEARS", "futureYears should be true or false", BAD_REQUEST)
+object HistoryFormatError     extends MtdError("FORMAT_HISTORY", "history should be true or false", BAD_REQUEST)
 
 // Rule Errors
 object RuleIncorrectOrEmptyBodyError
