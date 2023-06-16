@@ -26,39 +26,39 @@ sealed trait StatusReasonEnum {
 object StatusReasonEnum {
 
   case object signUpReturnAvailable extends StatusReasonEnum {
-    override def toDesViewString = "Sign up - return available"
+    override def toDesViewString: String = "Sign up - return available"
   }
 
   case object signUpNoReturnAvailable extends StatusReasonEnum {
-    override def toDesViewString = "Sign up - no return available"
+    override def toDesViewString: String = "Sign up - no return available"
   }
 
   case object itsaFinalDeclaration extends StatusReasonEnum {
-    override def toDesViewString = "ITSA final declaration"
+    override def toDesViewString: String = "ITSA final declaration"
   }
 
   case object itsaQ4Declaration extends StatusReasonEnum {
-    override def toDesViewString = "ITSA Q4 declaration"
+    override def toDesViewString: String = "ITSA Q4 declaration"
   }
 
   case object cesaSaReturn extends StatusReasonEnum {
-    override def toDesViewString = "CESA SA return"
+    override def toDesViewString: String = "CESA SA return"
   }
 
   case object complex extends StatusReasonEnum {
-    override def toDesViewString = "Complex"
+    override def toDesViewString: String = "Complex"
   }
 
   case object ceasedIncomeSource extends StatusReasonEnum {
-    override def toDesViewString = "Ceased income source"
+    override def toDesViewString: String = "Ceased income source"
   }
 
   case object reinstatedIncomeSource extends StatusReasonEnum {
-    override def toDesViewString = "Reinstated income source"
+    override def toDesViewString: String = "Reinstated income source"
   }
 
   case object rollover extends StatusReasonEnum {
-    override def toDesViewString = "Rollover"
+    override def toDesViewString: String = "Rollover"
   }
 
   implicit val format: Format[StatusReasonEnum]         = Enums.format[StatusReasonEnum]
