@@ -16,4 +16,12 @@
 
 package v1.models.response
 
-case class RetrieveItsaStatusResponse(itsaStatuses: ItsaStatuses)
+import play.api.libs.json.{Json, OWrites}
+
+case class RetrieveItsaStatusResponse(itsaStatuses: Seq[ItsaStatuses])
+
+object RetrieveItsaStatusResponse {
+
+  implicit val writes: OWrites[ItsaStatuses] = Json.writes[ItsaStatuses]
+
+}

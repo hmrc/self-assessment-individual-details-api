@@ -16,18 +16,14 @@
 
 package v1.models.response
 
-import play.api.libs.functional.syntax._
-import play.api.libs.json.{JsPath, Json, OWrites, Reads}
+import play.api.libs.json.{Json, OWrites, Reads}
 
-case class ItsaStatuses(taxYear: String, itsaStatusDetails: Option[ItsaStatusDetails])
+case class ItsaStatuses(taxYear: String, itsaStatusDetails: Option[Seq[ItsaStatusDetails]])
 
 object ItsaStatuses {
 
   implicit val writes: OWrites[ItsaStatuses] = Json.writes[ItsaStatuses]
 
-  implicit val reads: Reads[ItsaStatuses] = (
-    (JsPath \\ "taxYear").read[String] and
-      (JsPath \\ "itsaStatusDetails").readNullable[ItsaStatusDetails]
-  )(ItsaStatuses.apply _)
+  implicit val reads: Reads[ItsaStatuses] = Json.reads[ItsaStatuses]
 
 }

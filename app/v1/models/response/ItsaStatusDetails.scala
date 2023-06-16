@@ -16,8 +16,7 @@
 
 package v1.models.response
 
-import play.api.libs.functional.syntax._
-import play.api.libs.json.{JsPath, Json, OWrites, Reads}
+import play.api.libs.json.{Json, OWrites, Reads}
 import v1.models.domain.StatusReasonEnum
 
 case class ItsaStatusDetails(submittedOn: String, status: String, statusReason: StatusReasonEnum, businessIncomePriorTo2Years: Option[BigDecimal])
@@ -26,11 +25,6 @@ object ItsaStatusDetails {
 
   implicit val writes: OWrites[ItsaStatusDetails] = Json.writes[ItsaStatusDetails]
 
-  implicit val reads: Reads[ItsaStatusDetails] = (
-    (JsPath \\ "submittedOn").read[String] and
-      (JsPath \\ "status").read[String] and
-      (JsPath \\ "statusReason").read[StatusReasonEnum] and
-      (JsPath \\ "businessIncomePriorTo2Years").readNullable[BigDecimal]
-  )(ItsaStatusDetails.apply _)
+  implicit val reads: Reads[ItsaStatuses] = Json.reads[ItsaStatuses]
 
 }

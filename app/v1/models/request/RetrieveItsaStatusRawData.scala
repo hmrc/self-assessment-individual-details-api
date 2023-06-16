@@ -16,4 +16,6 @@
 
 package v1.models.request
 
+import api.models.request.RawData
+
 case class RetrieveItsaStatusRawData(nino: String, taxYear: String, futureYears: Option[Boolean], history: Option[Boolean]) extends RawData
