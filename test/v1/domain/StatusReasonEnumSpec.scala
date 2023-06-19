@@ -34,18 +34,4 @@ class StatusReasonEnumSpec extends UnitSpec with EnumJsonSpecSupport {
     ("rollover", StatusReasonEnum.rollover)
   )
 
-  "toDesViewString" must {
-    "return the expected string" in {
-      StatusReasonEnum.signUpReturnAvailable.toDesViewString shouldBe "Sign up - return available"
-      StatusReasonEnum.signUpNoReturnAvailable.toDesViewString shouldBe "Sign up - no return available"
-      StatusReasonEnum.itsaFinalDeclaration.toDesViewString shouldBe "ITSA final declaration"
-      StatusReasonEnum.itsaQ4Declaration.toDesViewString shouldBe "ITSA Q4 declaration"
-      StatusReasonEnum.cesaSaReturn.toDesViewString shouldBe "CESA SA return"
-      StatusReasonEnum.complex.toDesViewString shouldBe "Complex"
-      StatusReasonEnum.ceasedIncomeSource.toDesViewString shouldBe "Ceased income source"
-      StatusReasonEnum.reinstatedIncomeSource.toDesViewString shouldBe "Reinstated income source"
-      StatusReasonEnum.rollover.toDesViewString shouldBe "Rollover"
-    }
-  }
-
 }

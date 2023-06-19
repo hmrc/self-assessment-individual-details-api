@@ -20,37 +20,37 @@ import play.api.libs.json.Format
 import utils.enums.Enums
 
 sealed trait StatusEnum {
-  def toDesViewString: String
+  val downstreamValue: String
 }
 
 object StatusEnum {
 
   case object noStatus extends StatusEnum {
-    override def toDesViewString: String = "No Status"
+    val downstreamValue: String = "No Status"
   }
 
   case object mtdMandated extends StatusEnum {
-    override def toDesViewString: String = "MTD Mandated"
+    val downstreamValue: String = "MTD Mandated"
   }
 
   case object mtdVoluntary extends StatusEnum {
-    override def toDesViewString: String = "MTD Voluntary"
+    val downstreamValue: String = "MTD Voluntary"
   }
 
   case object annual extends StatusEnum {
-    override def toDesViewString: String = "Annual"
+    val downstreamValue: String = "Annual"
   }
 
   case object nonDigital extends StatusEnum {
-    override def toDesViewString: String = "Non Digital"
+    val downstreamValue: String = "Non Digital"
   }
 
   case object dormant extends StatusEnum {
-    override def toDesViewString: String = "Dormant"
+    val downstreamValue: String = "Dormant"
   }
 
   case object mtdExempt extends StatusEnum {
-    override def toDesViewString: String = "MTD Exempt"
+    val downstreamValue: String = "MTD Exempt"
   }
 
   implicit val format: Format[StatusEnum]         = Enums.format[StatusEnum]

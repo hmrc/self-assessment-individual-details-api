@@ -20,45 +20,45 @@ import play.api.libs.json.Format
 import utils.enums.Enums
 
 sealed trait StatusReasonEnum {
-  def toDesViewString: String
+  val downstreamValue: String
 }
 
 object StatusReasonEnum {
 
   case object signUpReturnAvailable extends StatusReasonEnum {
-    override def toDesViewString: String = "Sign up - return available"
+    val downstreamValue: String = "Sign up - return available"
   }
 
   case object signUpNoReturnAvailable extends StatusReasonEnum {
-    override def toDesViewString: String = "Sign up - no return available"
+    val downstreamValue: String = "Sign up - no return available"
   }
 
   case object itsaFinalDeclaration extends StatusReasonEnum {
-    override def toDesViewString: String = "ITSA final declaration"
+    val downstreamValue: String = "ITSA final declaration"
   }
 
   case object itsaQ4Declaration extends StatusReasonEnum {
-    override def toDesViewString: String = "ITSA Q4 declaration"
+    val downstreamValue: String = "ITSA Q4 declaration"
   }
 
   case object cesaSaReturn extends StatusReasonEnum {
-    override def toDesViewString: String = "CESA SA return"
+    val downstreamValue: String = "CESA SA return"
   }
 
   case object complex extends StatusReasonEnum {
-    override def toDesViewString: String = "Complex"
+    val downstreamValue: String = "Complex"
   }
 
   case object ceasedIncomeSource extends StatusReasonEnum {
-    override def toDesViewString: String = "Ceased income source"
+    val downstreamValue: String = "Ceased income source"
   }
 
   case object reinstatedIncomeSource extends StatusReasonEnum {
-    override def toDesViewString: String = "Reinstated income source"
+    val downstreamValue: String = "Reinstated income source"
   }
 
   case object rollover extends StatusReasonEnum {
-    override def toDesViewString: String = "Rollover"
+    val downstreamValue: String = "Rollover"
   }
 
   implicit val format: Format[StatusReasonEnum]         = Enums.format[StatusReasonEnum]

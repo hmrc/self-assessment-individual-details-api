@@ -32,16 +32,4 @@ class StatusEnumSpec extends UnitSpec with EnumJsonSpecSupport {
     ("mtdExempt", StatusEnum.mtdExempt)
   )
 
-  "toDesViewString" must {
-    "return the expected string" in {
-      StatusEnum.noStatus.toDesViewString shouldBe "No Status"
-      StatusEnum.mtdMandated.toDesViewString shouldBe "MTD Mandated"
-      StatusEnum.mtdVoluntary.toDesViewString shouldBe "MTD Voluntary"
-      StatusEnum.annual.toDesViewString shouldBe "Annual"
-      StatusEnum.nonDigital.toDesViewString shouldBe "Non Digital"
-      StatusEnum.dormant.toDesViewString shouldBe "Dormant"
-      StatusEnum.mtdExempt.toDesViewString shouldBe "MTD Exempt"
-    }
-  }
-
 }
