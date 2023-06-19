@@ -26,39 +26,39 @@ sealed trait StatusReasonEnum {
 object StatusReasonEnum {
 
   case object signUpReturnAvailable extends StatusReasonEnum {
-    val downstreamValue: String = "Sign up - return available"
+    val downstreamValue = "Sign up - return available"
   }
 
   case object signUpNoReturnAvailable extends StatusReasonEnum {
-    val downstreamValue: String = "Sign up - no return available"
+    val downstreamValue = "Sign up - no return available"
   }
 
   case object itsaFinalDeclaration extends StatusReasonEnum {
-    val downstreamValue: String = "ITSA final declaration"
+    val downstreamValue = "ITSA final declaration"
   }
 
   case object itsaQ4Declaration extends StatusReasonEnum {
-    val downstreamValue: String = "ITSA Q4 declaration"
+    val downstreamValue = "ITSA Q4 declaration"
   }
 
   case object cesaSaReturn extends StatusReasonEnum {
-    val downstreamValue: String = "CESA SA return"
+    val downstreamValue = "CESA SA return"
   }
 
   case object complex extends StatusReasonEnum {
-    val downstreamValue: String = "Complex"
+    val downstreamValue = "Complex"
   }
 
   case object ceasedIncomeSource extends StatusReasonEnum {
-    val downstreamValue: String = "Ceased income source"
+    val downstreamValue = "Ceased income source"
   }
 
   case object reinstatedIncomeSource extends StatusReasonEnum {
-    val downstreamValue: String = "Reinstated income source"
+    val downstreamValue = "Reinstated income source"
   }
 
   case object rollover extends StatusReasonEnum {
-    val downstreamValue: String = "Rollover"
+    val downstreamValue = "Rollover"
   }
 
   implicit val format: Format[StatusReasonEnum]         = Enums.format[StatusReasonEnum]

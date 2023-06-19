@@ -26,31 +26,31 @@ sealed trait StatusEnum {
 object StatusEnum {
 
   case object noStatus extends StatusEnum {
-    val downstreamValue: String = "No Status"
+    val downstreamValue = "No Status"
   }
 
   case object mtdMandated extends StatusEnum {
-    val downstreamValue: String = "MTD Mandated"
+    val downstreamValue = "MTD Mandated"
   }
 
   case object mtdVoluntary extends StatusEnum {
-    val downstreamValue: String = "MTD Voluntary"
+    val downstreamValue = "MTD Voluntary"
   }
 
   case object annual extends StatusEnum {
-    val downstreamValue: String = "Annual"
+    val downstreamValue = "Annual"
   }
 
   case object nonDigital extends StatusEnum {
-    val downstreamValue: String = "Non Digital"
+    val downstreamValue = "Non Digital"
   }
 
   case object dormant extends StatusEnum {
-    val downstreamValue: String = "Dormant"
+    val downstreamValue = "Dormant"
   }
 
   case object mtdExempt extends StatusEnum {
-    val downstreamValue: String = "MTD Exempt"
+    val downstreamValue = "MTD Exempt"
   }
 
   implicit val format: Format[StatusEnum]         = Enums.format[StatusEnum]

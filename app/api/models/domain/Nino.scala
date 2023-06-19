@@ -19,10 +19,8 @@ package api.models.domain
 case class Nino(nino: String) {
   private val LengthWithoutSuffix = 8
 
-  def value: String = nino
-
-  def formatted: String     = value.grouped(2).mkString(" ")
-  def withoutSuffix: String = value.take(LengthWithoutSuffix)
+  def formatted: String     = nino.grouped(2).mkString(" ")
+  def withoutSuffix: String = nino.take(LengthWithoutSuffix)
 
   override def toString: String = nino
 }
