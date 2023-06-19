@@ -16,14 +16,12 @@
 
 package v1.models.response
 
-import play.api.libs.json.{Json, OWrites, Reads}
+import play.api.libs.json.{Json, OFormat}
 
 case class ItsaStatuses(taxYear: String, itsaStatusDetails: Option[Seq[ItsaStatusDetails]])
 
 object ItsaStatuses {
 
-  implicit val writes: OWrites[ItsaStatuses] = Json.writes[ItsaStatuses]
-
-  implicit val reads: Reads[ItsaStatuses] = Json.reads[ItsaStatuses]
+  implicit val format: OFormat[ItsaStatuses] = Json.format[ItsaStatuses]
 
 }

@@ -16,15 +16,13 @@
 
 package v1.models.response
 
-import play.api.libs.json.{Json, OWrites, Reads}
+import play.api.libs.json.{Json, OFormat}
 import v1.models.domain.{StatusEnum, StatusReasonEnum}
 
 case class ItsaStatusDetails(submittedOn: String, status: StatusEnum, statusReason: StatusReasonEnum, businessIncomePriorTo2Years: Option[BigDecimal])
 
 object ItsaStatusDetails {
 
-  implicit val writes: OWrites[ItsaStatusDetails] = Json.writes[ItsaStatusDetails]
-
-  implicit val reads: Reads[ItsaStatusDetails] = Json.reads[ItsaStatusDetails]
+  implicit val format: OFormat[ItsaStatusDetails] = Json.format[ItsaStatusDetails]
 
 }
