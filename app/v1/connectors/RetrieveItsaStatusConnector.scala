@@ -17,9 +17,12 @@
 package v1.connectors
 
 import api.connectors.DownstreamUri.IfsUri
+import api.connectors.httpparsers.StandardDownstreamHttpParser._
 import api.connectors.{BaseDownstreamConnector, DownstreamOutcome}
 import config.AppConfig
 import uk.gov.hmrc.http.{HeaderCarrier, HttpClient}
+import v1.models.request.RetrieveItsaStatusRequest
+import v1.models.response.RetrieveItsaStatusResponse
 
 import javax.inject.Inject
 import scala.concurrent.{ExecutionContext, Future}
@@ -31,8 +34,10 @@ class RetrieveItsaStatusConnector @Inject() (val http: HttpClient, val appConfig
       ec: ExecutionContext,
       correlationId: String): Future[DownstreamOutcome[RetrieveItsaStatusResponse]] = {
 
+    import request._
+
     val downstreamUri: IfsUri[RetrieveItsaStatusResponse] = IfsUri[RetrieveItsaStatusResponse](
-      s"/income-tax/{taxableEntityId}/person-itd/itsa-status/{taxYear}?futureYears={futureYears}&history={history}"
+      s"income-tax/$nino/person-itd/itsa-status/${taxYear.asTysDownstream}?futureYears=$futureYears&history=$history"
     )
 
     get(uri = downstreamUri)

@@ -16,6 +16,91 @@
 
 package v1.services
 
+import api.controllers.EndpointLogContext
+import api.models.domain.{Nino, TaxYear}
+import api.models.errors._
+import api.models.outcomes.ResponseWrapper
 import api.services.ServiceSpec
+import uk.gov.hmrc.http.HeaderCarrier
+import v1.mocks.connectors.MockRetrieveItsaStatusConnector
+import v1.models.domain.{StatusEnum, StatusReasonEnum}
+import v1.models.request.RetrieveItsaStatusRequest
+import v1.models.response.{ItsaStatusDetails, ItsaStatuses, RetrieveItsaStatusResponse}
 
-class RetrieveItsaStatusServiceSpec extends ServiceSpec {}
+import scala.concurrent.Future
+
+class RetrieveItsaStatusServiceSpec extends ServiceSpec {
+
+  "RetrieveItsaStatusService" should {
+    "return correct result for a success" when {
+      "a valid request is made" in new Test {
+        val outcome: Right[Nothing, ResponseWrapper[RetrieveItsaStatusResponse]] = Right(ResponseWrapper(correlationId, responseModel))
+
+        MockRetrieveItsaStatusConnector
+          .retrieve(request)
+          .returns(Future.successful(outcome))
+
+        await(service.retrieve(request)) shouldBe outcome
+      }
+
+      "map errors according to spec" when {
+
+        def serviceError(downstreamErrorCode: String, error: MtdError): Unit =
+          s"a $downstreamErrorCode error is returned from the service" in new Test {
+
+            MockRetrieveItsaStatusConnector
+              .retrieve(request)
+              .returns(Future.successful(Left(ResponseWrapper(correlationId, DownstreamErrors.single(DownstreamErrorCode(downstreamErrorCode))))))
+
+            await(service.retrieve(request)) shouldBe Left(ErrorWrapper(correlationId, error))
+          }
+
+        val input = List(
+          ("INVALID_TAXABLE_ENTITY_ID", NinoFormatError),
+          ("INVALID_TAX_YEAR", TaxYearFormatError),
+          ("INVALID_FUTURES_YEAR", FuturesYearFormatError),
+          ("INVALID_HISTORY", HistoryFormatError),
+          ("INVALID_CORRELATION_ID", InternalError),
+          ("NOT_FOUND", NotFoundError),
+          ("SERVER_ERROR", InternalError),
+          ("SERVICE_UNAVAILABLE", InternalError)
+        )
+
+        input.foreach(args => (serviceError _).tupled(args))
+      }
+    }
+  }
+
+  trait Test extends MockRetrieveItsaStatusConnector {
+
+    private val nino    = "AA112233A"
+    private val taxYear = "2019-20"
+
+    val request: RetrieveItsaStatusRequest = RetrieveItsaStatusRequest(Nino(nino), TaxYear.fromMtd(taxYear))
+
+    val itsaStatusDetails: ItsaStatusDetails = ItsaStatusDetails(
+      submittedOn = "2023-05-23T12:29:27.566Z",
+      status = StatusEnum.noStatus,
+      statusReason = StatusReasonEnum.signUpReturnAvailable,
+      businessIncomePriorTo2Years = Some(23600.99)
+    )
+
+    val itsaStatuses: ItsaStatuses = ItsaStatuses(
+      taxYear = taxYear,
+      itsaStatusDetails = Some(Seq(itsaStatusDetails))
+    )
+
+    val responseModel: RetrieveItsaStatusResponse = RetrieveItsaStatusResponse(
+      itsaStatuses = Seq(itsaStatuses)
+    )
+
+    implicit val hc: HeaderCarrier              = HeaderCarrier()
+    implicit val logContext: EndpointLogContext = EndpointLogContext("controller", "RetrieveItsaStatus")
+
+    val service: RetrieveItsaStatusService = new RetrieveItsaStatusService(
+      connector = mockRetrieveItsaStatusConnector
+    )
+
+  }
+
+}

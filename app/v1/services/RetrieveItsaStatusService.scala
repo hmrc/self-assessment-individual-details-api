@@ -21,6 +21,8 @@ import api.models.errors._
 import api.services.{BaseService, ServiceOutcome}
 import cats.implicits._
 import v1.connectors.RetrieveItsaStatusConnector
+import v1.models.request.RetrieveItsaStatusRequest
+import v1.models.response.RetrieveItsaStatusResponse
 
 import javax.inject.Inject
 import scala.concurrent.{ExecutionContext, Future}
@@ -37,7 +39,7 @@ class RetrieveItsaStatusService @Inject() (connector: RetrieveItsaStatusConnecto
       "INVALID_TAX_YEAR"          -> TaxYearFormatError,
       "INVALID_FUTURES_YEAR"      -> FuturesYearFormatError,
       "INVALID_HISTORY"           -> HistoryFormatError,
-      "INVALID_CORRELATIONID"     -> InternalError,
+      "INVALID_CORRELATION_ID"    -> InternalError,
       "NOT_FOUND"                 -> NotFoundError,
       "SERVER_ERROR"              -> InternalError,
       "SERVICE_UNAVAILABLE"       -> InternalError
