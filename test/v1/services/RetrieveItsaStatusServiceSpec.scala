@@ -58,7 +58,7 @@ class RetrieveItsaStatusServiceSpec extends ServiceSpec {
         val input = List(
           ("INVALID_TAXABLE_ENTITY_ID", NinoFormatError),
           ("INVALID_TAX_YEAR", TaxYearFormatError),
-          ("INVALID_FUTURES_YEAR", FuturesYearFormatError),
+          ("INVALID_FUTURES_YEAR", FutureYearsFormatError),
           ("INVALID_HISTORY", HistoryFormatError),
           ("INVALID_CORRELATION_ID", InternalError),
           ("NOT_FOUND", NotFoundError),
@@ -85,10 +85,7 @@ class RetrieveItsaStatusServiceSpec extends ServiceSpec {
       businessIncomePriorTo2Years = Some(23600.99)
     )
 
-    val itsaStatuses: ItsaStatuses = ItsaStatuses(
-      taxYear = taxYear,
-      itsaStatusDetails = Some(Seq(itsaStatusDetails))
-    )
+    val itsaStatuses: ItsaStatuses = ItsaStatuses(taxYear, itsaStatusDetails = Some(Seq(itsaStatusDetails)))
 
     val responseModel: RetrieveItsaStatusResponse = RetrieveItsaStatusResponse(
       itsaStatuses = Seq(itsaStatuses)

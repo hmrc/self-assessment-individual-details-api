@@ -37,7 +37,7 @@ class RetrieveItsaStatusService @Inject() (connector: RetrieveItsaStatusConnecto
     Map(
       "INVALID_TAXABLE_ENTITY_ID" -> NinoFormatError,
       "INVALID_TAX_YEAR"          -> TaxYearFormatError,
-      "INVALID_FUTURES_YEAR"      -> FuturesYearFormatError,
+      "INVALID_FUTURES_YEAR"      -> FutureYearsFormatError,
       "INVALID_HISTORY"           -> HistoryFormatError,
       "INVALID_CORRELATION_ID"    -> InternalError,
       "NOT_FOUND"                 -> NotFoundError,
