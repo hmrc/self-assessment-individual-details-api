@@ -14,15 +14,14 @@
  * limitations under the License.
  */
 
-package v2.controllers.validators
+package v1.controllers.validators
 
 import api.models.domain.{Nino, TaxYear}
 import api.models.errors._
-import api.models.request.NinoTaxYearFutureYearsHistoryRawData
 import mocks.MockAppConfig
 import support.UnitSpec
 import v1.controllers.requestParsers.validators.RetrieveItsaStatusValidator
-import v1.models.request.RetrieveItsaStatusRequest
+import v1.models.request.{RetrieveItsaStatusRawData, RetrieveItsaStatusRequest}
 
 class RetrieveItsaStatusValidatorSpec extends UnitSpec {
 
@@ -32,25 +31,25 @@ class RetrieveItsaStatusValidatorSpec extends UnitSpec {
   private val invalidNino    = "Darth Sidious"
   private val invalidTaxYear = "23-24"
 
-  private val validRawData: NinoTaxYearFutureYearsHistoryRawData = NinoTaxYearFutureYearsHistoryRawData(validNino, validTaxYear, None, None)
+  private val validRawData: RetrieveItsaStatusRawData = RetrieveItsaStatusRawData(validNino, validTaxYear, None, None)
 
-  private val requestWithInvalidNino: NinoTaxYearFutureYearsHistoryRawData =
-    NinoTaxYearFutureYearsHistoryRawData(invalidNino, validTaxYear, None, None)
+  private val requestWithInvalidNino: RetrieveItsaStatusRawData =
+    RetrieveItsaStatusRawData(invalidNino, validTaxYear, None, None)
 
-  private val requestWithInvalidTaxYear: NinoTaxYearFutureYearsHistoryRawData =
-    NinoTaxYearFutureYearsHistoryRawData(validNino, invalidTaxYear, None, None)
+  private val requestWithInvalidTaxYear: RetrieveItsaStatusRawData =
+    RetrieveItsaStatusRawData(validNino, invalidTaxYear, None, None)
 
-  private val requestWithInvalidNinoAndTaxYear: NinoTaxYearFutureYearsHistoryRawData =
-    NinoTaxYearFutureYearsHistoryRawData(invalidNino, invalidTaxYear, None, None)
+  private val requestWithInvalidNinoAndTaxYear: RetrieveItsaStatusRawData =
+    RetrieveItsaStatusRawData(invalidNino, invalidTaxYear, None, None)
 
-  private val requestWithInvalidFutureYears: NinoTaxYearFutureYearsHistoryRawData =
-    NinoTaxYearFutureYearsHistoryRawData(validNino, validTaxYear, Some("yes"), None)
+  private val requestWithInvalidFutureYears: RetrieveItsaStatusRawData =
+    RetrieveItsaStatusRawData(validNino, validTaxYear, Some("yes"), None)
 
-  private val requestWithInvalidHistory: NinoTaxYearFutureYearsHistoryRawData =
-    NinoTaxYearFutureYearsHistoryRawData(validNino, validTaxYear, None, Some("yes"))
+  private val requestWithInvalidHistory: RetrieveItsaStatusRawData =
+    RetrieveItsaStatusRawData(validNino, validTaxYear, None, Some("yes"))
 
-  private val requestWithAllInvalidRawData: NinoTaxYearFutureYearsHistoryRawData =
-    NinoTaxYearFutureYearsHistoryRawData(invalidNino, invalidTaxYear, Some("yes"), Some("yes"))
+  private val requestWithAllInvalidRawData: RetrieveItsaStatusRawData =
+    RetrieveItsaStatusRawData(invalidNino, invalidTaxYear, Some("yes"), Some("yes"))
 
   class Test extends MockAppConfig {
     implicit val correlationId: String = "1234"
@@ -64,7 +63,7 @@ class RetrieveItsaStatusValidatorSpec extends UnitSpec {
         val result: Either[ErrorWrapper, RetrieveItsaStatusRequest] =
           validator.parseAndValidateRequest(validRawData)
 
-        result shouldBe Right(RetrieveItsaStatusRequest(Nino(validNino), TaxYear.fromMtd(validTaxYear)))
+        result shouldBe Right(RetrieveItsaStatusRequest(Nino(validNino), TaxYear.fromMtd(validTaxYear), futureYears = false, history = false))
       }
     }
 

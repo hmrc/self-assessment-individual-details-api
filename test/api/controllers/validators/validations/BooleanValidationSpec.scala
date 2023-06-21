@@ -26,40 +26,40 @@ class BooleanValidationSpec extends UnitSpec with JsonErrorValidators {
     "return no errors" when {
       "when the string true is supplied" in {
         val validBoolean     = "true"
-        val validationResult = BooleanValidation.validate(validBoolean, BadRequestError)
-        validationResult shouldBe Nil
+        val result = BooleanValidation.validate(validBoolean, BadRequestError)
+        result shouldBe Nil
       }
 
       "when the upper case string TRUE is supplied" in {
         val validBoolean     = "TRUE"
-        val validationResult = BooleanValidation.validate(validBoolean, BadRequestError)
-        validationResult shouldBe Nil
+        val result = BooleanValidation.validate(validBoolean, BadRequestError)
+        result shouldBe Nil
       }
 
       "when the string false is supplied" in {
         val validBoolean     = "false"
-        val validationResult = BooleanValidation.validate(validBoolean, BadRequestError)
-        validationResult shouldBe Nil
+        val result = BooleanValidation.validate(validBoolean, BadRequestError)
+        result shouldBe Nil
       }
 
       "when the optional string true is supplied" in {
         val validBoolean     = Some("true")
-        val validationResult = BooleanValidation.validate(validBoolean, BadRequestError)
-        validationResult shouldBe Nil
+        val result = BooleanValidation.validate(validBoolean, BadRequestError)
+        result shouldBe Nil
       }
     }
 
     "return an error" when {
       "when an invalid string is supplied" in {
         val invalidBoolean   = "invalid"
-        val validationResult = BooleanValidation.validate(invalidBoolean, BadRequestError)
-        validationResult shouldBe List(BadRequestError)
+        val result = BooleanValidation.validate(invalidBoolean, BadRequestError)
+        result shouldBe List(BadRequestError)
       }
 
       "when an invalid optional string is supplied" in {
         val invalidBoolean   = Some("invalid")
-        val validationResult = BooleanValidation.validate(invalidBoolean, BadRequestError)
-        validationResult shouldBe List(BadRequestError)
+        val result = BooleanValidation.validate(invalidBoolean, BadRequestError)
+        result shouldBe List(BadRequestError)
       }
     }
   }

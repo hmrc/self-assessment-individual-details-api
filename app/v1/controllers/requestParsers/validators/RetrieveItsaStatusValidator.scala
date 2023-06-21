@@ -21,15 +21,14 @@ import api.controllers.validators.Validator.{ParserValidationCaller, PostParseVa
 import api.controllers.validators.validations.{BooleanValidation, NinoValidation, TaxYearValidation}
 import api.models.domain.{Nino, TaxYear}
 import api.models.errors.{FutureYearsFormatError, HistoryFormatError}
-import api.models.request.NinoTaxYearFutureYearsHistoryRawData
-import v1.models.request.RetrieveItsaStatusRequest
+import v1.models.request.{RetrieveItsaStatusRawData, RetrieveItsaStatusRequest}
 
 import javax.inject.Singleton
 
 @Singleton
-class RetrieveItsaStatusValidator extends Validator[NinoTaxYearFutureYearsHistoryRawData, RetrieveItsaStatusRequest] {
+class RetrieveItsaStatusValidator extends Validator[RetrieveItsaStatusRawData, RetrieveItsaStatusRequest] {
 
-  protected val preParserValidations: PreParseValidationCallers[NinoTaxYearFutureYearsHistoryRawData] =
+  protected val preParserValidations: PreParseValidationCallers[RetrieveItsaStatusRawData] =
     List(
       data => NinoValidation(data.nino),
       data => TaxYearValidation(data.taxYear),
@@ -37,8 +36,8 @@ class RetrieveItsaStatusValidator extends Validator[NinoTaxYearFutureYearsHistor
       data => BooleanValidation.validate(data.history, HistoryFormatError)
     )
 
-  protected val parserValidation: ParserValidationCaller[NinoTaxYearFutureYearsHistoryRawData, RetrieveItsaStatusRequest] = { data =>
-    Right(RetrieveItsaStatusRequest(Nino(data.nino), TaxYear.fromMtd(data.taxYear)))
+  protected val parserValidation: ParserValidationCaller[RetrieveItsaStatusRawData, RetrieveItsaStatusRequest] = { data =>
+    Right(RetrieveItsaStatusRequest(Nino(data.nino), TaxYear.fromMtd(data.taxYear), data.futureYears.contains("true"), data.history.contains("true")))
   }
 
   protected val postParserValidations: PostParseValidationCallers[RetrieveItsaStatusRequest] = Nil

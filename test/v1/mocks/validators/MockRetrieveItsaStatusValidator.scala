@@ -17,11 +17,10 @@
 package v1.mocks.validators
 
 import api.models.errors.{ErrorWrapper, MtdError}
-import api.models.request.NinoTaxYearFutureYearsHistoryRawData
 import org.scalamock.handlers.{CallHandler, CallHandler1}
 import org.scalamock.scalatest.MockFactory
 import v1.controllers.requestParsers.validators.RetrieveItsaStatusValidator
-import v1.models.request.RetrieveItsaStatusRequest
+import v1.models.request.{RetrieveItsaStatusRawData, RetrieveItsaStatusRequest}
 
 trait MockRetrieveItsaStatusValidator extends MockFactory {
 
@@ -29,16 +28,17 @@ trait MockRetrieveItsaStatusValidator extends MockFactory {
 
   object MockedRetrieveItsaStatusValidator {
 
-    def parseAndValidateRequest(data: NinoTaxYearFutureYearsHistoryRawData): CallHandler[Either[ErrorWrapper, RetrieveItsaStatusRequest]] = {
+    def parseAndValidateRequest(data: RetrieveItsaStatusRawData): CallHandler[Either[ErrorWrapper, RetrieveItsaStatusRequest]] = {
       (mockRetrieveItsaStatusValidator
-        .parseAndValidateRequest(_: NinoTaxYearFutureYearsHistoryRawData)(_: String))
+        .parseAndValidateRequest(_: RetrieveItsaStatusRawData)(_: String))
         .expects(data, *)
     }
 
-    def parseAndValidate(data: NinoTaxYearFutureYearsHistoryRawData): CallHandler1[NinoTaxYearFutureYearsHistoryRawData, Either[Seq[MtdError], RetrieveItsaStatusRequest]] = {
+    def parseAndValidate(
+        data: RetrieveItsaStatusRawData): CallHandler1[RetrieveItsaStatusRawData, Either[Seq[MtdError], RetrieveItsaStatusRequest]] = {
 
       (mockRetrieveItsaStatusValidator
-        .parseAndValidate(_: NinoTaxYearFutureYearsHistoryRawData))
+        .parseAndValidate(_: RetrieveItsaStatusRawData))
         .expects(data)
     }
 
