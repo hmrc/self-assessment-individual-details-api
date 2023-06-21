@@ -19,7 +19,7 @@ package v1.mocks.validators
 import api.models.errors.{ErrorWrapper, MtdError}
 import org.scalamock.handlers.{CallHandler, CallHandler1}
 import org.scalamock.scalatest.MockFactory
-import v1.controllers.requestParsers.validators.RetrieveItsaStatusValidator
+import v1.controllers.validators.RetrieveItsaStatusValidator
 import v1.models.request.{RetrieveItsaStatusRawData, RetrieveItsaStatusRequest}
 
 trait MockRetrieveItsaStatusValidator extends MockFactory {

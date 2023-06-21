@@ -20,7 +20,6 @@ import api.models.domain.{Nino, TaxYear}
 import api.models.errors._
 import mocks.MockAppConfig
 import support.UnitSpec
-import v1.controllers.requestParsers.validators.RetrieveItsaStatusValidator
 import v1.models.request.{RetrieveItsaStatusRawData, RetrieveItsaStatusRequest}
 
 class RetrieveItsaStatusValidatorSpec extends UnitSpec {

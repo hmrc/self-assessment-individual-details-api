@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package v1.controllers.requestParsers.validators
+package v1.controllers.validators
 
 import api.controllers.validators.Validator
 import api.controllers.validators.Validator.{ParserValidationCaller, PostParseValidationCallers, PreParseValidationCallers}
