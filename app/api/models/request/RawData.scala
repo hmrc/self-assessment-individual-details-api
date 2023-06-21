@@ -21,3 +21,4 @@ import play.api.mvc.AnyContentAsJson
 trait RawData
 
 case class NinoAndJsonBodyRawData(nino: String, body: AnyContentAsJson) extends RawData
+case class NinoTaxYearFutureYearsHistoryRawData(nino: String, taxYear: String, futureYears: Option[String], history: Option[String]) extends RawData

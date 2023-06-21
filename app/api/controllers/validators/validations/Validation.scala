@@ -14,8 +14,6 @@
  * limitations under the License.
  */
 
-package v1.models.request
+package api.controllers.validators.validations
 
-import api.models.domain.{Nino, TaxYear}
-
-case class RetrieveItsaStatusRequest(nino: Nino, taxYear: TaxYear, futureYears: Boolean = false, history: Boolean = false)
+trait Validation

@@ -14,8 +14,10 @@
  * limitations under the License.
  */
 
-package v1.models.request
+package api.controllers.validators.validations
 
-import api.models.domain.{Nino, TaxYear}
+import api.models.errors.MtdError
 
-case class RetrieveItsaStatusRequest(nino: Nino, taxYear: TaxYear, futureYears: Boolean = false, history: Boolean = false)
+package object validations {
+  val NoValidationErrors: List[MtdError] = List()
+}
