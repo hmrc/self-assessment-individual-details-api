@@ -23,13 +23,13 @@ import v1.models.domain.StatusEnum
 class StatusEnumSpec extends UnitSpec with EnumJsonSpecSupport {
 
   testRoundTrip[StatusEnum](
-    ("noStatus", StatusEnum.noStatus),
-    ("mtdMandated", StatusEnum.mtdMandated),
-    ("mtdVoluntary", StatusEnum.mtdVoluntary),
-    ("annual", StatusEnum.annual),
-    ("nonDigital", StatusEnum.nonDigital),
-    ("dormant", StatusEnum.dormant),
-    ("mtdExempt", StatusEnum.mtdExempt)
+    ("No Status", StatusEnum.`No Status`),
+    ("MTD Mandated", StatusEnum.`MTD Mandated`),
+    ("MTD Voluntary", StatusEnum.`MTD Voluntary`),
+    ("Annual", StatusEnum.`Annual`),
+    ("Non Digital", StatusEnum.`Non Digital`),
+    ("Dormant", StatusEnum.`Dormant`),
+    ("MTD Exempt", StatusEnum.`MTD Exempt`)
   )
 
 }

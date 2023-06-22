@@ -25,31 +25,31 @@ sealed trait StatusEnum {
 
 object StatusEnum {
 
-  case object noStatus extends StatusEnum {
+  case object `No Status` extends StatusEnum {
     val downstreamValue = "No Status"
   }
 
-  case object mtdMandated extends StatusEnum {
+  case object `MTD Mandated` extends StatusEnum {
     val downstreamValue = "MTD Mandated"
   }
 
-  case object mtdVoluntary extends StatusEnum {
+  case object `MTD Voluntary` extends StatusEnum {
     val downstreamValue = "MTD Voluntary"
   }
 
-  case object annual extends StatusEnum {
+  case object `Annual` extends StatusEnum {
     val downstreamValue = "Annual"
   }
 
-  case object nonDigital extends StatusEnum {
+  case object `Non Digital` extends StatusEnum {
     val downstreamValue = "Non Digital"
   }
 
-  case object dormant extends StatusEnum {
+  case object `Dormant` extends StatusEnum {
     val downstreamValue = "Dormant"
   }
 
-  case object mtdExempt extends StatusEnum {
+  case object `MTD Exempt` extends StatusEnum {
     val downstreamValue = "MTD Exempt"
   }
 
