@@ -16,7 +16,7 @@
 
 package v1.models.response
 
-import play.api.libs.json.{JsError, JsSuccess, Json}
+import play.api.libs.json.{JsError, JsPath, Json}
 import support.UnitSpec
 import v1.models.domain.StatusEnum.{`MTD Mandated`, `No Status`}
 import v1.models.domain.StatusReasonEnum.{`ITSA Q4 declaration`, `Sign up - return available`}
@@ -107,16 +107,9 @@ class RetrieveItsaStatusResponseSpec extends UnitSpec {
           .parse(json)
           .validate[RetrieveItsaStatusResponse]
 
-      result match {
-        case err: JsError =>
-          err.errors should have size (1)
-          err.errors.head match {
-            case (jsPath, _) => jsPath.toString should include("(0)/taxYear")
-          }
-
-        case x: JsSuccess[_] =>
-          fail("Expected an error but got: " + x)
-      }
+      result shouldBe a[JsError]
+      val expectedPath = JsPath \ 0 \ "taxYear"
+      result.asInstanceOf[JsError].errors.head._1 shouldBe expectedPath
     }
 
   }
