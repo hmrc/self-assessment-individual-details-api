@@ -143,7 +143,7 @@ class RetrieveItsaStatusControllerSpec
       idGenerator = mockIdGenerator
     )
 
-    protected def callController(): Future[Result] = controller.retrieveItsaStatus(nino, taxYear)(fakeGetRequest)
+    protected def callController(): Future[Result] = controller.retrieveItsaStatus(nino, taxYear, None, None)(fakeGetRequest)
 
   }
 

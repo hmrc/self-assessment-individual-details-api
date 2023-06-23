@@ -19,7 +19,6 @@ package v1.endpoints
 import api.models.domain.TaxYear
 import api.models.errors._
 import api.stubs.{AuditStub, AuthStub, DownstreamStub, MtdIdLookupStub}
-import com.github.tomakehurst.wiremock.stubbing.StubMapping
 import play.api.http.HeaderNames.ACCEPT
 import play.api.http.Status._
 import play.api.libs.json.{JsValue, Json}
@@ -33,16 +32,13 @@ class RetrieveItsaStatusControllerISpec extends IntegrationBaseSpec {
     "return a 200 status code" when {
       "any valid request is made" in new Test {
 
-        val ifsQueryParam: Map[String, String] = Map("futureYears" -> "false", "history" -> "false")
+        val ifsQueryParams: Map[String, String] = Map("futureYears" -> futureYears, "history" -> history)
 
-        override def setupStubs(): StubMapping = {
-          AuditStub.audit()
-          AuthStub.authorised()
-          MtdIdLookupStub.ninoFound(nino)
-          DownstreamStub.onSuccess(DownstreamStub.GET, ifsUri, ifsQueryParam, OK, ifsResponse)
+        override def setupStubs(): Unit = {
+          DownstreamStub.onSuccess(DownstreamStub.GET, ifsUri, ifsQueryParams, OK, ifsResponse)
         }
 
-        val response: WSResponse = await(request.get())
+        val response: WSResponse = await(request.withQueryStringParameters("futureYears" -> futureYears, "history" -> history).get())
         response.status shouldBe OK
         response.json shouldBe mtdResponse
         response.header("Content-Type") shouldBe Some("application/json")
@@ -52,19 +48,20 @@ class RetrieveItsaStatusControllerISpec extends IntegrationBaseSpec {
     "return error according to spec" when {
 
       "validation error" when {
-        def validationErrorTest(requestNino: String, requestTaxYear: String, expectedStatus: Int, expectedBody: MtdError): Unit = {
+        def validationErrorTest(requestNino: String,
+                                requestTaxYear: String,
+                                requestFutureYears: String,
+                                requestHistory: String,
+                                expectedStatus: Int,
+                                expectedBody: MtdError): Unit = {
           s"validation fails with ${expectedBody.code} error" in new Test {
 
-            override val nino: String       = requestNino
-            override val mtdTaxYear: String = requestTaxYear
+            override val nino: String        = requestNino
+            override val mtdTaxYear: String  = requestTaxYear
+            override val futureYears: String = requestFutureYears
+            override val history: String     = requestHistory
 
-            override def setupStubs(): StubMapping = {
-              AuditStub.audit()
-              AuthStub.authorised()
-              MtdIdLookupStub.ninoFound(nino)
-            }
-
-            val response: WSResponse = await(request.get())
+            val response: WSResponse = await(request.withQueryStringParameters("futureYears" -> futureYears, "history" -> history).get())
             response.status shouldBe expectedStatus
             response.json shouldBe Json.toJson(expectedBody)
             response.header("Content-Type") shouldBe Some("application/json")
@@ -72,10 +69,10 @@ class RetrieveItsaStatusControllerISpec extends IntegrationBaseSpec {
         }
 
         val input = Seq(
-          ("AA1123A", "2023-24", BAD_REQUEST, NinoFormatError),
-          ("AA123456A", "20199", BAD_REQUEST, TaxYearFormatError),
-          ("AA123456A", "2023-24", BAD_REQUEST, FutureYearsFormatError),
-          ("AA123456A", "2023-24", BAD_REQUEST, HistoryFormatError)
+          ("AA1123A", "2023-24", "true", "true", BAD_REQUEST, NinoFormatError),
+          ("AA123456A", "20199", "true", "true", BAD_REQUEST, TaxYearFormatError),
+          ("AA123456A", "2023-24", "A", "true", BAD_REQUEST, FutureYearsFormatError),
+          ("AA123456A", "2023-24", "true", "B", BAD_REQUEST, HistoryFormatError)
         )
         input.foreach(args => (validationErrorTest _).tupled(args))
       }
@@ -84,14 +81,11 @@ class RetrieveItsaStatusControllerISpec extends IntegrationBaseSpec {
         def serviceErrorTest(ifsStatus: Int, ifsCode: String, expectedStatus: Int, expectedBody: MtdError): Unit = {
           s"ifs returns an $ifsCode error and status $ifsStatus" in new Test {
 
-            override def setupStubs(): StubMapping = {
-              AuditStub.audit()
-              AuthStub.authorised()
-              MtdIdLookupStub.ninoFound(nino)
+            override def setupStubs(): Unit = {
               DownstreamStub.onError(DownstreamStub.GET, ifsUri, ifsStatus, errorBody(ifsCode))
             }
 
-            val response: WSResponse = await(request.get())
+            val response: WSResponse = await(request.withQueryStringParameters("futureYears" -> futureYears, "history" -> history).get())
             response.status shouldBe expectedStatus
             response.json shouldBe Json.toJson(expectedBody)
             response.header("Content-Type") shouldBe Some("application/json")
@@ -123,16 +117,17 @@ class RetrieveItsaStatusControllerISpec extends IntegrationBaseSpec {
 
   private trait Test {
 
-    val nino: String              = "AA123456A"
-    val mtdTaxYear: String        = "2023-24"
-    val downstreamTaxYear: String = TaxYear.fromMtd(mtdTaxYear).asTysDownstream
+    val nino: String                   = "AA123456A"
+    val mtdTaxYear: String             = "2023-24"
+    lazy val downstreamTaxYear: String = TaxYear.fromMtd(mtdTaxYear).asTysDownstream
+    val futureYears: String            = "true"
+    val history: String                = "true"
 
     val ifsResponse: JsValue = Json.parse(
       """
-        |
         |[
         |  {
-        |    "taxYear": "2019-20",
+        |    "taxYear": "2023-24",
         |    "itsaStatusDetails": [
         |      {
         |        "submittedOn": "2023-05-23T12:29:27.566Z",
@@ -170,9 +165,12 @@ class RetrieveItsaStatusControllerISpec extends IntegrationBaseSpec {
 
     def ifsUri: String = s"/income-tax/$nino/person-itd/itsa-status/$downstreamTaxYear"
 
-    def setupStubs(): StubMapping
+    def setupStubs(): Unit = {}
 
     def request: WSRequest = {
+      AuditStub.audit()
+      AuthStub.authorised()
+      MtdIdLookupStub.ninoFound(nino)
       setupStubs()
       buildRequest(uri)
         .withHttpHeaders(

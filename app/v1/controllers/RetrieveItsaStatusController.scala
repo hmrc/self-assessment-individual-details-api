@@ -43,15 +43,15 @@ class RetrieveItsaStatusController @Inject() (val authService: EnrolmentsAuthSer
       endpointName = "retrieveItsaStatus"
     )
 
-  def retrieveItsaStatus(nino: String, taxYear: String): Action[AnyContent] =
+  def retrieveItsaStatus(nino: String, taxYear: String, futureYears: Option[String], history: Option[String]): Action[AnyContent] =
     authorisedAction(nino).async { implicit request =>
       implicit val ctx: RequestContext = RequestContext.from(idGenerator, endpointLogContext)
 
       val rawData: RetrieveItsaStatusRawData = RetrieveItsaStatusRawData(
         nino = nino,
         taxYear = taxYear,
-        futureYears = request.getQueryString("futureYears"),
-        history = request.getQueryString("history")
+        futureYears = futureYears,
+        history = history
       )
 
       val requestHandler =
