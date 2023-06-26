@@ -45,7 +45,7 @@ object StatusEnum {
     val downstreamValue = "Non Digital"
   }
 
-  case object `Dormant` extends StatusEnum {
+  case object Dormant extends StatusEnum {
     val downstreamValue = "Dormant"
   }
 

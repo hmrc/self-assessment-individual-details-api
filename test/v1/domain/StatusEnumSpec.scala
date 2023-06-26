@@ -26,9 +26,9 @@ class StatusEnumSpec extends UnitSpec with EnumJsonSpecSupport {
     ("No Status", StatusEnum.`No Status`),
     ("MTD Mandated", StatusEnum.`MTD Mandated`),
     ("MTD Voluntary", StatusEnum.`MTD Voluntary`),
-    ("Annual", StatusEnum.`Annual`),
+    ("Annual", StatusEnum.Annual),
     ("Non Digital", StatusEnum.`Non Digital`),
-    ("Dormant", StatusEnum.`Dormant`),
+    ("Dormant", StatusEnum.Dormant),
     ("MTD Exempt", StatusEnum.`MTD Exempt`)
   )
 
