@@ -8,10 +8,33 @@
       "type": "array",
       "description": "",
       "items": {
-      "taxYear": {
-        "description": "The tax year the data applies to. The start year and end year must not span two tax years. No gaps are allowed, for example, 2023-25 is not valid. There is no minimum tax year. For example 2023-24."
-      },
-
+        "type": "object",
+        "properties": {
+          "taxYear": {
+            "$ref": "itsa_status_retrieve_definitions.json#/definitions/taxYear"
+          },
+          "itsaStatusDetails": {
+            "type": "array",
+            "description": "",
+            "items": {
+              "type": "object",
+              "properties": {
+                "submittedOn": {
+                  "$ref": "itsa_status_retrieve_definitions.json#/definitions/submittedOn"
+                },
+                "status": {
+                  "$ref": "itsa_status_retrieve_definitions.json#/definitions/status"
+                },
+                "statusReason": {
+                  "$ref": "itsa_status_retrieve_definitions.json#/definitions/statusReason"
+                },
+                "businessIncomePriorTo2Years": {
+                  "$ref": "itsa_status_retrieve_definitions.json#/definitions/businessIncomePriorTo2Years"
+                }
+              }
+            }
+          }
+        }
       }
     }
   }
