@@ -28,10 +28,10 @@ class StatusReasonEnumSpec extends UnitSpec with EnumJsonSpecSupport {
     ("ITSA final declaration", StatusReasonEnum.`ITSA final declaration`),
     ("ITSA Q4 declaration", StatusReasonEnum.`ITSA Q4 declaration`),
     ("CESA SA return", StatusReasonEnum.`CESA SA return`),
-    ("Complex", StatusReasonEnum.`Complex`),
+    ("Complex", StatusReasonEnum.Complex),
     ("Ceased income source", StatusReasonEnum.`Ceased income source`),
     ("Reinstated income source", StatusReasonEnum.`Reinstated income source`),
-    ("Rollover", StatusReasonEnum.`Rollover`)
+    ("Rollover", StatusReasonEnum.Rollover)
   )
 
 }

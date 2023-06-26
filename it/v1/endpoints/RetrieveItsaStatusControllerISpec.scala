@@ -32,10 +32,10 @@ class RetrieveItsaStatusControllerISpec extends IntegrationBaseSpec {
     "return a 200 status code" when {
       "any valid request is made" in new Test {
 
-        val ifsQueryParams: Map[String, String] = Map("futureYears" -> futureYears, "history" -> history)
+        val downstreamQueryParams: Map[String, String] = Map("futureYears" -> futureYears, "history" -> history)
 
         override def setupStubs(): Unit = {
-          DownstreamStub.onSuccess(DownstreamStub.GET, ifsUri, ifsQueryParams, OK, ifsResponse)
+          DownstreamStub.onSuccess(DownstreamStub.GET, downstreamUri, downstreamQueryParams, OK, downstreamResponse)
         }
 
         val response: WSResponse = await(request.withQueryStringParameters("futureYears" -> futureYears, "history" -> history).get())
@@ -68,7 +68,7 @@ class RetrieveItsaStatusControllerISpec extends IntegrationBaseSpec {
           }
         }
 
-        val input = Seq(
+        val input = List(
           ("AA1123A", "2023-24", "true", "true", BAD_REQUEST, NinoFormatError),
           ("AA123456A", "20199", "true", "true", BAD_REQUEST, TaxYearFormatError),
           ("AA123456A", "2023-24", "A", "true", BAD_REQUEST, FutureYearsFormatError),
@@ -77,12 +77,12 @@ class RetrieveItsaStatusControllerISpec extends IntegrationBaseSpec {
         input.foreach(args => (validationErrorTest _).tupled(args))
       }
 
-      "ifs service error" when {
-        def serviceErrorTest(ifsStatus: Int, ifsCode: String, expectedStatus: Int, expectedBody: MtdError): Unit = {
-          s"ifs returns an $ifsCode error and status $ifsStatus" in new Test {
+      "downstream service error" when {
+        def serviceErrorTest(downstreamStatus: Int, downstreamCode: String, expectedStatus: Int, expectedBody: MtdError): Unit = {
+          s"downstream returns an $downstreamCode error and status $downstreamStatus" in new Test {
 
             override def setupStubs(): Unit = {
-              DownstreamStub.onError(DownstreamStub.GET, ifsUri, ifsStatus, errorBody(ifsCode))
+              DownstreamStub.onError(DownstreamStub.GET, downstreamUri, downstreamStatus, errorBody(downstreamCode))
             }
 
             val response: WSResponse = await(request.withQueryStringParameters("futureYears" -> futureYears, "history" -> history).get())
@@ -96,11 +96,11 @@ class RetrieveItsaStatusControllerISpec extends IntegrationBaseSpec {
           s"""
              |{
              |   "code": "$code",
-             |   "reason": "ifs message"
+             |   "reason": "downstream message"
              |}
             """.stripMargin
 
-        val input = Seq(
+        val input = List(
           (BAD_REQUEST, "INVALID_TAXABLE_ENTITY_ID", BAD_REQUEST, NinoFormatError),
           (BAD_REQUEST, "INVALID_TAX_YEAR", BAD_REQUEST, TaxYearFormatError),
           (BAD_REQUEST, "INVALID_FUTURES_YEAR", BAD_REQUEST, FutureYearsFormatError),
@@ -123,7 +123,7 @@ class RetrieveItsaStatusControllerISpec extends IntegrationBaseSpec {
     val futureYears: String            = "true"
     val history: String                = "true"
 
-    val ifsResponse: JsValue = Json.parse(
+    val downstreamResponse: JsValue = Json.parse(
       """
         |[
         |  {
@@ -163,7 +163,7 @@ class RetrieveItsaStatusControllerISpec extends IntegrationBaseSpec {
 
     def uri: String = s"/itsa-status/$nino/$mtdTaxYear"
 
-    def ifsUri: String = s"/income-tax/$nino/person-itd/itsa-status/$downstreamTaxYear"
+    def downstreamUri: String = s"/income-tax/$nino/person-itd/itsa-status/$downstreamTaxYear"
 
     def setupStubs(): Unit = {}
 

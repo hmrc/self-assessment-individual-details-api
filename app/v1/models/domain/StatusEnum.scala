@@ -37,7 +37,7 @@ object StatusEnum {
     val downstreamValue = "MTD Voluntary"
   }
 
-  case object `Annual` extends StatusEnum {
+  case object Annual extends StatusEnum {
     val downstreamValue = "Annual"
   }
 

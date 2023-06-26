@@ -45,7 +45,7 @@ object StatusReasonEnum {
     val downstreamValue = "CESA SA return"
   }
 
-  case object `Complex` extends StatusReasonEnum {
+  case object Complex extends StatusReasonEnum {
     val downstreamValue = "Complex"
   }
 
@@ -57,7 +57,7 @@ object StatusReasonEnum {
     val downstreamValue = "Reinstated income source"
   }
 
-  case object `Rollover` extends StatusReasonEnum {
+  case object Rollover extends StatusReasonEnum {
     val downstreamValue = "Rollover"
   }
 
