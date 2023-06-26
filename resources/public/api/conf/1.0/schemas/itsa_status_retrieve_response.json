@@ -6,7 +6,7 @@
   "properties": {
     "itsaStatuses": {
       "type": "array",
-      "description": "",
+      "description": "An array of ITSA statuses for the requested National Insurance number and tax year(s).",
       "items": {
         "type": "object",
         "properties": {
@@ -15,7 +15,7 @@
           },
           "itsaStatusDetails": {
             "type": "array",
-            "description": "",
+            "description": "An array of ITSA status details for a specific National Insurance number and tax year.",
             "items": {
               "type": "object",
               "properties": {
