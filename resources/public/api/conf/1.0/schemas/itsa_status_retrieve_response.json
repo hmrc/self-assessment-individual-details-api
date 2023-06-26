@@ -4,9 +4,15 @@
   "description": "Retrieve ITSA Status Request",
   "type": "object",
   "properties": {
-    "hello": {
-      "type": "string",
-      "example": "world"
+    "itsaStatuses": {
+      "type": "array",
+      "description": "",
+      "items": {
+      "taxYear": {
+        "description": "The tax year the data applies to. The start year and end year must not span two tax years. No gaps are allowed, for example, 2023-25 is not valid. There is no minimum tax year. For example 2023-24."
+      },
+
+      }
     }
   }
 }
