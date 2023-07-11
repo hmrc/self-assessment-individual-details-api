@@ -23,6 +23,7 @@ import support.UnitSpec
 class ResolveBooleanSpec extends UnitSpec with JsonErrorValidators {
 
   "ResolveBoolean" should {
+
     "return no errors" when {
       "given the string 'true'" in {
         val result = ResolveBoolean("true", BadRequestError)

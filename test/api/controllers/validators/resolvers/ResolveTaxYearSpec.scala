@@ -23,7 +23,7 @@ import support.UnitSpec
 
 class ResolveTaxYearSpec extends UnitSpec with JsonErrorValidators {
 
-  "validate" should {
+  "ResolveTaxYear" should {
     "return no errors" when {
       "passed a valid tax year" in {
         val validTaxYear = "2018-19"
@@ -34,34 +34,29 @@ class ResolveTaxYearSpec extends UnitSpec with JsonErrorValidators {
 
     "return an error" when {
       "passed an invalid tax year format" in {
-        val invalidTaxYear = "2019"
-        val result         = ResolveTaxYear(invalidTaxYear)
+        val result = ResolveTaxYear("2019")
         result shouldBe Left(List(TaxYearFormatError))
       }
-    }
 
-    "passed a tax year string in which the range is greater than 1 year" in {
-      val invalidTaxYear = "2017-19"
-      val result         = ResolveTaxYear(invalidTaxYear)
-      result shouldBe Left(List(RuleTaxYearRangeInvalid))
-    }
+      "passed a tax year string in which the range is greater than 1 year" in {
+        val result = ResolveTaxYear("2017-19")
+        result shouldBe Left(List(RuleTaxYearRangeInvalid))
+      }
 
-    "the end year is before the start year" in {
-      val invalidTaxYear = "2018-17"
-      val result         = ResolveTaxYear(invalidTaxYear)
-      result shouldBe Left(List(RuleTaxYearRangeInvalid))
-    }
+      "the end year is before the start year" in {
+        val result = ResolveTaxYear("2018-17")
+        result shouldBe Left(List(RuleTaxYearRangeInvalid))
+      }
 
-    "the start and end years are the same" in {
-      val invalidTaxYear = "2017-17"
-      val result         = ResolveTaxYear(invalidTaxYear)
-      result shouldBe Left(List(RuleTaxYearRangeInvalid))
-    }
+      "the start and end years are the same" in {
+        val result = ResolveTaxYear("2017-17")
+        result shouldBe Left(List(RuleTaxYearRangeInvalid))
+      }
 
-    "the tax year is bad" in {
-      val invalidTaxYear = "20177-17"
-      val result         = ResolveTaxYear(invalidTaxYear)
-      result shouldBe Left(List(TaxYearFormatError))
+      "the tax year is bad" in {
+        val result = ResolveTaxYear("20177-17")
+        result shouldBe Left(List(TaxYearFormatError))
+      }
     }
   }
 

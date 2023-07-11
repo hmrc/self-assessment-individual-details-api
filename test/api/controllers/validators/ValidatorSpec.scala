@@ -67,34 +67,7 @@ class ValidatorSpec extends UnitSpec with MockFactory {
         result shouldBe Left(ErrorWrapper(correlationId, BadRequestError, Some(List(NinoFormatError, TaxYearFormatError))))
       }
 
-      // TODO would need an example 'concrete' parseRequestBody -
-      //  no point doing that here as it'll just be testing itself.
-//      "given an invalid request param and an invalid Json body" in {
-//        val validator = new TestValidator {
-//          override protected def parseRequestParams = Left(List(NinoFormatError))
-//          override protected def parseRequestBody(parsed: TestParsedRequest) = Left(List(TaxYearFormatError))
-//        }
-//
-//        val result = validator.validateAndWrapResult()
-//        withClue("The request body error shouldn't be included as the validation shouldn't get that far") {
-//          result shouldBe Left(ErrorWrapper(correlationId, NinoFormatError))
-//        }
-//      }
     }
-
-//    "return an error from the request body" when {
-//      "given valid request params and one invalid body value" in {
-//        val validator = new TestValidator {
-//          override protected def parseRequestParams = Right()
-//          override protected def parseRequestBody(parsed: TestParsedRequest) = Left(List(TaxYearFormatError))
-//        }
-//
-//      }
-//
-//      "given valid request params and two invalid body values" in {
-//
-//      }
-//    }
   }
 
 }

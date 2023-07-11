@@ -18,10 +18,11 @@ package v1.controllers
 
 import api.controllers.{ControllerBaseSpec, ControllerTestRunner}
 import api.hateoas.HateoasLinks
+import api.mocks.hateoas.MockHateoasFactory
 import api.models.domain.{Nino, TaxYear}
 import api.models.errors.{ErrorWrapper, FutureYearsFormatError, NinoFormatError}
 import api.models.outcomes.ResponseWrapper
-import play.api.libs.json.{JsValue, Json}
+import play.api.libs.json.Json
 import play.api.mvc.Result
 import v1.controllers.validators.MockRetrieveItsaStatusValidatorFactory
 import v1.models.domain.{StatusEnum, StatusReasonEnum}
@@ -37,34 +38,33 @@ class RetrieveItsaStatusControllerSpec
     with ControllerTestRunner
     with MockRetrieveItsaStatusService
     with MockRetrieveItsaStatusValidatorFactory
+    with MockHateoasFactory
     with HateoasLinks {
 
-  val taxYear: String = "2023-24"
+  private val taxYear = "2023-24"
 
-  val requestData: RetrieveItsaStatusRequest = RetrieveItsaStatusRequest(
+  private val requestData = RetrieveItsaStatusRequest(
     nino = Nino(nino),
     taxYear = TaxYear.fromMtd(taxYear),
     futureYears = false,
     history = false
   )
 
-  val itsaStatusDetails: ItsaStatusDetails = ItsaStatusDetails(
+  private val itsaStatusDetails = ItsaStatusDetails(
     submittedOn = "2023-05-23T12:29:27.566Z",
     status = StatusEnum.`No Status`,
     statusReason = StatusReasonEnum.`Sign up - return available`,
     businessIncomePriorTo2Years = Some(23600.99)
   )
 
-  val itsaStatuses: ItsaStatuses = ItsaStatuses(
+  private val itsaStatuses = ItsaStatuses(
     taxYear = taxYear,
     itsaStatusDetails = Some(Seq(itsaStatusDetails))
   )
 
-  val responseModel: RetrieveItsaStatusResponse = RetrieveItsaStatusResponse(
-    itsaStatuses = Seq(itsaStatuses)
-  )
+  private val responseDomainObject = RetrieveItsaStatusResponse(itsaStatuses = Seq(itsaStatuses))
 
-  val mtdResponse: JsValue = Json.parse(
+  private val mtdResponse = Json.parse(
     """
       |{
       |  "itsaStatuses": [
@@ -89,13 +89,9 @@ class RetrieveItsaStatusControllerSpec
       "a valid request is made" in new Test {
         willUseValidator(successValidator(requestData))
 
-//        MockedRetrieveItsaStatusValidatorFactory
-//          .validator()
-//          .returns(Right(requestData))
-
         MockRetrieveItsaStatusService
           .retrieve(requestData)
-          .returns(Future.successful(Right(ResponseWrapper(correlationId, responseModel))))
+          .returns(Future.successful(Right(ResponseWrapper(correlationId, responseDomainObject))))
 
         runOkTest(expectedStatus = OK, maybeExpectedResponseBody = Some(mtdResponse))
       }
@@ -104,11 +100,6 @@ class RetrieveItsaStatusControllerSpec
     "return the error as per spec" when {
       "the validation fails" in new Test {
         willUseValidator(errorValidator(NinoFormatError))
-
-//        MockedRetrieveItsaStatusValidatorFactory
-//          .validateAndWrapResult()
-//          .returns(Left(ErrorWrapper(correlationId, NinoFormatError, None)))
-
         runErrorTest(NinoFormatError)
       }
 
@@ -126,11 +117,12 @@ class RetrieveItsaStatusControllerSpec
 
   trait Test extends ControllerTest {
 
-    val controller = new RetrieveItsaStatusController(
+    private val controller = new RetrieveItsaStatusController(
       authService = mockEnrolmentsAuthService,
       lookupService = mockMtdIdLookupService,
       validator = mockRetrieveItsaStatusValidatorFactory,
       service = mockRetrieveItsaStatusService,
+      hateoasFactory = mockHateoasFactory,
       cc = cc,
       idGenerator = mockIdGenerator
     )
