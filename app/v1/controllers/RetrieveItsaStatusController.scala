@@ -29,7 +29,7 @@ import scala.concurrent.ExecutionContext
 
 class RetrieveItsaStatusController @Inject() (val authService: EnrolmentsAuthService,
                                               val lookupService: MtdIdLookupService,
-                                              validator: RetrieveItsaStatusValidatorFactory,
+                                              validatorFactory: RetrieveItsaStatusValidatorFactory,
                                               service: RetrieveItsaStatusService,
                                               hateoasFactory: HateoasFactory,
                                               cc: ControllerComponents,
@@ -46,11 +46,11 @@ class RetrieveItsaStatusController @Inject() (val authService: EnrolmentsAuthSer
     authorisedAction(nino).async { implicit request =>
       implicit val ctx: RequestContext = RequestContext.from(idGenerator, endpointLogContext)
 
-      val validate = validator.validator(nino, taxYear, futureYears, history)
+      val validator = validatorFactory.validator(nino, taxYear, futureYears, history)
 
       val requestHandler =
         RequestHandler
-          .withValidator(validate)
+          .withValidator(validator)
           .withService(service.retrieve)
           .withPlainJsonResult()
 

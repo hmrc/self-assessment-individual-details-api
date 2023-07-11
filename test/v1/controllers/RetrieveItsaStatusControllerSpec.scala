@@ -120,7 +120,7 @@ class RetrieveItsaStatusControllerSpec
     private val controller = new RetrieveItsaStatusController(
       authService = mockEnrolmentsAuthService,
       lookupService = mockMtdIdLookupService,
-      validator = mockRetrieveItsaStatusValidatorFactory,
+      validatorFactory = mockRetrieveItsaStatusValidatorFactory,
       service = mockRetrieveItsaStatusService,
       hateoasFactory = mockHateoasFactory,
       cc = cc,

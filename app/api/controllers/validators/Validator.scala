@@ -26,22 +26,15 @@ trait Validator[PARSED] extends Logging {
   def validateAndWrapResult()(implicit correlationId: String): Either[ErrorWrapper, PARSED] = {
     validate match {
       case Right(parsed) =>
-        logger.info(
-          "[RequestParser][parseRequest] " +
-            s"Validation successful for the request with CorrelationId: $correlationId")
-
+        logger.info(s"Validation successful for the request with CorrelationId: $correlationId")
         Right(parsed)
 
       case Left(err :: Nil) =>
-        logger.warn(
-          "[RequestParser][parseRequest] " +
-            s"Validation failed with ${err.code} error for the request with CorrelationId: $correlationId")
+        logger.warn(s"Validation failed with ${err.code} error for the request with CorrelationId: $correlationId")
         Left(ErrorWrapper(correlationId, err, None))
 
       case Left(errs) =>
-        logger.warn(
-          "[RequestParser][parseRequest] " +
-            s"Validation failed with ${errs.map(_.code).mkString(",")} error for the request with CorrelationId: $correlationId")
+        logger.warn(s"Validation failed with ${errs.map(_.code).mkString(",")} error for the request with CorrelationId: $correlationId")
         Left(ErrorWrapper(correlationId, BadRequestError, Some(errs)))
     }
   }

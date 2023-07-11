@@ -51,11 +51,11 @@ object RequestHandler {
   }
 
   case class RequestHandlerBuilder[Input, Output] private[RequestHandler] (
-                                                                            validator: Validator[Input],
-                                                                            service: Input => Future[Either[ErrorWrapper, ResponseWrapper[Output]]],
-                                                                            errorHandling: ErrorHandling = ErrorHandling.Default,
-                                                                            resultCreator: ResultCreator[Input, Output] = ResultCreator.noContent[Input, Output](),
-                                                                            auditHandler: Option[AuditHandler] = None
+      validator: Validator[Input],
+      service: Input => Future[Either[ErrorWrapper, ResponseWrapper[Output]]],
+      errorHandling: ErrorHandling = ErrorHandling.Default,
+      resultCreator: ResultCreator[Input, Output] = ResultCreator.noContent[Input, Output](),
+      auditHandler: Option[AuditHandler] = None
   ) extends RequestHandler {
 
     def handleRequest()(implicit ctx: RequestContext, request: UserRequest[_], ec: ExecutionContext): Future[Result] =
@@ -124,7 +124,6 @@ object RequestHandler {
       }
 
       def handleRequest()(implicit ctx: RequestContext, request: UserRequest[_], ec: ExecutionContext): Future[Result] = {
-
         logger.info(
           message = s"[${ctx.endpointLogContext.controllerName}][${ctx.endpointLogContext.endpointName}] " +
             s"with correlationId : ${ctx.correlationId}")

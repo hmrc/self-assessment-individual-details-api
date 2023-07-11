@@ -36,9 +36,9 @@ class RetrieveItsaStatusValidatorFactorySpec extends UnitSpec with MockAppConfig
   private val validatorFactory = new RetrieveItsaStatusValidatorFactory()
 
   protected def validator(nino: String,
-                        taxYear: String,
-                        futureYears: Option[String] = None,
-                        history: Option[String] = None): Validator[RetrieveItsaStatusRequest] =
+                          taxYear: String,
+                          futureYears: Option[String] = None,
+                          history: Option[String] = None): Validator[RetrieveItsaStatusRequest] =
     validatorFactory.validator(nino, taxYear, futureYears, history)
 
   "parseAndValidateRequest()" should {
