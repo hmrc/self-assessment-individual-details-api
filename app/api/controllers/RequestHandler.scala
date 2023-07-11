@@ -21,7 +21,6 @@ import api.hateoas.{HateoasFactory, HateoasLinksFactory}
 import api.models.errors.{ErrorWrapper, InternalError}
 import api.models.hateoas.{HateoasData, HateoasWrapper}
 import api.models.outcomes.ResponseWrapper
-import api.models.request.RawData
 import cats.data.EitherT
 import cats.implicits._
 import play.api.http.Status
@@ -32,44 +31,43 @@ import utils.Logging
 
 import scala.concurrent.{ExecutionContext, Future}
 
-trait RequestHandler[InputRaw <: RawData] {
+trait RequestHandler {
 
-  def handleRequest(rawData: InputRaw)(implicit ctx: RequestContext, request: UserRequest[_], ec: ExecutionContext): Future[Result]
+  def handleRequest()(implicit ctx: RequestContext, request: UserRequest[_], ec: ExecutionContext): Future[Result]
 
 }
 
 object RequestHandler {
 
-  def withValidator[InputRaw <: RawData, Input](validator: Validator[InputRaw, Input]): ValidatorOnlyBuilder[InputRaw, Input] =
-    new ValidatorOnlyBuilder[InputRaw, Input](validator)
+  def withValidator[Input](validator: Validator[Input]): ValidatorOnlyBuilder[Input] =
+    new ValidatorOnlyBuilder[Input](validator)
 
   // Intermediate class so that the compiler can separately capture the InputRaw and Input types here, and the Output type later
-  class ValidatorOnlyBuilder[InputRaw <: RawData, Input] private[RequestHandler] (validator: Validator[InputRaw, Input]) {
+  class ValidatorOnlyBuilder[Input] private[RequestHandler] (validator: Validator[Input]) {
 
-    def withService[Output](
-        serviceFunction: Input => Future[Either[ErrorWrapper, ResponseWrapper[Output]]]): RequestHandlerBuilder[InputRaw, Input, Output] =
+    def withService[Output](serviceFunction: Input => Future[Either[ErrorWrapper, ResponseWrapper[Output]]]): RequestHandlerBuilder[Input, Output] =
       RequestHandlerBuilder(validator, serviceFunction)
 
   }
 
-  case class RequestHandlerBuilder[InputRaw <: RawData, Input, Output] private[RequestHandler] (
-      validator: Validator[InputRaw, Input],
-      service: Input => Future[Either[ErrorWrapper, ResponseWrapper[Output]]],
-      errorHandling: ErrorHandling = ErrorHandling.Default,
-      resultCreator: ResultCreator[InputRaw, Input, Output] = ResultCreator.noContent[InputRaw, Input, Output](),
-      auditHandler: Option[AuditHandler] = None
-  ) extends RequestHandler[InputRaw] {
+  case class RequestHandlerBuilder[Input, Output] private[RequestHandler] (
+                                                                            validator: Validator[Input],
+                                                                            service: Input => Future[Either[ErrorWrapper, ResponseWrapper[Output]]],
+                                                                            errorHandling: ErrorHandling = ErrorHandling.Default,
+                                                                            resultCreator: ResultCreator[Input, Output] = ResultCreator.noContent[Input, Output](),
+                                                                            auditHandler: Option[AuditHandler] = None
+  ) extends RequestHandler {
 
-    def handleRequest(rawData: InputRaw)(implicit ctx: RequestContext, request: UserRequest[_], ec: ExecutionContext): Future[Result] =
-      Delegate.handleRequest(rawData)
+    def handleRequest()(implicit ctx: RequestContext, request: UserRequest[_], ec: ExecutionContext): Future[Result] =
+      Delegate.handleRequest()
 
-    def withResultCreator(resultCreator: ResultCreator[InputRaw, Input, Output]): RequestHandlerBuilder[InputRaw, Input, Output] =
+    def withResultCreator(resultCreator: ResultCreator[Input, Output]): RequestHandlerBuilder[Input, Output] =
       copy(resultCreator = resultCreator)
 
-    def withErrorHandling(errorHandling: ErrorHandling): RequestHandlerBuilder[InputRaw, Input, Output] =
+    def withErrorHandling(errorHandling: ErrorHandling): RequestHandlerBuilder[Input, Output] =
       copy(errorHandling = errorHandling)
 
-    def withAuditing(auditHandler: AuditHandler): RequestHandlerBuilder[InputRaw, Input, Output] =
+    def withAuditing(auditHandler: AuditHandler): RequestHandlerBuilder[Input, Output] =
       copy(auditHandler = Some(auditHandler))
 
     /** Shorthand for
@@ -77,7 +75,7 @@ object RequestHandler {
       * withResultCreator(ResultCreator.plainJson(successStatus))
       * }}}
       */
-    def withPlainJsonResult(successStatus: Int = Status.OK)(implicit ws: Writes[Output]): RequestHandlerBuilder[InputRaw, Input, Output] =
+    def withPlainJsonResult(successStatus: Int = Status.OK)(implicit ws: Writes[Output]): RequestHandlerBuilder[Input, Output] =
       withResultCreator(ResultCreator.plainJson(successStatus))
 
     /** Shorthand for
@@ -85,7 +83,7 @@ object RequestHandler {
       * withResultCreator(ResultCreator.noContent)
       * }}}
       */
-    def withNoContentResult(successStatus: Int = Status.NO_CONTENT): RequestHandlerBuilder[InputRaw, Input, Output] =
+    def withNoContentResult(successStatus: Int = Status.NO_CONTENT): RequestHandlerBuilder[Input, Output] =
       withResultCreator(ResultCreator.noContent(successStatus))
 
     /** Shorthand for
@@ -96,7 +94,7 @@ object RequestHandler {
     def withHateoasResultFrom[HData <: HateoasData](
         hateoasFactory: HateoasFactory)(data: (Input, Output) => HData, successStatus: Int = Status.OK)(implicit
         linksFactory: HateoasLinksFactory[Output, HData],
-        writes: Writes[HateoasWrapper[Output]]): RequestHandlerBuilder[InputRaw, Input, Output] =
+        writes: Writes[HateoasWrapper[Output]]): RequestHandlerBuilder[Input, Output] =
       withResultCreator(ResultCreator.hateoasWrapping(hateoasFactory, successStatus)(data))
 
     /** Shorthand for
@@ -106,16 +104,15 @@ object RequestHandler {
       */
     def withHateoasResult[HData <: HateoasData](hateoasFactory: HateoasFactory)(data: HData, successStatus: Int = Status.OK)(implicit
         linksFactory: HateoasLinksFactory[Output, HData],
-        writes: Writes[HateoasWrapper[Output]]): RequestHandlerBuilder[InputRaw, Input, Output] =
+        writes: Writes[HateoasWrapper[Output]]): RequestHandlerBuilder[Input, Output] =
       withResultCreator(ResultCreator.hateoasWrapping(hateoasFactory, successStatus)((_, _) => data))
 
     // Scoped as a private delegate so as to keep the logic completely separate from the configuration
-    private object Delegate extends RequestHandler[InputRaw] with Logging with RequestContextImplicits {
+    private object Delegate extends RequestHandler with Logging with RequestContextImplicits {
 
       implicit class Response(result: Result) {
 
         def withApiHeaders(correlationId: String, responseHeaders: (String, String)*): Result = {
-
           val newHeaders: Seq[(String, String)] = responseHeaders ++ Seq(
             "X-CorrelationId"        -> correlationId,
             "X-Content-Type-Options" -> "nosniff"
@@ -126,7 +123,7 @@ object RequestHandler {
 
       }
 
-      def handleRequest(rawData: InputRaw)(implicit ctx: RequestContext, request: UserRequest[_], ec: ExecutionContext): Future[Result] = {
+      def handleRequest()(implicit ctx: RequestContext, request: UserRequest[_], ec: ExecutionContext): Future[Result] = {
 
         logger.info(
           message = s"[${ctx.endpointLogContext.controllerName}][${ctx.endpointLogContext.endpointName}] " +
@@ -134,10 +131,10 @@ object RequestHandler {
 
         val result =
           for {
-            parsedRequest   <- EitherT.fromEither[Future](validator.parseAndValidateRequest(rawData))
+            parsedRequest   <- EitherT.fromEither[Future](validator.validateAndWrapResult())
             serviceResponse <- EitherT(service(parsedRequest))
           } yield doWithContext(ctx.withCorrelationId(serviceResponse.correlationId)) { implicit ctx: RequestContext =>
-            handleSuccess(rawData, parsedRequest, serviceResponse)
+            handleSuccess(parsedRequest, serviceResponse)
           }
 
         result.leftMap { errorWrapper =>
@@ -149,7 +146,7 @@ object RequestHandler {
 
       private def doWithContext[A](ctx: RequestContext)(f: RequestContext => A) = f(ctx)
 
-      private def handleSuccess(rawData: InputRaw, parsedRequest: Input, serviceResponse: ResponseWrapper[Output])(implicit
+      private def handleSuccess(parsedRequest: Input, serviceResponse: ResponseWrapper[Output])(implicit
           ctx: RequestContext,
           request: UserRequest[_],
           ec: ExecutionContext): Result = {
@@ -158,26 +155,21 @@ object RequestHandler {
             s"Success response received with CorrelationId: ${ctx.correlationId}")
 
         val resultWrapper = resultCreator
-          .createResult(rawData, parsedRequest, serviceResponse.responseData)
+          .createResult(parsedRequest, serviceResponse.responseData)
 
         val result = resultWrapper.asResult.withApiHeaders(ctx.correlationId)
-
         auditIfRequired(result.header.status, Right(resultWrapper.body))
-
         result
       }
 
-      private def handleFailure(errorWrapper: ErrorWrapper)(implicit ctx: RequestContext, request: UserRequest[_], ec: ExecutionContext) = {
+      private def handleFailure(errorWrapper: ErrorWrapper)(implicit ctx: RequestContext, request: UserRequest[_], ec: ExecutionContext): Result = {
         logger.warn(
           s"[${ctx.endpointLogContext.controllerName}][${ctx.endpointLogContext.endpointName}] - " +
             s"Error response received with CorrelationId: ${ctx.correlationId}")
 
         val errorResult = errorHandling.errorHandler.applyOrElse(errorWrapper, unhandledError)
-
-        val result = errorResult.withApiHeaders(ctx.correlationId)
-
+        val result      = errorResult.withApiHeaders(ctx.correlationId)
         auditIfRequired(result.header.status, Left(errorWrapper))
-
         result
       }
 

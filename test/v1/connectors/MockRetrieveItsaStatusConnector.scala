@@ -14,13 +14,12 @@
  * limitations under the License.
  */
 
-package v1.mocks.connectors
+package v1.connectors
 
 import api.connectors.DownstreamOutcome
 import org.scalamock.handlers.CallHandler
 import org.scalamock.scalatest.MockFactory
 import uk.gov.hmrc.http.HeaderCarrier
-import v1.connectors.RetrieveItsaStatusConnector
 import v1.models.request.RetrieveItsaStatusRequest
 import v1.models.response.RetrieveItsaStatusResponse
 
