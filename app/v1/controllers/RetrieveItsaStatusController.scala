@@ -21,8 +21,7 @@ import api.hateoas.HateoasFactory
 import api.services.{EnrolmentsAuthService, MtdIdLookupService}
 import play.api.mvc.{Action, AnyContent, ControllerComponents}
 import utils.IdGenerator
-import v1.controllers.validators.RetrieveItsaStatusValidator
-import v1.models.request.RetrieveItsaStatusRawData
+import v1.controllers.validators.RetrieveItsaStatusValidatorFactory
 import v1.services.RetrieveItsaStatusService
 
 import javax.inject.Inject
@@ -30,7 +29,7 @@ import scala.concurrent.ExecutionContext
 
 class RetrieveItsaStatusController @Inject() (val authService: EnrolmentsAuthService,
                                               val lookupService: MtdIdLookupService,
-                                              validator: RetrieveItsaStatusValidator,
+                                              validatorFactory: RetrieveItsaStatusValidatorFactory,
                                               service: RetrieveItsaStatusService,
                                               hateoasFactory: HateoasFactory,
                                               cc: ControllerComponents,
@@ -47,12 +46,7 @@ class RetrieveItsaStatusController @Inject() (val authService: EnrolmentsAuthSer
     authorisedAction(nino).async { implicit request =>
       implicit val ctx: RequestContext = RequestContext.from(idGenerator, endpointLogContext)
 
-      val rawData: RetrieveItsaStatusRawData = RetrieveItsaStatusRawData(
-        nino = nino,
-        taxYear = taxYear,
-        futureYears = futureYears,
-        history = history
-      )
+      val validator = validatorFactory.validator(nino, taxYear, futureYears, history)
 
       val requestHandler =
         RequestHandler
@@ -60,7 +54,7 @@ class RetrieveItsaStatusController @Inject() (val authService: EnrolmentsAuthSer
           .withService(service.retrieve)
           .withPlainJsonResult()
 
-      requestHandler.handleRequest(rawData)
+      requestHandler.handleRequest()
     }
 
 }

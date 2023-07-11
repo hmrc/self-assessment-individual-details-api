@@ -14,8 +14,11 @@
  * limitations under the License.
  */
 
-package v1.models.request
+package api.models.errors
 
-import api.models.request.RawData
+import play.api.http.Status.BAD_REQUEST
 
-case class RetrieveItsaStatusRawData(nino: String, taxYear: String, futureYears: Option[String], history: Option[String]) extends RawData
+// Format Errors
+
+object FutureYearsFormatError extends MtdError("FORMAT_FUTURE_YEARS", "The provided futureYears value should be true or false", BAD_REQUEST)
+object HistoryFormatError     extends MtdError("FORMAT_HISTORY", "The provided history value should be true or false", BAD_REQUEST)

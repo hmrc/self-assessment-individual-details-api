@@ -14,34 +14,29 @@
  * limitations under the License.
  */
 
-package api.controllers.validators.validations
+package api.controllers.validators.resolvers
 
+import api.models.domain.Nino
 import api.models.errors.NinoFormatError
 import api.models.utils.JsonErrorValidators
 import support.UnitSpec
 
-class NinoValidationSpec extends UnitSpec with JsonErrorValidators {
+class ResolveNinoSpec extends UnitSpec with JsonErrorValidators {
 
-  "validate" should {
+  "ResolveNino" should {
     "return no errors" when {
-      "when a valid NINO is supplied" in {
-
-        val validNino        = "AA123456A"
-        val validationResult = NinoValidation(validNino)
-        validationResult.isEmpty shouldBe true
-
+      "passed a valid NINO" in {
+        val validNino = "AA123456A"
+        val result    = ResolveNino(validNino, NinoFormatError)
+        result shouldBe Right(Nino(validNino))
       }
     }
 
     "return an error" when {
-      "when an invalid NINO is supplied" in {
-
-        val invalidNino      = "AA123456ABCBBCBCBC"
-        val validationResult = NinoValidation(invalidNino)
-        validationResult.isEmpty shouldBe false
-        validationResult.length shouldBe 1
-        validationResult.head shouldBe NinoFormatError
-
+      "passed an invalid NINO" in {
+        val invalidNino = "AA123456ABCBBCBCBC"
+        val result      = ResolveNino(invalidNino, NinoFormatError)
+        result shouldBe Left(List(NinoFormatError))
       }
     }
   }

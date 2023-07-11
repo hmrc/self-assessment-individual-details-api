@@ -14,10 +14,21 @@
  * limitations under the License.
  */
 
-package api.models.request
+package api.controllers.validators.resolvers
 
-import play.api.mvc.AnyContentAsJson
+import api.models.domain.Nino
+import api.models.errors.{MtdError, NinoFormatError}
 
-trait RawData
+object ResolveNino extends Resolver[Nino] {
 
-case class NinoAndJsonBodyRawData(nino: String, body: AnyContentAsJson) extends RawData
+  private val ninoRegex =
+    "^([ACEHJLMOPRSWXY][A-CEGHJ-NPR-TW-Z]|B[A-CEHJ-NPR-TW-Z]|G[ACEGHJ-NPR-TW-Z]|" +
+      "[KT][A-CEGHJ-MPR-TW-Z]|N[A-CEGHJL-NPR-SW-Z]|Z[A-CEGHJ-NPR-TW-Y])[0-9]{6}[A-D ]?$"
+
+  def apply(value: String, unusedError: Option[MtdError]): Either[Seq[MtdError], Nino] =
+    if (Nino.isValid(value) && value.matches(ninoRegex))
+      Right(Nino(value))
+    else
+      Left(List(NinoFormatError))
+
+}

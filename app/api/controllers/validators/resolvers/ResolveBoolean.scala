@@ -14,23 +14,19 @@
  * limitations under the License.
  */
 
-package api.controllers.validators.validations
+package api.controllers.validators.resolvers
 
 import api.models.errors.MtdError
 
 import scala.util.{Failure, Success, Try}
 
-object BooleanValidation {
+object ResolveBoolean extends Resolver[Boolean] {
 
-  def validate(value: Option[String], error: MtdError): List[MtdError] = {
-    value.map(validate(_, error)).getOrElse(Nil)
-  }
-
-  def validate(value: String, error: MtdError): List[MtdError] = Try {
+  def apply(value: String, error: Option[MtdError]): Either[Seq[MtdError], Boolean] = Try {
     value.toBoolean
   } match {
-    case Success(_) => Nil
-    case Failure(_) => List(error)
+    case Success(result) => Right(result)
+    case Failure(_)      => Left(List(requireError(error)))
   }
 
 }

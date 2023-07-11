@@ -22,7 +22,7 @@ import api.models.errors._
 import api.models.outcomes.ResponseWrapper
 import api.services.ServiceSpec
 import uk.gov.hmrc.http.HeaderCarrier
-import v1.mocks.connectors.MockRetrieveItsaStatusConnector
+import v1.connectors.MockRetrieveItsaStatusConnector
 import v1.models.domain.{StatusEnum, StatusReasonEnum}
 import v1.models.request.RetrieveItsaStatusRequest
 import v1.models.response.{ItsaStatusDetails, ItsaStatuses, RetrieveItsaStatusResponse}
