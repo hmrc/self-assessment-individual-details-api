@@ -29,16 +29,38 @@ get:
       description: Success
       headers:
         X-CorrelationId:
-          $ref: './common/headers.yaml#/components/parameters/correlationId'
+          correlationId:
+            in: header
+            type: string
+            description: |
+              Unique ID for operation tracking
+              String, 36 characters.
+            schema:
+              type: string
+              example: c75f40a6-a3df-4429-a697-471eeec46435
+            required: true
       content:
         application/json:
           schema:
-            $ref: './schemas/itsa_status_retrieve_response.json'
+            {
+              "$schema": "http://json-schema.org/draft-04/schema#",
+              "title": "Retrieve ITSA Status Request",
+              "description": "Retrieve ITSA Status Request",
+              "type": "object",
+              "properties": {
+                "hello": {
+                  "type": "string",
+                  "example": "world"
+                },
+              }
+            }
           examples:
             example-response:
               description: Example Response
               value:
-                $ref: './examples/itsa_status_retrieve_response.json'
+                {
+                  "hello": "world"
+                }
 
   "400":
     description: Bad request
