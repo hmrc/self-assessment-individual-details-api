@@ -17,11 +17,12 @@
 package api.controllers
 
 import api.MockIdGenerator
+import api.controllers.RequestHandler.RequestHandlerBuilder
 import api.controllers.validators.Validator
 import api.hateoas._
 import api.models.audit.{AuditError, AuditEvent, AuditResponse, GenericAuditDetail}
 import api.models.auth.UserDetails
-import api.models.errors.{ErrorWrapper, MtdError, NinoFormatError}
+import api.models.errors.{BadRequestError, ErrorWrapper, MtdError, NinoFormatError}
 import api.models.outcomes.ResponseWrapper
 import api.services.{MockAuditService, ServiceOutcome}
 import cats.data.Validated
@@ -31,6 +32,7 @@ import org.scalamock.handlers.CallHandler
 import play.api.http.{HeaderNames, Status}
 import play.api.libs.json.{JsString, Json, OWrites}
 import play.api.mvc.AnyContent
+import play.api.mvc.Results.{Status => ResultStatus}
 import play.api.test.{FakeRequest, ResultExtractors}
 import routing.{Version, Version1}
 import support.UnitSpec
@@ -93,6 +95,17 @@ class RequestHandlerSpec
     def validate: Validated[Seq[MtdError], Input.type] = Invalid(List(NinoFormatError))
   }
 
+  "RequestHandlerBuilder.withErrorHandling" should {
+    "return the new RequestHandler with the error handler added" in {
+      val nonDefaultErrorHandler = ErrorHandling { case _ => ResultStatus(BadRequestError.httpStatus) }
+
+      val builder = RequestHandler.withValidator(singleErrorValidatorForRequest).withService(mockService.service)
+      val result: RequestHandlerBuilder[Input.type, Output.type] = builder.withErrorHandling(nonDefaultErrorHandler)
+
+      result.errorHandling shouldBe nonDefaultErrorHandler
+    }
+  }
+
   "RequestHandler" when {
     "a request is successful" must {
       "return the correct response" in {
@@ -116,7 +129,6 @@ class RequestHandlerSpec
           .withService(mockService.service)
           .withNoContentResult()
 
-        MockedAppConfig.isApiDeprecated(version) returns false
         service returns Future.successful(Right(ResponseWrapper(serviceCorrelationId, Output)))
 
         val result = requestHandler.handleRequest()
@@ -126,13 +138,12 @@ class RequestHandlerSpec
         status(result) shouldBe NO_CONTENT
       }
 
-      "wrap the response with hateoas links if required§" in {
+      "wrap the response with hateoas links if required" in {
         val requestHandler = RequestHandler
           .withValidator(successValidatorForRequest)
           .withService(mockService.service)
           .withHateoasResult(mockHateoasFactory)(HData, successCode)
 
-        MockedAppConfig.isApiDeprecated(version) returns false
         service returns Future.successful(Right(ResponseWrapper(serviceCorrelationId, Output)))
 
         MockHateoasFactory.wrap(Output, HData) returns HateoasWrapper(Output, hateoaslinks)
@@ -152,8 +163,6 @@ class RequestHandlerSpec
           .withService(mockService.service)
           .withPlainJsonResult(successCode)
 
-        MockedAppConfig.isApiDeprecated(version) returns false
-
         val result = requestHandler.handleRequest()
 
         contentAsJson(result) shouldBe NinoFormatError.asJson
@@ -169,7 +178,6 @@ class RequestHandlerSpec
           .withService(mockService.service)
           .withPlainJsonResult(successCode)
 
-        MockedAppConfig.isApiDeprecated(version) returns false
         service returns Future.successful(Left(ErrorWrapper(serviceCorrelationId, NinoFormatError)))
 
         val result = requestHandler.handleRequest()
@@ -184,8 +192,6 @@ class RequestHandlerSpec
       val params    = Map("param" -> "value")
       val auditType = "type"
       val txName    = "txName"
-
-      MockedAppConfig.isApiDeprecated(version) returns false
 
       val requestBody = Some(JsString("REQUEST BODY"))
 
@@ -227,8 +233,6 @@ class RequestHandlerSpec
         "no response is to be audited" must {
           "audit without the response" in {
             val requestHandler = basicRequestHandler.withAuditing(auditHandler())
-
-            MockedAppConfig.isApiDeprecated(version) returns false
             service returns Future.successful(Right(ResponseWrapper(serviceCorrelationId, Output)))
 
             val result = requestHandler.handleRequest()
@@ -244,8 +248,6 @@ class RequestHandlerSpec
         "the response is to be audited" must {
           "audit with the response" in {
             val requestHandler = basicRequestHandler.withAuditing(auditHandler(includeResponse = true))
-
-            MockedAppConfig.isApiDeprecated(version) returns false
             service returns Future.successful(Right(ResponseWrapper(serviceCorrelationId, Output)))
 
             val result = requestHandler.handleRequest()
@@ -263,8 +265,6 @@ class RequestHandlerSpec
         "audit the failure" in {
           val requestHandler = basicErrorRequestHandler.withAuditing(auditHandler())
 
-          MockedAppConfig.isApiDeprecated(version) returns false
-
           val result = requestHandler.handleRequest()
 
           contentAsJson(result) shouldBe NinoFormatError.asJson
@@ -278,9 +278,6 @@ class RequestHandlerSpec
       "a request fails with service errors" must {
         "audit the failure" in {
           val requestHandler = basicRequestHandler.withAuditing(auditHandler())
-
-          MockedAppConfig.isApiDeprecated(version) returns false
-
           service returns Future.successful(Left(ErrorWrapper(serviceCorrelationId, NinoFormatError)))
 
           val result = requestHandler.handleRequest()

@@ -17,12 +17,36 @@
 package routing
 
 import play.api.http.HeaderNames.ACCEPT
+import play.api.libs.json.{JsError, JsPath, JsResult, Json}
 import play.api.test.FakeRequest
+import routing.Version.versionFormat
 import support.UnitSpec
 
 class VersionSpec extends UnitSpec {
 
   "Versions" when {
+
+    "serialized to Json" must {
+      "return the expected Json output" in {
+        val version: Version = Version1
+        val expected         = Json.parse(""" "1.0" """)
+        val result           = Json.toJson(version)
+        result shouldBe expected
+      }
+    }
+
+    "deserialized from a Json array" must {
+      "return the expected version enum" in {
+        val result = Json.parse(""" [ "1.0" ]""").as[Seq[Version]]
+        result shouldBe List(Version1)
+      }
+
+      "read from Json containing an invalid version" in {
+        val result: JsResult[Seq[Version]] = Json.parse(""" [ "99.0" ]""").validate[Seq[Version]]
+        result shouldBe JsError(JsPath(0), "Unrecognised version")
+      }
+    }
+
     "retrieved from a request header" must {
       "return an error if the version is unsupported" in {
         val result = Versions.getFromRequest(FakeRequest().withHeaders((ACCEPT, "application/vnd.hmrc.5.0+json")))

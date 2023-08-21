@@ -17,14 +17,17 @@
 package definition
 
 import config.AppConfig
-import play.api.Logger
 import routing.{Version, Version1}
 import uk.gov.hmrc.auth.core.ConfidenceLevel
+import utils.Logging
 
 import javax.inject.{Inject, Singleton}
 
 @Singleton
-class ApiDefinitionFactory @Inject() (appConfig: AppConfig) {
+class ApiDefinitionFactory @Inject() (appConfig: AppConfig) extends Logging {
+
+  private val readScope  = "read:self-assessment"
+  private val writeScope = "write:self-assessment"
 
   lazy val confidenceLevel: ConfidenceLevel = {
     val clConfig = appConfig.confidenceLevelConfig
@@ -55,7 +58,7 @@ class ApiDefinitionFactory @Inject() (appConfig: AppConfig) {
         categories = Seq("INCOME_TAX_MTD"),
         versions = Seq(
           APIVersion(
-            version = Version1.name,
+            version = Version1,
             status = buildAPIStatus(Version1),
             endpointsEnabled = appConfig.endpointsEnabled(Version1)
           )
@@ -63,10 +66,6 @@ class ApiDefinitionFactory @Inject() (appConfig: AppConfig) {
         requiresTrust = None
       )
     )
-
-  private val readScope      = "read:self-assessment"
-  private val writeScope     = "write:self-assessment"
-  private val logger: Logger = Logger(this.getClass)
 
   private[definition] def buildAPIStatus(version: Version): APIStatus = {
     APIStatus.parser

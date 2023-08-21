@@ -23,8 +23,8 @@ import support.UnitSpec
 
 class HateoasFactorySpec extends UnitSpec with MockAppConfig {
 
-  val hateoasFactory = new HateoasFactory(mockAppConfig)
-  val response       = Response("X")
+  private val hateoasFactory = new HateoasFactory(mockAppConfig)
+  private val response       = Response("X")
 
   case class Response(foo: String)
 

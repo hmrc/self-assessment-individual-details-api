@@ -23,7 +23,6 @@ import api.models.outcomes.ResponseWrapper
 import config.MockAppConfig
 import play.api.libs.json.Json
 import play.api.mvc.Result
-import routing.Version1
 import v1.controllers.validators.MockRetrieveItsaStatusValidatorFactory
 import v1.models.domain.{StatusEnum, StatusReasonEnum}
 import v1.models.errors.FutureYearsFormatError
@@ -129,9 +128,6 @@ class RetrieveItsaStatusControllerSpec
     )
 
     protected def callController(): Future[Result] = controller.retrieveItsaStatus(nino.nino, taxYear.asMtd, None, None)(fakeGetRequest)
-
-    MockedAppConfig.isApiDeprecated(Version1) returns false
-
   }
 
 }

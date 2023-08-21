@@ -23,7 +23,7 @@ import routing.Version1
 import support.UnitSpec
 import uk.gov.hmrc.auth.core.ConfidenceLevel
 
-class ApiDefinitionFactorySpec extends UnitSpec {
+class ApiDefinitionFactorySpec extends UnitSpec with MockAppConfig {
 
   private val confidenceLevel: ConfidenceLevel = ConfidenceLevel.L200
 
@@ -44,12 +44,12 @@ class ApiDefinitionFactorySpec extends UnitSpec {
       }
 
       def testDefinitionWithConfidence(confidenceLevelConfig: ConfidenceLevelConfig): Unit = new Test {
-        MockedAppConfig.apiStatus(Version1) returns "1.0"
+        MockedAppConfig.apiStatus(Version1) returns "BETA"
         MockedAppConfig.endpointsEnabled(Version1) returns true
         MockedAppConfig.confidenceLevelCheckEnabled.returns(confidenceLevelConfig).anyNumberOfTimes()
 
-        val readScope: String                = "read:self-assessment"
-        val writeScope: String               = "write:self-assessment"
+        private val readScope                = "read:self-assessment"
+        private val writeScope               = "write:self-assessment"
         val confidenceLevel: ConfidenceLevel = if (confidenceLevelConfig.authValidationEnabled) ConfidenceLevel.L200 else ConfidenceLevel.L50
 
         apiDefinitionFactory.definition shouldBe
@@ -75,8 +75,8 @@ class ApiDefinitionFactorySpec extends UnitSpec {
               categories = List("INCOME_TAX_MTD"),
               versions = List(
                 APIVersion(
-                  version = Version1.name,
-                  status = ALPHA,
+                  Version1,
+                  status = BETA,
                   endpointsEnabled = true
                 )
               ),
