@@ -22,7 +22,6 @@ import config.AppConfig
 
 import javax.inject.Inject
 
-@Singleton
 class HateoasFactory @Inject() (appConfig: AppConfig) {
 
   def wrap[A, D <: HateoasData](payload: A, data: D)(implicit lf: HateoasLinksFactory[A, D]): HateoasWrapper[A] = {
