@@ -20,7 +20,6 @@ import api.controllers.{AuthorisedController, EndpointLogContext, RequestContext
 import api.services.{EnrolmentsAuthService, MtdIdLookupService}
 import config.AppConfig
 import play.api.mvc.{Action, AnyContent, ControllerComponents}
-import routing.{Version, Version1}
 import utils.IdGenerator
 import v1.controllers.validators.RetrieveItsaStatusValidatorFactory
 import v1.services.RetrieveItsaStatusService
@@ -45,7 +44,6 @@ class RetrieveItsaStatusController @Inject() (val authService: EnrolmentsAuthSer
   def retrieveItsaStatus(nino: String, taxYear: String, futureYears: Option[String], history: Option[String]): Action[AnyContent] =
     authorisedAction(nino).async { implicit request =>
       implicit val ctx: RequestContext = RequestContext.from(idGenerator, endpointLogContext)
-      implicit val version: Version    = Version.from(request, orElse = Version1)
 
       val validator = validatorFactory.validator(nino, taxYear, futureYears, history)
 

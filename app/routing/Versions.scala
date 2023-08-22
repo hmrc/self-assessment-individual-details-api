@@ -56,15 +56,6 @@ case object Version1 extends Version {
   val name = "1.0"
 }
 
-// TODO to increase test coverage, + make tests easier to write:
-//  Turn Versions into a Singleton class,
-//  Allow versionsByName to be overridden,
-//  Make Version be not a sealed trait.
-
-//case object Version99 extends Version {
-//  val name = "99.0"
-//}
-
 object Versions {
 
   val latest: Version = Version1

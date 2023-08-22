@@ -28,19 +28,13 @@ import play.api.http.Status
 import play.api.libs.json.{JsValue, Writes}
 import play.api.mvc.Result
 import play.api.mvc.Results.InternalServerError
-import routing.Version
 import utils.Logging
 
 import scala.concurrent.{ExecutionContext, Future}
 
 trait RequestHandler {
 
-  def handleRequest()(implicit
-      ctx: RequestContext,
-      request: UserRequest[_],
-      ec: ExecutionContext,
-      appConfig: AppConfig,
-      apiVersion: Version): Future[Result]
+  def handleRequest()(implicit ctx: RequestContext, request: UserRequest[_], ec: ExecutionContext, appConfig: AppConfig): Future[Result]
 
 }
 
@@ -64,12 +58,7 @@ object RequestHandler {
       auditHandler: Option[AuditHandler] = None
   ) extends RequestHandler {
 
-    def handleRequest()(implicit
-        ctx: RequestContext,
-        request: UserRequest[_],
-        ec: ExecutionContext,
-        appConfig: AppConfig,
-        apiVersion: Version): Future[Result] =
+    def handleRequest()(implicit ctx: RequestContext, request: UserRequest[_], ec: ExecutionContext, appConfig: AppConfig): Future[Result] =
       Delegate.handleRequest()
 
     def withErrorHandling(errorHandling: ErrorHandling): RequestHandlerBuilder[Input, Output] =
@@ -136,12 +125,7 @@ object RequestHandler {
 
       }
 
-      def handleRequest()(implicit
-          ctx: RequestContext,
-          request: UserRequest[_],
-          ec: ExecutionContext,
-          appConfig: AppConfig,
-          apiVersion: Version): Future[Result] = {
+      def handleRequest()(implicit ctx: RequestContext, request: UserRequest[_], ec: ExecutionContext, appConfig: AppConfig): Future[Result] = {
 
         logger.info(
           message = s"[${ctx.endpointLogContext.controllerName}][${ctx.endpointLogContext.endpointName}] " +

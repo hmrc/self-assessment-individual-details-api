@@ -45,8 +45,6 @@ trait MockAppConfig extends MockFactory {
 
     def apiStatus(version: Version): CallHandler[String] = (mockAppConfig.apiStatus: Version => String).expects(version)
 
-    def isApiDeprecated(version: Version): CallHandler[Boolean] = (mockAppConfig.isApiDeprecated: Version => Boolean).expects(version)
-
     def endpointsEnabled(version: Version): CallHandler[Boolean] = (mockAppConfig.endpointsEnabled: Version => Boolean).expects(version)
 
     def confidenceLevelCheckEnabled: CallHandler[ConfidenceLevelConfig] =

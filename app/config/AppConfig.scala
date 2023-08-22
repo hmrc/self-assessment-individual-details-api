@@ -45,8 +45,6 @@ trait AppConfig {
 
   def apiStatus(version: Version): String
 
-  def isApiDeprecated(version: Version): Boolean = apiStatus(version) == "DEPRECATED"
-
   def endpointsEnabled(version: Version): Boolean
 
   def featureSwitches: Configuration
