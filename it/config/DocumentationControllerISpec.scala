@@ -112,43 +112,4 @@ class DocumentationControllerISpec extends IntegrationBaseSpec {
     response
   }
 
-  //  "an OAS documentation request" must {
-//    def version(version: Version): Unit = {
-//      s"return the documentation that passes OAS $version parser" in {
-//        val response     = get(s"/api/conf/${version.name}/application.yaml")
-//        val contents     = response.body[String]
-//        val parserResult = Try(new OpenAPIV3Parser().readContents(contents))
-//        parserResult.isSuccess shouldBe true
-//
-//        val openAPI = Option(parserResult.get.getOpenAPI)
-//        openAPI.isEmpty shouldBe false
-//        openAPI.get.getOpenapi shouldBe "3.0.3"
-//        openAPI.get.getInfo.getTitle shouldBe "Self Assessment Individual Details (MTD)"
-//        openAPI.get.getInfo.getVersion shouldBe s"${version.name}"
-//      }
-//
-//      s"return the documentation with the correct accept header for version $version" in {
-//        val response = get(s"/api/conf/${version.name}/common/headers.yaml")
-//        val body     = response.body[String]
-//
-//        val headerRegex = """(?s).*?application/vnd\.hmrc\.(\d+\.\d+)\+json.*?""".r
-//        val header      = headerRegex.findFirstMatchIn(body)
-//        header.isDefined shouldBe true
-//
-//        val versionFromHeader = header.get.group(1)
-//        versionFromHeader shouldBe version.name
-//
-//      }
-//    }
-//
-//    val versions: Seq[Version] = Seq(Version1)
-//    versions.foreach(v => version(v))
-//  }
-
-//  private def get(path: String): WSResponse = {
-//    val response: WSResponse = await(buildRequest(path).get())
-//    response.status shouldBe OK
-//    response
-//  }
-
 }
