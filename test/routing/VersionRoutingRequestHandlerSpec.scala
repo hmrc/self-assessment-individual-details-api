@@ -16,7 +16,7 @@
 
 package routing
 
-import akka.actor.ActorSystem
+import org.apache.pekko.actor.ActorSystem
 import api.models.errors.{InvalidAcceptHeaderError, UnsupportedVersionError}
 import config.MockAppConfig
 import org.scalatest.Inside
