@@ -14,23 +14,19 @@
  * limitations under the License.
  */
 
-package v2.domain
+package config
 
-import shared.utils.UnitSpec
-import shared.utils.enums.EnumJsonSpecSupport
-import v2.models.domain.StatusEnum
-import v2.models.domain.StatusEnum._
+import com.google.inject.AbstractModule
+import definition.SAIndividualDetailsApiDefinitionFactory
+import shared.definition.ApiDefinitionFactory
+import shared.models.audit.routing.SAIndividualDetailsVersionRoutingMap
+import shared.routing.VersionRoutingMap
 
-class StatusEnumSpec extends UnitSpec with EnumJsonSpecSupport {
+class SAIndividualDetailsPlayModule extends AbstractModule {
 
-  testRoundTrip[StatusEnum](
-    ("No Status", `No Status`),
-    ("MTD Mandated", `MTD Mandated`),
-    ("MTD Voluntary", `MTD Voluntary`),
-    ("Annual", Annual),
-    ("Non Digital", `Non Digital`),
-    ("Dormant", Dormant),
-    ("MTD Exempt", `MTD Exempt`)
-  )
+  override def configure(): Unit = {
+    bind(classOf[ApiDefinitionFactory]).to(classOf[SAIndividualDetailsApiDefinitionFactory]).asEagerSingleton()
+    bind(classOf[VersionRoutingMap]).to(classOf[SAIndividualDetailsVersionRoutingMap]).asEagerSingleton()
+  }
 
 }

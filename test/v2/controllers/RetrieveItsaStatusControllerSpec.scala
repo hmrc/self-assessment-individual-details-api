@@ -16,16 +16,16 @@
 
 package v2.controllers
 
-import api.controllers.{ControllerBaseSpec, ControllerTestRunner}
-import api.models.audit.{AuditEvent, AuditResponse, FlattenedGenericAuditDetail}
-import api.models.auth.UserDetails
-import api.models.domain.TaxYear
-import api.models.errors.{ErrorWrapper, NinoFormatError}
-import api.models.outcomes.ResponseWrapper
-import api.services.MockAuditService
-import config.MockAppConfig
 import play.api.libs.json.{JsValue, Json}
 import play.api.mvc.Result
+import shared.config.MockAppConfig
+import shared.controllers.{ControllerBaseSpec, ControllerTestRunner}
+import shared.models.audit.{AuditEvent, AuditResponse, FlattenedGenericAuditDetail}
+import shared.models.auth.UserDetails
+import shared.models.domain.{Nino, TaxYear}
+import shared.models.errors.{ErrorWrapper, NinoFormatError}
+import shared.models.outcomes.ResponseWrapper
+import shared.services.MockAuditService
 import v2.controllers.validators.MockRetrieveItsaStatusValidatorFactory
 import v2.models.domain.StatusEnum.`No Status`
 import v2.models.domain.StatusReasonEnum.`Sign up - return available`
@@ -45,6 +45,7 @@ class RetrieveItsaStatusControllerSpec
     with MockRetrieveItsaStatusValidatorFactory
     with MockAppConfig {
 
+  private val nino        = Nino("AA123456A")
   private val taxYear     = TaxYear.fromMtd("2023-24")
   private val userType    = "Individual"
   private val userDetails = UserDetails("mtdId", userType, None)

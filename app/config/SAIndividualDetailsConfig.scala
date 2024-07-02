@@ -14,23 +14,21 @@
  * limitations under the License.
  */
 
-package v2.domain
+package config
 
-import shared.utils.UnitSpec
-import shared.utils.enums.EnumJsonSpecSupport
-import v2.models.domain.StatusEnum
-import v2.models.domain.StatusEnum._
+import play.api.Configuration
+import shared.config.FeatureSwitches
+import uk.gov.hmrc.play.bootstrap.config.ServicesConfig
 
-class StatusEnumSpec extends UnitSpec with EnumJsonSpecSupport {
+import javax.inject.{Inject, Singleton}
 
-  testRoundTrip[StatusEnum](
-    ("No Status", `No Status`),
-    ("MTD Mandated", `MTD Mandated`),
-    ("MTD Voluntary", `MTD Voluntary`),
-    ("Annual", Annual),
-    ("Non Digital", `Non Digital`),
-    ("Dormant", Dormant),
-    ("MTD Exempt", `MTD Exempt`)
-  )
+/** Put API-specific config here...
+  */
+@Singleton
+class SAIndividualDetailsConfig @Inject() (config: ServicesConfig, configuration: Configuration) {
+
+  def featureSwitchConfig: Configuration = configuration.getOptional[Configuration](s"feature-switch").getOrElse(Configuration.empty)
+
+  def featureSwitches: FeatureSwitches = SAIndividualDetailsFeatureSwitches(featureSwitchConfig)
 
 }

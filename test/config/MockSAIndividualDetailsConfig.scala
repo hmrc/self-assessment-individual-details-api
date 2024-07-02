@@ -14,23 +14,14 @@
  * limitations under the License.
  */
 
-package v2.domain
+package config
 
-import shared.utils.UnitSpec
-import shared.utils.enums.EnumJsonSpecSupport
-import v2.models.domain.StatusEnum
-import v2.models.domain.StatusEnum._
+import org.scalamock.scalatest.MockFactory
 
-class StatusEnumSpec extends UnitSpec with EnumJsonSpecSupport {
+trait MockSAIndividualDetailsConfig extends MockFactory {
 
-  testRoundTrip[StatusEnum](
-    ("No Status", `No Status`),
-    ("MTD Mandated", `MTD Mandated`),
-    ("MTD Voluntary", `MTD Voluntary`),
-    ("Annual", Annual),
-    ("Non Digital", `Non Digital`),
-    ("Dormant", Dormant),
-    ("MTD Exempt", `MTD Exempt`)
-  )
+  implicit val mockBsasConfig: SAIndividualDetailsConfig = mock[SAIndividualDetailsConfig]
+
+  object MockedSAIndividualDetailsConfig {}
 
 }

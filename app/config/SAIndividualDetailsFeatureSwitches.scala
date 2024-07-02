@@ -14,23 +14,15 @@
  * limitations under the License.
  */
 
-package v2.domain
+package config
 
-import shared.utils.UnitSpec
-import shared.utils.enums.EnumJsonSpecSupport
-import v2.models.domain.StatusEnum
-import v2.models.domain.StatusEnum._
+import play.api.Configuration
+import shared.config.{AppConfig, FeatureSwitches}
 
-class StatusEnumSpec extends UnitSpec with EnumJsonSpecSupport {
+import javax.inject.Inject
 
-  testRoundTrip[StatusEnum](
-    ("No Status", `No Status`),
-    ("MTD Mandated", `MTD Mandated`),
-    ("MTD Voluntary", `MTD Voluntary`),
-    ("Annual", Annual),
-    ("Non Digital", `Non Digital`),
-    ("Dormant", Dormant),
-    ("MTD Exempt", `MTD Exempt`)
-  )
+case class SAIndividualDetailsFeatureSwitches @Inject() (protected val featureSwitchConfig: Configuration) extends FeatureSwitches {}
 
+object SAIndividualDetailsFeatureSwitches {
+  def apply()(implicit appConfig: AppConfig): SAIndividualDetailsFeatureSwitches = SAIndividualDetailsFeatureSwitches(appConfig.featureSwitchConfig)
 }

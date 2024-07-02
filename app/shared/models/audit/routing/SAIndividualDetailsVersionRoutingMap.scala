@@ -14,23 +14,26 @@
  * limitations under the License.
  */
 
-package v2.domain
+package shared.models.audit.routing
 
-import shared.utils.UnitSpec
-import shared.utils.enums.EnumJsonSpecSupport
-import v2.models.domain.StatusEnum
-import v2.models.domain.StatusEnum._
+import play.api.routing.Router
+import shared.config.AppConfig
+import shared.routing._
 
-class StatusEnumSpec extends UnitSpec with EnumJsonSpecSupport {
+import javax.inject.{Inject, Singleton}
 
-  testRoundTrip[StatusEnum](
-    ("No Status", `No Status`),
-    ("MTD Mandated", `MTD Mandated`),
-    ("MTD Voluntary", `MTD Voluntary`),
-    ("Annual", Annual),
-    ("Non Digital", `Non Digital`),
-    ("Dormant", Dormant),
-    ("MTD Exempt", `MTD Exempt`)
+@Singleton case class SAIndividualDetailsVersionRoutingMap @Inject() (
+    appConfig: AppConfig,
+    defaultRouter: Router,
+    v1Router: v1.Routes,
+    v2Router: v2.Routes
+) extends VersionRoutingMap {
+
+  /** Routes corresponding to available versions.
+    */
+  val map: Map[Version, Router] = Map(
+    Version1 -> v1Router,
+    Version2 -> v2Router
   )
 
 }
