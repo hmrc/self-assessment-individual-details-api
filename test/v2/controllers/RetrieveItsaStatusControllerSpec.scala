@@ -16,9 +16,9 @@
 
 package v2.controllers
 
+import config.MockSAIndividualDetailsConfig
 import play.api.libs.json.{JsValue, Json}
 import play.api.mvc.Result
-import shared.config.MockAppConfig
 import shared.controllers.{ControllerBaseSpec, ControllerTestRunner}
 import shared.models.audit.{AuditEvent, AuditResponse, FlattenedGenericAuditDetail}
 import shared.models.auth.UserDetails
@@ -43,7 +43,7 @@ class RetrieveItsaStatusControllerSpec
     with MockRetrieveItsaStatusService
     with MockAuditService
     with MockRetrieveItsaStatusValidatorFactory
-    with MockAppConfig {
+    with MockSAIndividualDetailsConfig {
 
   private val nino        = Nino("AA123456A")
   private val taxYear     = TaxYear.fromMtd("2023-24")
@@ -126,7 +126,7 @@ class RetrieveItsaStatusControllerSpec
         auditType = "RetrieveITSAStatus",
         transactionName = "Retrieve-ITSA-Status",
         detail = FlattenedGenericAuditDetail(
-          versionNumber = Some("2.0"),
+          versionNumber = Some(apiVersion.name),
           userDetails = userDetails,
           params = Map("nino" -> nino.toString, "taxYear" -> taxYear.asMtd),
           futureYears = None,
