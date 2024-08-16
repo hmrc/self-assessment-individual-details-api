@@ -57,6 +57,7 @@ class RetrieveItsaStatusConnectorSpec extends ConnectorSpec {
       http = mockHttpClient,
       appConfig = mockAppConfig
     )
+
     val request: Def1_RetrieveItsaStatusRequestData = Def1_RetrieveItsaStatusRequestData(Nino(nino), taxYear, futureYears = true, history = true)
 
   }

@@ -108,7 +108,7 @@ class RetrieveItsaStatusControllerSpec
 
   private trait Test extends ControllerTest with AuditEventChecking[FlattenedGenericAuditDetail] {
 
-     val controller = new RetrieveItsaStatusController(
+    val controller = new RetrieveItsaStatusController(
       authService = mockEnrolmentsAuthService,
       lookupService = mockMtdIdLookupService,
       validatorFactory = mockRetrieveItsaStatusValidatorFactory,

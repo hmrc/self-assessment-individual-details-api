@@ -24,7 +24,7 @@ import play.api.test.Helpers.AUTHORIZATION
 import shared.models.domain.TaxYear
 import shared.models.errors._
 import shared.services.{AuditStub, AuthStub, DownstreamStub, MtdIdLookupStub}
-import support.IntegrationBaseSpec
+import shared.support.IntegrationBaseSpec
 import v2.models.errors.{FutureYearsFormatError, HistoryFormatError}
 
 class Def1_RetrieveItsaStatusControllerISpec extends IntegrationBaseSpec {
