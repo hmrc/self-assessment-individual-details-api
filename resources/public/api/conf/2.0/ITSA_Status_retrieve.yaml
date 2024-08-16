@@ -39,12 +39,12 @@ get:
       content:
         application/json:
           schema:
-            $ref: './schemas/itsa_status_retrieve_response.json'
+            $ref: './schemas/retrieveItsaStatus/def1/response.json'
           examples:
             example-response:
               description: Example response given any tax year
               value:
-                $ref: './examples/itsa_status_retrieve_response.json'
+                $ref: './examples/retrieveItsaStatus/def1/response.json'
 
     400:
       description: Bad request

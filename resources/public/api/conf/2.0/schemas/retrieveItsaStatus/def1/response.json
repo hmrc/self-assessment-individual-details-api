@@ -11,7 +11,7 @@
         "type": "object",
         "properties": {
           "taxYear": {
-            "$ref": "itsa_status_retrieve_definitions.json#/definitions/taxYear"
+            "$ref": "definitions.json#/definitions/taxYear"
           },
           "itsaStatusDetails": {
             "type": "array",
@@ -20,16 +20,16 @@
               "type": "object",
               "properties": {
                 "submittedOn": {
-                  "$ref": "itsa_status_retrieve_definitions.json#/definitions/submittedOn"
+                  "$ref": "definitions.json#/definitions/submittedOn"
                 },
                 "status": {
-                  "$ref": "itsa_status_retrieve_definitions.json#/definitions/status"
+                  "$ref": "definitions.json#/definitions/status"
                 },
                 "statusReason": {
-                  "$ref": "itsa_status_retrieve_definitions.json#/definitions/statusReason"
+                  "$ref": "definitions.json#/definitions/statusReason"
                 },
                 "businessIncome2YearsPrior": {
-                  "$ref": "itsa_status_retrieve_definitions.json#/definitions/businessIncome2YearsPrior"
+                  "$ref": "definitions.json#/definitions/businessIncome2YearsPrior"
                 }
               }
             }

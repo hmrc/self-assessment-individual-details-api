@@ -16,7 +16,7 @@
 
 package v2.retrieveItsaStatus.model.response
 
-import play.api.libs.json.OWrites
+import play.api.libs.json.{JsObject, Json, OWrites}
 import shared.utils.JsonWritesUtil
 import v2.retrieveItsaStatus.def1.model.response.Def1_RetrieveItsaStatusResponse
 
@@ -25,7 +25,7 @@ trait RetrieveItsaStatusResponse
 object RetrieveItsaStatusResponse extends JsonWritesUtil {
 
   implicit val writes: OWrites[RetrieveItsaStatusResponse] = writesFrom { case def1: Def1_RetrieveItsaStatusResponse =>
-    implicitly[OWrites[Def1_RetrieveItsaStatusResponse]].writes(def1)
+    Json.toJson(def1).as[JsObject]
 
   }
 
