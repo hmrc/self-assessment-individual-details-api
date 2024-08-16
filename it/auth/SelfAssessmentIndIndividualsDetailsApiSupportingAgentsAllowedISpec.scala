@@ -21,7 +21,7 @@ import play.api.libs.ws.{WSRequest, WSResponse}
 import shared.auth.AuthSupportingAgentsAllowedISpec
 import shared.services.DownstreamStub
 
-class SelfAssessmentIndIndividualsDetailsApiSupportingAgentsAllowedISpec extends AuthSupportingAgentsAllowedISpec {
+class SelfAssessmentIndividualDetailsApiSupportingAgentsAllowedISpec extends AuthSupportingAgentsAllowedISpec {
 
   override val callingApiVersion = "2.0"
 

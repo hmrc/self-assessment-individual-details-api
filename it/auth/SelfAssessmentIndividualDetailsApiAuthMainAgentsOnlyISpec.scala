@@ -21,7 +21,7 @@ import play.api.libs.ws.{WSRequest, WSResponse}
 import shared.auth.AuthMainAgentsOnlyISpec
 import shared.services.DownstreamStub
 
-class SelfAssessmentIndIndividualsDetailsApiAuthMainAgentsOnlyISpec extends AuthMainAgentsOnlyISpec {
+class SelfAssessmentIndividualDetailsApiAuthMainAgentsOnlyISpec extends AuthMainAgentsOnlyISpec {
 
   override val callingApiVersion = "2.0"
 
