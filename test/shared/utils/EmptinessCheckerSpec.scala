@@ -25,13 +25,53 @@ class EmptinessCheckerSpec extends UnitSpec {
 
   case class Baz(a: Option[Int] = None, e: Option[SomeEnum] = None)
 
+  case class BazDouble(a: Option[Double] = None, e: Option[SomeEnum] = None)
+
+  case class BazBigInt(a: Option[BigInt] = None, e: Option[SomeEnum] = None)
+
+  case class BazBigDecimal(a: Option[BigDecimal] = None, e: Option[SomeEnum] = None)
+
+  case class BazBoolean(a: Option[Boolean] = None, e: Option[SomeEnum] = None)
+
   case class Bar(baz: Option[Baz] = None, arr: Option[List[Bar]] = None)
+
+  case class BarDouble(baz: Option[BazDouble] = None, arr: Option[List[Bar]] = None)
+
+  case class BarBigInt(baz: Option[BazBigInt] = None, arr: Option[List[Bar]] = None)
+
+  case class BarBigDecimal(baz: Option[BazBigDecimal] = None, arr: Option[List[Bar]] = None)
+
+  case class BarBoolean(baz: Option[BazBoolean] = None, arr: Option[List[BarBoolean]] = None)
 
   case class Foo(bar: Option[Bar] = None,
                  arr1: Option[List[Bar]] = None,
                  arr2: Option[List[Bar]] = None,
                  arr3: Option[List[Bar]] = None,
                  bar2: Option[Bar] = None)
+
+  case class FooDouble(bar: Option[BarDouble] = None,
+                       arr1: Option[List[BarDouble]] = None,
+                       arr2: Option[List[BarDouble]] = None,
+                       arr3: Option[List[BarDouble]] = None,
+                       bar2: Option[BarDouble] = None)
+
+  case class FooBigInt(bar: Option[BarBigInt] = None,
+                       arr1: Option[List[BarBigInt]] = None,
+                       arr2: Option[List[BarBigInt]] = None,
+                       arr3: Option[List[BarBigInt]] = None,
+                       bar2: Option[BarBigInt] = None)
+
+  case class FooBigDecimal(bar: Option[BarBigDecimal] = None,
+                           arr1: Option[List[BarBigDecimal]] = None,
+                           arr2: Option[List[BarBigDecimal]] = None,
+                           arr3: Option[List[BarBigDecimal]] = None,
+                           bar2: Option[BarBigDecimal] = None)
+
+  case class FooBoolean(bar: Option[BarBoolean] = None,
+                        arr1: Option[List[BarBoolean]] = None,
+                        arr2: Option[List[BarBoolean]] = None,
+                        arr3: Option[List[BarBoolean]] = None,
+                        bar2: Option[BarBoolean] = None)
 
   object SomeEnum {
     case object E1 extends SomeEnum
@@ -48,10 +88,38 @@ class EmptinessCheckerSpec extends UnitSpec {
       }
     }
 
-    "all arrays and objects are non empty" must {
+    "all arrays and objects are non empty and contain an Int" must {
       "return empty" in {
         val barFull = Bar(baz = Some(Baz(Some(1))))
         EmptinessChecker.findEmptyPaths(Foo(bar = Some(barFull), arr1 = Some(List(barFull)))) shouldBe NoEmptyPaths
+      }
+    }
+
+    "all arrays and objects are non empty and contain a Double" must {
+      "return empty" in {
+        val barFull = BarDouble(baz = Some(BazDouble(Some(1.4))))
+        EmptinessChecker.findEmptyPaths(FooDouble(bar = Some(barFull), arr1 = Some(List(barFull)))) shouldBe NoEmptyPaths
+      }
+    }
+
+    "all arrays and objects are non empty and contain a BigInt" must {
+      "return empty" in {
+        val barFull = BarBigInt(baz = Some(BazBigInt(Some(1))))
+        EmptinessChecker.findEmptyPaths(FooBigInt(bar = Some(barFull), arr1 = Some(List(barFull)))) shouldBe NoEmptyPaths
+      }
+    }
+
+    "all arrays and objects are non empty and contain a BigDecimal" must {
+      "return empty" in {
+        val barFull = BarBigDecimal(baz = Some(BazBigDecimal(Some(1.4))))
+        EmptinessChecker.findEmptyPaths(FooBigDecimal(bar = Some(barFull), arr1 = Some(List(barFull)))) shouldBe NoEmptyPaths
+      }
+    }
+
+    "all arrays and objects are non empty and contain a Boolean" must {
+      "return empty" in {
+        val barFull = BarBoolean(baz = Some(BazBoolean(Some(true))))
+        EmptinessChecker.findEmptyPaths(FooBoolean(bar = Some(barFull), arr1 = Some(List(barFull)))) shouldBe NoEmptyPaths
       }
     }
 
