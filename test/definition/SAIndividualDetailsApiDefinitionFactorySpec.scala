@@ -50,11 +50,6 @@ class SAIndividualDetailsApiDefinitionFactorySpec extends UnitSpec with MockShar
               categories = List("INCOME_TAX_MTD"),
               versions = List(
                 APIVersion(
-                  Version1,
-                  status = BETA,
-                  endpointsEnabled = true
-                ),
-                APIVersion(
                   Version2,
                   status = BETA,
                   endpointsEnabled = true
