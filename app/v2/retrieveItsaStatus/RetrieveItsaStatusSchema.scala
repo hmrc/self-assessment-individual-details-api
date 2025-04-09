@@ -25,9 +25,14 @@ sealed trait RetrieveItsaStatusSchema extends DownstreamReadable[RetrieveItsaSta
 
 object RetrieveItsaStatusSchema {
 
-  case object Def1 extends RetrieveItsaStatusSchema {
+  case object IfsDef1 extends RetrieveItsaStatusSchema {
     type DownstreamResp = Def1_RetrieveItsaStatusResponse
-    val connectorReads: Reads[DownstreamResp] = Def1_RetrieveItsaStatusResponse.reads
+    val connectorReads: Reads[DownstreamResp] = Def1_RetrieveItsaStatusIfsResponse.reads
+  }
+
+  case object HipDef1 extends RetrieveItsaStatusSchema {
+    override type DownstreamResp = Def1_RetrieveItsaStatusResponse
+    val connectorReads: Reads[DownstreamResp] = Def1_RetrieveItsaStatusHipResponse.reads
   }
 
 }
