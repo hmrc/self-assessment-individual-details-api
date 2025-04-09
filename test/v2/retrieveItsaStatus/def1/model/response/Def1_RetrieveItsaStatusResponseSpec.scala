@@ -20,6 +20,7 @@ import play.api.libs.json.{JsError, JsPath, Json}
 import shared.utils.UnitSpec
 import v2.models.domain.StatusEnum.{`MTD Mandated`, `No Status`}
 import v2.models.domain.StatusReasonEnum.{`ITSA Q4 declaration`, `Sign up - return available`}
+import v2.retrieveItsaStatus.def1.model.response.ItsaStatusResponse.Def1_RetrieveItsaStatusIfsResponse
 
 class Def1_RetrieveItsaStatusResponseSpec extends UnitSpec {
 

@@ -1,5 +1,5 @@
 /*
- * Copyright 2023 HM Revenue & Customs
+ * Copyright 2025 HM Revenue & Customs
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,12 +14,13 @@
  * limitations under the License.
  */
 
-package v2.retrieveItsaStatus.def1.model.response
+package v2.retrieveItsaStatus.def1.model.response.ItsaStatusResponse
 
-import play.api.libs.json._
+import play.api.libs.json.{Json, OWrites, Reads}
+import v2.retrieveItsaStatus.def1.model.response.IfsItsaStatuses
 import v2.retrieveItsaStatus.model.response.RetrieveItsaStatusResponse
 
-case class Def1_RetrieveItsaStatusIfsResponse(itsaStatuses: Seq[ItsaStatuses]) extends RetrieveItsaStatusResponse
+case class Def1_RetrieveItsaStatusIfsResponse(itsaStatuses: Seq[IfsItsaStatuses]) extends RetrieveItsaStatusResponse
 
 object Def1_RetrieveItsaStatusIfsResponse {
 
@@ -28,19 +29,6 @@ object Def1_RetrieveItsaStatusIfsResponse {
   implicit val reads: Reads[Def1_RetrieveItsaStatusIfsResponse] = json =>
     json
       .validate[Seq[IfsItsaStatuses]]
-      .map(itsaStatuses => Def1_RetrieveItsaStatusIfsResponse(itsaStatuses))
-
-}
-
-case class Def1_RetrieveItsaStatusHipResponse(itsaStatuses: Seq[ItsaStatuses]) extends RetrieveItsaStatusResponse
-
-object Def1_RetrieveItsaStatusHipResponse {
-
-  implicit val writes: OWrites[Def1_RetrieveItsaStatusHipResponse] = Json.writes[Def1_RetrieveItsaStatusHipResponse]
-
-  implicit val reads: Reads[Def1_RetrieveItsaStatusIfsResponse] = json =>
-    json
-      .validate[Seq[HipItsaStatuses]]
       .map(itsaStatuses => Def1_RetrieveItsaStatusIfsResponse(itsaStatuses))
 
 }
