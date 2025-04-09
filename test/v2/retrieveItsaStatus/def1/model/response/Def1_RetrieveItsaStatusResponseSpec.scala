@@ -64,23 +64,23 @@ class Def1_RetrieveItsaStatusResponseSpec extends UnitSpec {
       val result =
         Json
           .parse(json)
-          .as[Def1_RetrieveItsaStatusResponse]
+          .as[Def1_RetrieveItsaStatusIfsResponse]
 
-      result shouldBe Def1_RetrieveItsaStatusResponse(itsaStatuses = List(
-        ItsaStatuses(
+      result shouldBe Def1_RetrieveItsaStatusIfsResponse(itsaStatuses = List(
+        IfsItsaStatuses(
           "2021-22",
           Some(
             List(
-              ItsaStatusDetails("2023-06-01T10:19:00.303Z", `No Status`, `Sign up - return available`, Some(BigDecimal("99999999999.99")))
+              IfsItsaStatusDetails("2023-06-01T10:19:00.303Z", `No Status`, `Sign up - return available`, Some(BigDecimal("99999999999.99")))
             ))),
-        ItsaStatuses(
+        IfsItsaStatuses(
           "2020-21",
           Some(
             List(
-              ItsaStatusDetails("2022-05-01T10:19:00.101Z", `MTD Mandated`, `ITSA Q4 declaration`, Some(BigDecimal("8.88")))
+              IfsItsaStatusDetails("2022-05-01T10:19:00.101Z", `MTD Mandated`, `ITSA Q4 declaration`, Some(BigDecimal("8.88")))
             ))),
-        ItsaStatuses("2019-20", Some(Nil)),
-        ItsaStatuses("2018-19", None)
+        IfsItsaStatuses("2019-20", Some(Nil)),
+        IfsItsaStatuses("2018-19", None)
       ))
 
     }
@@ -105,7 +105,7 @@ class Def1_RetrieveItsaStatusResponseSpec extends UnitSpec {
       val result =
         Json
           .parse(json)
-          .validate[Def1_RetrieveItsaStatusResponse]
+          .validate[Def1_RetrieveItsaStatusIfsResponse]
 
       result shouldBe a[JsError]
       val expectedPath = JsPath \ 0 \ "taxYear"

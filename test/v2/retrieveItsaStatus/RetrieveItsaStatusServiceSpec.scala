@@ -24,7 +24,7 @@ import v2.models.domain.StatusEnum.`No Status`
 import v2.models.domain.StatusReasonEnum.`Sign up - return available`
 import v2.models.errors.{FutureYearsFormatError, HistoryFormatError}
 import v2.retrieveItsaStatus.def1.model.request.Def1_RetrieveItsaStatusRequestData
-import v2.retrieveItsaStatus.def1.model.response.{Def1_RetrieveItsaStatusResponse, ItsaStatusDetails, ItsaStatuses}
+import v2.retrieveItsaStatus.def1.model.response.{Def1_RetrieveItsaStatusResponse, IfsItsaStatusDetails, IfsItsaStatuses}
 
 import scala.concurrent.Future
 
@@ -34,8 +34,8 @@ class RetrieveItsaStatusServiceSpec extends ServiceSpec with MockRetrieveItsaSta
   private val taxYear = "2019-20"
   private val request = Def1_RetrieveItsaStatusRequestData(Nino(nino), TaxYear.fromMtd(taxYear), futureYears = true, history = true)
 
-  private val itsaStatusDetails = ItsaStatusDetails("2023-05-23T12:29:27.566Z", `No Status`, `Sign up - return available`, Some(23600.99))
-  private val itsaStatuses      = ItsaStatuses(taxYear, Some(List(itsaStatusDetails)))
+  private val itsaStatusDetails = IfsItsaStatusDetails("2023-05-23T12:29:27.566Z", `No Status`, `Sign up - return available`, Some(23600.99))
+  private val itsaStatuses      = IfsItsaStatuses(taxYear, Some(List(itsaStatusDetails)))
   private val responseModel     = Def1_RetrieveItsaStatusResponse(List(itsaStatuses))
 
   private val service = new RetrieveItsaStatusService(mockRetrieveItsaStatusConnector)

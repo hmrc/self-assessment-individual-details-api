@@ -17,6 +17,7 @@
 package v2.retrieveItsaStatus
 
 import cats.implicits._
+import shared.config.{ConfigFeatureSwitches, SharedAppConfig}
 import shared.controllers.RequestContext
 import shared.models.errors._
 import shared.services.{BaseService, ServiceOutcome}
@@ -27,14 +28,25 @@ import v2.retrieveItsaStatus.model.response.RetrieveItsaStatusResponse
 import javax.inject.Inject
 import scala.concurrent.{ExecutionContext, Future}
 
-class RetrieveItsaStatusService @Inject() (connector: RetrieveItsaStatusConnector) extends BaseService {
+class RetrieveItsaStatusService @Inject() (ifsConnector: RetrieveItsaStatusIfsConnector, hipConnector: RetrieveItsaStatusHipConnector)(implicit
+    appConfig: SharedAppConfig)
+    extends BaseService {
 
   def retrieve(request: RetrieveItsaStatusRequestData)(implicit
       ctx: RequestContext,
-      ec: ExecutionContext): Future[ServiceOutcome[RetrieveItsaStatusResponse]] =
-    connector
-      .retrieve(request)
-      .map(_.leftMap(mapDownstreamErrors(downstreamErrorMap)))
+      ec: ExecutionContext): Future[ServiceOutcome[RetrieveItsaStatusResponse]] = {
+
+    if (ConfigFeatureSwitches().isEnabled("ifs_hip_migration_1878")) {
+      hipConnector
+        .retrieve(request)
+        .map(_.leftMap(mapDownstreamErrors(downstreamErrorMap)))
+    } else {
+      ifsConnector
+        .retrieve(request)
+        .map(_.leftMap(mapDownstreamErrors(downstreamErrorMap)))
+    }
+
+  }
 
   private val downstreamErrorMap: Map[String, MtdError] =
     Map(

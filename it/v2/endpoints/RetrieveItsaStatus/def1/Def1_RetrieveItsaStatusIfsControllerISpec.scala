@@ -27,7 +27,10 @@ import shared.services.{AuditStub, AuthStub, DownstreamStub, MtdIdLookupStub}
 import shared.support.IntegrationBaseSpec
 import v2.models.errors.{FutureYearsFormatError, HistoryFormatError}
 
-class Def1_RetrieveItsaStatusControllerISpec extends IntegrationBaseSpec {
+class Def1_RetrieveItsaStatusIfsControllerISpec extends IntegrationBaseSpec {
+
+  override def servicesConfig: Map[String, Any] =
+    Map("feature-switch.ifs_hip_migration_1878.enabled" -> false) ++ super.servicesConfig
 
   "Calling the 'Retrieve ITSA Status' endpoint" should {
     "return a 200 status code" when {

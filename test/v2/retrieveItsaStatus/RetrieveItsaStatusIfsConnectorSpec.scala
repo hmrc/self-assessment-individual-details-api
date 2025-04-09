@@ -22,18 +22,18 @@ import shared.models.outcomes.ResponseWrapper
 import v2.models.domain.StatusEnum.`No Status`
 import v2.models.domain.StatusReasonEnum.`Sign up - return available`
 import v2.retrieveItsaStatus.def1.model.request.Def1_RetrieveItsaStatusRequestData
-import v2.retrieveItsaStatus.def1.model.response.{Def1_RetrieveItsaStatusResponse, ItsaStatusDetails, ItsaStatuses}
+import v2.retrieveItsaStatus.def1.model.response.{Def1_RetrieveItsaStatusResponse, IfsItsaStatusDetails, IfsItsaStatuses}
 import v2.retrieveItsaStatus.model.response.RetrieveItsaStatusResponse
 
 import scala.concurrent.Future
 
-class RetrieveItsaStatusConnectorSpec extends ConnectorSpec {
+class RetrieveItsaStatusIfsConnectorSpec extends ConnectorSpec {
 
   private val nino    = "AA111111A"
   private val taxYear = TaxYear.fromMtd("2023-24")
 
   private val itsaStatusDetails = ItsaStatusDetails("2023-05-23T12:29:27.566Z", `No Status`, `Sign up - return available`, Some(23600.99))
-  private val itsaStatuses      = ItsaStatuses(taxYear.asMtd, Some(List(itsaStatusDetails)))
+  private val itsaStatuses      = IfsItsaStatuses(taxYear.asMtd, Some(List(itsaStatusDetails)))
   private val responseModel     = Def1_RetrieveItsaStatusResponse(List(itsaStatuses))
 
   private val outcome = Right(ResponseWrapper(correlationId, responseModel))
@@ -53,7 +53,7 @@ class RetrieveItsaStatusConnectorSpec extends ConnectorSpec {
   private trait Test {
     _: ConnectorTest =>
 
-    val connector: RetrieveItsaStatusConnector = new RetrieveItsaStatusConnector(
+    val connector: RetrieveItsaStatusIfsConnector = new RetrieveItsaStatusIfsConnector(
       http = mockHttpClient,
       appConfig = mockSharedAppConfig
     )

@@ -16,13 +16,42 @@
 
 package v2.retrieveItsaStatus.def1.model.response
 
-import play.api.libs.json.{Json, OFormat}
+import play.api.libs.functional.syntax.toFunctionalBuilderOps
+import play.api.libs.json.{JsObject, JsResult, JsValue, Json, OFormat, Reads, __}
 import v2.models.domain.{StatusEnum, StatusReasonEnum}
 
-case class ItsaStatusDetails(submittedOn: String, status: StatusEnum, statusReason: StatusReasonEnum, businessIncome2YearsPrior: Option[BigDecimal])
+sealed trait ItsaStatusDetails
 
-object ItsaStatusDetails {
+case class IfsItsaStatusDetails(submittedOn: String,
+                                status: StatusEnum,
+                                statusReason: StatusReasonEnum,
+                                businessIncome2YearsPrior: Option[BigDecimal])
+    extends ItsaStatusDetails
 
-  implicit val format: OFormat[ItsaStatusDetails] = Json.format[ItsaStatusDetails]
+object IfsItsaStatusDetails {
+  implicit val format: OFormat[IfsItsaStatusDetails] = Json.format[IfsItsaStatusDetails]
+}
+
+case class HipItsaStatusDetails(submittedOn: String,
+                                status: StatusEnum,
+                                statusReason: StatusReasonEnum,
+                                businessIncome2YearsPrior: Option[BigDecimal])
+    extends ItsaStatusDetails
+
+object HipItsaStatusDetails {
+
+  implicit val formats: OFormat[HipItsaStatusDetails] = new OFormat[HipItsaStatusDetails] {
+
+    val hipReads: Reads[HipItsaStatusDetails] = (
+      (__ \ "submittedOn").read[String] and
+        (__ \ "status").read[StatusEnum] and
+        (__ \ "statusReason").read[StatusReasonEnum] and
+        (__ \ "businessIncomePriorTo2Years").readNullable[BigDecimal]
+    )(HipItsaStatusDetails.apply _)
+
+    override def writes(o: HipItsaStatusDetails): JsObject = Json.writes.writes(o)
+
+    override def reads(json: JsValue): JsResult[HipItsaStatusDetails] = json.validate[HipItsaStatusDetails](hipReads)
+  }
 
 }

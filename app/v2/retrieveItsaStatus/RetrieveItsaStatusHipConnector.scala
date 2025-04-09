@@ -1,5 +1,5 @@
 /*
- * Copyright 2023 HM Revenue & Customs
+ * Copyright 2025 HM Revenue & Customs
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,32 +16,28 @@
 
 package v2.retrieveItsaStatus
 
+import play.api.libs.json.Reads
 import shared.config.SharedAppConfig
-import shared.connectors.DownstreamUri.IfsUri
+import shared.connectors.DownstreamUri.HipUri
 import shared.connectors.httpparsers.StandardDownstreamHttpParser.reads
-import shared.connectors.{BaseDownstreamConnector, DownstreamOutcome, DownstreamUri}
+import shared.connectors.{BaseDownstreamConnector, DownstreamOutcome}
 import uk.gov.hmrc.http.{HeaderCarrier, HttpClient}
-import v2.retrieveItsaStatus.model.request.RetrieveItsaStatusRequestData
-import v2.retrieveItsaStatus.model.response.RetrieveItsaStatusResponse
+import v2.retrieveItsaStatus.RetrieveItsaStatusSchema.HipDef1
 
 import javax.inject.Inject
 import scala.concurrent.{ExecutionContext, Future}
 
-class RetrieveItsaStatusConnector @Inject() (val http: HttpClient, val appConfig: SharedAppConfig) extends BaseDownstreamConnector {
+class RetrieveItsaStatusHipConnector @Inject() (val http: HttpClient, val appConfig: SharedAppConfig) extends BaseDownstreamConnector {
 
   def retrieve(request: RetrieveItsaStatusRequestData)(implicit
       hc: HeaderCarrier,
       ec: ExecutionContext,
       correlationId: String): Future[DownstreamOutcome[RetrieveItsaStatusResponse]] = {
-
     import request._
-    import schema._
 
-    val downstreamUri: DownstreamUri[DownstreamResp] = IfsUri[DownstreamResp](
-      s"income-tax/$nino/person-itd/itsa-status/${taxYear.asTysDownstream}?futureYears=$futureYears&history=$history"
-    )
+    implicit val schema: Reads[Def1_RetrieveItsaStatusResponse] = HipDef1.connectorReads
 
-    get(downstreamUri)
+    get(HipUri(s"itsd/person-itd/itsa-status/$nino?taxYear=${taxYear.asTysDownstream}&futureYears=$futureYears&history=$history"))
   }
 
 }

@@ -27,7 +27,7 @@ import scala.concurrent.{ExecutionContext, Future}
 
 trait MockRetrieveItsaStatusConnector extends MockFactory {
 
-  val mockRetrieveItsaStatusConnector: RetrieveItsaStatusConnector = mock[RetrieveItsaStatusConnector]
+  val mockRetrieveItsaStatusConnector: RetrieveItsaStatusIfsConnector = mock[RetrieveItsaStatusIfsConnector]
 
   object MockedRetrieveItsaStatusConnector {
 
