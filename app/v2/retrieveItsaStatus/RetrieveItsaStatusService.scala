@@ -22,8 +22,9 @@ import shared.controllers.RequestContext
 import shared.models.errors._
 import shared.services.{BaseService, ServiceOutcome}
 import v2.models.errors.{FutureYearsFormatError, HistoryFormatError}
-import v2.retrieveItsaStatus.model.request.RetrieveItsaStatusRequestData
-import v2.retrieveItsaStatus.model.response.RetrieveItsaStatusResponse
+import model.request.RetrieveItsaStatusRequestData
+import model.response.RetrieveItsaStatusResponse
+import connectors.{RetrieveItsaStatusIfsConnector, RetrieveItsaStatusHipConnector}
 
 import javax.inject.Inject
 import scala.concurrent.{ExecutionContext, Future}
@@ -39,16 +40,16 @@ class RetrieveItsaStatusService @Inject() (ifsConnector: RetrieveItsaStatusIfsCo
     if (ConfigFeatureSwitches().isEnabled("ifs_hip_migration_1878")) {
       hipConnector
         .retrieve(request)
-        .map(_.leftMap(mapDownstreamErrors(downstreamErrorMap)))
+        .map(_.leftMap(mapDownstreamErrors(hipErrorMap)))
     } else {
       ifsConnector
         .retrieve(request)
-        .map(_.leftMap(mapDownstreamErrors(downstreamErrorMap)))
+        .map(_.leftMap(mapDownstreamErrors(ifsErrorMap)))
     }
 
   }
 
-  private val downstreamErrorMap: Map[String, MtdError] =
+  private val ifsErrorMap: Map[String, MtdError] =
     Map(
       "INVALID_TAXABLE_ENTITY_ID" -> NinoFormatError,
       "INVALID_TAX_YEAR"          -> TaxYearFormatError,
@@ -58,6 +59,15 @@ class RetrieveItsaStatusService @Inject() (ifsConnector: RetrieveItsaStatusIfsCo
       "NOT_FOUND"                 -> NotFoundError,
       "SERVER_ERROR"              -> InternalError,
       "SERVICE_UNAVAILABLE"       -> InternalError
+    )
+
+  private val hipErrorMap: Map[String, MtdError] =
+    ifsErrorMap ++ Map(
+      "1215" -> NinoFormatError,
+      "1117" -> InternalError,
+      "1122" -> InternalError,
+      "1216" -> TaxYearFormatError,
+      "5010" -> NotFoundError
     )
 
 }

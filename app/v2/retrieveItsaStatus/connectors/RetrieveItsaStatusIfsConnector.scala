@@ -14,14 +14,16 @@
  * limitations under the License.
  */
 
-package v2.retrieveItsaStatus
+package v2.retrieveItsaStatus.connectors
 
+import play.api.libs.json.Reads
 import shared.config.SharedAppConfig
 import shared.connectors.DownstreamUri.IfsUri
 import shared.connectors.httpparsers.StandardDownstreamHttpParser.reads
 import shared.connectors.{BaseDownstreamConnector, DownstreamOutcome}
 import uk.gov.hmrc.http.{HeaderCarrier, HttpClient}
 import v2.retrieveItsaStatus.RetrieveItsaStatusSchema.IfsDef1
+import v2.retrieveItsaStatus.def1.model.response.ItsaStatusResponse.Def1_RetrieveItsaStatusIfsResponse
 import v2.retrieveItsaStatus.model.request.RetrieveItsaStatusRequestData
 import v2.retrieveItsaStatus.model.response.RetrieveItsaStatusResponse
 
@@ -37,7 +39,7 @@ class RetrieveItsaStatusIfsConnector @Inject() (val http: HttpClient, val appCon
 
     import request._
 
-    implicit val schema = IfsDef1.connectorReads
+    implicit val schema: Reads[Def1_RetrieveItsaStatusIfsResponse] = IfsDef1.connectorReads
 
     get(IfsUri(s"income-tax/$nino/person-itd/itsa-status/${taxYear.asTysDownstream}?futureYears=$futureYears&history=$history"))
   }

@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package v2.domain
+package v2.models.domain
 
 import shared.utils.UnitSpec
 import shared.utils.enums.EnumJsonSpecSupport
