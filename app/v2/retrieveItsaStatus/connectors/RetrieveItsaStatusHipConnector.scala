@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package v2.retrieveItsaStatus
+package v2.retrieveItsaStatus.connectors
 
 import play.api.libs.json.Reads
 import shared.config.SharedAppConfig
@@ -23,6 +23,9 @@ import shared.connectors.httpparsers.StandardDownstreamHttpParser.reads
 import shared.connectors.{BaseDownstreamConnector, DownstreamOutcome}
 import uk.gov.hmrc.http.{HeaderCarrier, HttpClient}
 import v2.retrieveItsaStatus.RetrieveItsaStatusSchema.HipDef1
+import v2.retrieveItsaStatus.def1.model.response.ItsaStatusResponse.Def1_RetrieveItsaStatusHipResponse
+import v2.retrieveItsaStatus.model.request.RetrieveItsaStatusRequestData
+import v2.retrieveItsaStatus.model.response.RetrieveItsaStatusResponse
 
 import javax.inject.Inject
 import scala.concurrent.{ExecutionContext, Future}
@@ -35,7 +38,7 @@ class RetrieveItsaStatusHipConnector @Inject() (val http: HttpClient, val appCon
       correlationId: String): Future[DownstreamOutcome[RetrieveItsaStatusResponse]] = {
     import request._
 
-    implicit val schema: Reads[Def1_RetrieveItsaStatusResponse] = HipDef1.connectorReads
+    implicit val schema: Reads[Def1_RetrieveItsaStatusHipResponse] = HipDef1.connectorReads
 
     get(HipUri(s"itsd/person-itd/itsa-status/$nino?taxYear=${taxYear.asTysDownstream}&futureYears=$futureYears&history=$history"))
   }

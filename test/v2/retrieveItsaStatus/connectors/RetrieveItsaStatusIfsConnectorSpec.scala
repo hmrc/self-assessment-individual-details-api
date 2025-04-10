@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package v2.retrieveItsaStatus
+package v2.retrieveItsaStatus.connectors
 
 import shared.connectors.{ConnectorSpec, DownstreamOutcome}
 import shared.models.domain.{Nino, TaxYear}
@@ -22,7 +22,8 @@ import shared.models.outcomes.ResponseWrapper
 import v2.models.domain.StatusEnum.`No Status`
 import v2.models.domain.StatusReasonEnum.`Sign up - return available`
 import v2.retrieveItsaStatus.def1.model.request.Def1_RetrieveItsaStatusRequestData
-import v2.retrieveItsaStatus.def1.model.response.{Def1_RetrieveItsaStatusResponse, IfsItsaStatusDetails, IfsItsaStatuses}
+import v2.retrieveItsaStatus.def1.model.response.ItsaStatusResponse.Def1_RetrieveItsaStatusIfsResponse
+import v2.retrieveItsaStatus.def1.model.response.{IfsItsaStatusDetails, IfsItsaStatuses}
 import v2.retrieveItsaStatus.model.response.RetrieveItsaStatusResponse
 
 import scala.concurrent.Future
@@ -32,9 +33,9 @@ class RetrieveItsaStatusIfsConnectorSpec extends ConnectorSpec {
   private val nino    = "AA111111A"
   private val taxYear = TaxYear.fromMtd("2023-24")
 
-  private val itsaStatusDetails = ItsaStatusDetails("2023-05-23T12:29:27.566Z", `No Status`, `Sign up - return available`, Some(23600.99))
+  private val itsaStatusDetails = IfsItsaStatusDetails("2023-05-23T12:29:27.566Z", `No Status`, `Sign up - return available`, Some(23600.99))
   private val itsaStatuses      = IfsItsaStatuses(taxYear.asMtd, Some(List(itsaStatusDetails)))
-  private val responseModel     = Def1_RetrieveItsaStatusResponse(List(itsaStatuses))
+  private val responseModel     = Def1_RetrieveItsaStatusIfsResponse(List(itsaStatuses))
 
   private val outcome = Right(ResponseWrapper(correlationId, responseModel))
 

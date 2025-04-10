@@ -17,7 +17,7 @@
 package v2.retrieveItsaStatus
 
 import shared.utils.UnitSpec
-import v2.retrieveItsaStatus.def1.Def1_RetrieveItsaStatusValidator
+import def1.Def1_RetrieveItsaStatusValidator
 
 class RetrieveItsaStatusValidatorFactorySpec extends UnitSpec {
 

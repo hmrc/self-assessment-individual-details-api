@@ -22,7 +22,7 @@ import org.scalamock.handlers.CallHandler
 import org.scalamock.scalatest.MockFactory
 import shared.controllers.validators.Validator
 import shared.models.errors.MtdError
-import v2.retrieveItsaStatus.model.request.RetrieveItsaStatusRequestData
+import model.request.RetrieveItsaStatusRequestData
 
 trait MockRetrieveItsaStatusValidatorFactory extends MockFactory {
 

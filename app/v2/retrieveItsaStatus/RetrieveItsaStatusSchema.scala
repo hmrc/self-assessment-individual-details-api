@@ -18,6 +18,8 @@ package v2.retrieveItsaStatus
 
 import play.api.libs.json.Reads
 import shared.schema.DownstreamReadable
+import model.response.RetrieveItsaStatusResponse
+import def1.model.response.ItsaStatusResponse.{Def1_RetrieveItsaStatusIfsResponse, Def1_RetrieveItsaStatusHipResponse}
 
 sealed trait RetrieveItsaStatusSchema extends DownstreamReadable[RetrieveItsaStatusResponse]
 
