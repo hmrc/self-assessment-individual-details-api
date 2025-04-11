@@ -36,12 +36,10 @@ class RetrieveItsaStatusIfsConnector @Inject() (val http: HttpClient, val appCon
       hc: HeaderCarrier,
       ec: ExecutionContext,
       correlationId: String): Future[DownstreamOutcome[RetrieveItsaStatusResponse]] = {
-
     import request._
 
     implicit val schema: Reads[Def1_RetrieveItsaStatusIfsResponse] = IfsDef1.connectorReads
 
     get(IfsUri(s"income-tax/$nino/person-itd/itsa-status/${taxYear.asTysDownstream}?futureYears=$futureYears&history=$history"))
   }
-
 }
