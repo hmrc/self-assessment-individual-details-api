@@ -37,7 +37,8 @@ abstract class AuthSupportingAgentsAllowedISpec extends IntegrationBaseSpec {
     */
   override def servicesConfig: Map[String, Any] =
     Map(
-      s"api.supporting-agent-endpoints.$supportingAgentsAllowedEndpoint" -> "true"
+      s"api.supporting-agent-endpoints.$supportingAgentsAllowedEndpoint" -> "true",
+      "feature-switch.ifs_hip_migration_1878.enabled"                    -> "false"
     ) ++ super.servicesConfig
 
   protected val nino = "AA123456A"

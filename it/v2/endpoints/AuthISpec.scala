@@ -28,6 +28,9 @@ import shared.support.IntegrationBaseSpec
 
 class AuthISpec extends IntegrationBaseSpec {
 
+  override def servicesConfig: Map[String, Any] =
+    Map("feature-switch.ifs_hip_migration_1878.enabled" -> false) ++ super.servicesConfig
+
   "Calling the sample endpoint" when {
 
     "MTD ID lookup fails with a 500" should {

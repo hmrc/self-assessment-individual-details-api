@@ -16,27 +16,54 @@
 
 package v2.models.domain
 
-import play.api.libs.json.Format
+import play.api.libs.json.{Format, JsonValidationError, Reads}
 import shared.utils.enums.Enums
+import shared.utils.enums.Enums.typeName
+import shared.utils.enums.Values.MkValues
 
-sealed trait StatusEnum
+sealed trait StatusEnum {
+  val hipValue: String
+}
 
 object StatusEnum {
   val parser: PartialFunction[String, StatusEnum] = Enums.parser[StatusEnum]
   implicit val format: Format[StatusEnum]         = Enums.format[StatusEnum]
 
-  case object `No Status` extends StatusEnum
+  private def reads: Reads[StatusEnum] = {
+    val hipParser: PartialFunction[String, StatusEnum] =
+      implicitly[MkValues[StatusEnum]].values.map(e => e.hipValue -> e).toMap
 
-  case object `MTD Mandated` extends StatusEnum
+    implicitly[Reads[String]].collect(JsonValidationError(s"error.expected.$typeName"))(hipParser)
+  }
 
-  case object `MTD Voluntary` extends StatusEnum
+  val hipFormat: Format[StatusEnum] = Format(reads, Enums.writes[StatusEnum])
 
-  case object Annual extends StatusEnum
+  case object `No Status` extends StatusEnum {
+    override val hipValue: String = "00"
+  }
 
-  case object `Non Digital` extends StatusEnum
+  case object `MTD Mandated` extends StatusEnum {
+    override val hipValue: String = "01"
+  }
 
-  case object Dormant extends StatusEnum
+  case object `MTD Voluntary` extends StatusEnum {
+    override val hipValue: String = "02"
+  }
 
-  case object `MTD Exempt` extends StatusEnum
+  case object Annual extends StatusEnum {
+    override val hipValue: String = "03"
+  }
+
+  case object `Non Digital` extends StatusEnum {
+    override val hipValue: String = "04"
+  }
+
+  case object Dormant extends StatusEnum {
+    override val hipValue: String = "05"
+  }
+
+  case object `MTD Exempt` extends StatusEnum {
+    override val hipValue: String = "99"
+  }
 
 }

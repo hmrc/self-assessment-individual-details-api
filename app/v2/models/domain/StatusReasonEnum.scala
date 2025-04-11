@@ -16,35 +16,78 @@
 
 package v2.models.domain
 
-import play.api.libs.json.Format
+import play.api.libs.json.{Format, JsonValidationError, Reads}
 import shared.utils.enums.Enums
+import shared.utils.enums.Enums.typeName
+import shared.utils.enums.Values.MkValues
 
-sealed trait StatusReasonEnum
+sealed trait StatusReasonEnum {
+  val hipValue: String
+}
 
 object StatusReasonEnum {
   val parser: PartialFunction[String, StatusReasonEnum] = Enums.parser[StatusReasonEnum]
   implicit val format: Format[StatusReasonEnum]         = Enums.format[StatusReasonEnum]
 
-  case object `Sign up - return available` extends StatusReasonEnum
+  private def reads: Reads[StatusReasonEnum] = {
+    val hipParser: PartialFunction[String, StatusReasonEnum] =
+      implicitly[MkValues[StatusReasonEnum]].values.map(e => e.hipValue -> e).toMap
 
-  case object `Sign up - no return available` extends StatusReasonEnum
+    implicitly[Reads[String]].collect(JsonValidationError(s"error.expected.$typeName"))(hipParser)
+  }
 
-  case object `ITSA final declaration` extends StatusReasonEnum
+  val hipFormat: Format[StatusReasonEnum] = Format(reads, Enums.writes[StatusReasonEnum])
 
-  case object `ITSA Q4 declaration` extends StatusReasonEnum
+  case object `Sign up - return available` extends StatusReasonEnum {
+    val hipValue: String = "00"
+  }
 
-  case object `CESA SA return` extends StatusReasonEnum
+  case object `Sign up - no return available` extends StatusReasonEnum {
+    override val hipValue: String = "01"
+  }
 
-  case object Complex extends StatusReasonEnum
+  case object `ITSA final declaration` extends StatusReasonEnum {
+    override val hipValue: String = "02"
+  }
 
-  case object `Ceased income source` extends StatusReasonEnum
+  case object `ITSA Q4 declaration` extends StatusReasonEnum {
+    override val hipValue: String = "03"
+  }
 
-  case object `Reinstated income source` extends StatusReasonEnum
+  case object `CESA SA return` extends StatusReasonEnum {
+    override val hipValue: String = "04"
+  }
 
-  case object Rollover extends StatusReasonEnum
+  case object Complex extends StatusReasonEnum {
+    override val hipValue: String = "05"
+  }
 
-  case object `Income Source Latency Changes` extends StatusReasonEnum
+  case object `Ceased income source` extends StatusReasonEnum {
+    override val hipValue: String = "06"
+  }
 
-  case object `MTD ITSA Opt-Out` extends StatusReasonEnum
+  case object `Reinstated income source` extends StatusReasonEnum {
+    override val hipValue: String = "07"
+  }
+
+  case object Rollover extends StatusReasonEnum {
+    override val hipValue: String = "08"
+  }
+
+  case object `Income Source Latency Changes` extends StatusReasonEnum {
+    override val hipValue: String = "09"
+  }
+
+  case object `MTD ITSA Opt-Out` extends StatusReasonEnum {
+    override val hipValue: String = "10"
+  }
+
+  case object `MTD ITSA Opt-In` extends StatusReasonEnum {
+    override val hipValue: String = "11"
+  }
+
+  case object `Digitally Exempt` extends StatusReasonEnum {
+    override val hipValue: String = "12"
+  }
 
 }

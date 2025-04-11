@@ -33,7 +33,7 @@ class Def1_RetrieveItsaStatusHipControllerISpec extends IntegrationBaseSpec {
     "return a 200 status code" when {
       "any valid request is made" in new Test {
 
-        val downstreamQueryParams: Map[String, String] = Map("futureYears" -> futureYears, "history" -> history)
+        val downstreamQueryParams: Map[String, String] = Map("taxYear" -> downstreamTaxYear, "futureYears" -> futureYears, "history" -> history)
 
         override def setupStubs(): Unit = {
           DownstreamStub.onSuccess(DownstreamStub.GET, downstreamUri, downstreamQueryParams, OK, downstreamResponse)
@@ -62,7 +62,15 @@ class Def1_RetrieveItsaStatusHipControllerISpec extends IntegrationBaseSpec {
             override val futureYears: String = requestFutureYears
             override val history: String     = requestHistory
 
-            val response: WSResponse = await(request.withQueryStringParameters("futureYears" -> futureYears, "history" -> history).get())
+            val response: WSResponse =
+              await(
+                request
+                  .withQueryStringParameters(
+                    "futureYears" -> futureYears,
+                    "history"     -> history
+                  )
+                  .get())
+
             response.status shouldBe expectedStatus
             response.json shouldBe Json.toJson(expectedBody)
             response.header("Content-Type") shouldBe Some("application/json")
@@ -87,7 +95,6 @@ class Def1_RetrieveItsaStatusHipControllerISpec extends IntegrationBaseSpec {
             }
 
             val response: WSResponse = await(request.withQueryStringParameters("futureYears" -> futureYears, "history" -> history).get())
-            println("\n\n\n\njson = " + response.json + "\n\n\n\n")
             response.status shouldBe expectedStatus
             response.json shouldBe Json.toJson(expectedBody)
             response.header("Content-Type") shouldBe Some("application/json")
@@ -126,7 +133,7 @@ class Def1_RetrieveItsaStatusHipControllerISpec extends IntegrationBaseSpec {
 
   private trait Test {
 
-    private lazy val downstreamTaxYear: String = TaxYear.fromMtd(mtdTaxYear).asTysDownstream
+    lazy val downstreamTaxYear: String = TaxYear.fromMtd(mtdTaxYear).asTysDownstream
 
     val nino: String        = "AA123456A"
     val mtdTaxYear: String  = "2023-24"
@@ -171,7 +178,7 @@ class Def1_RetrieveItsaStatusHipControllerISpec extends IntegrationBaseSpec {
     """.stripMargin
     )
 
-    def downstreamUri: String = s"/itsd/person-itd/itsa-status/$nino?taxYear=$downstreamTaxYear}&futureYears=$futureYears&history=$history"
+    def downstreamUri: String = s"/itsd/person-itd/itsa-status/$nino"
 
     def request: WSRequest = {
       AuditStub.audit()

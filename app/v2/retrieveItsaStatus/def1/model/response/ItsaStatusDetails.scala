@@ -44,8 +44,8 @@ object HipItsaStatusDetails {
 
     val hipReads: Reads[HipItsaStatusDetails] = (
       (__ \ "submittedOn").read[String] and
-        (__ \ "status").read[StatusEnum] and
-        (__ \ "statusReason").read[StatusReasonEnum] and
+        (__ \ "status").read[StatusEnum](StatusEnum.hipFormat) and
+        (__ \ "statusReason").read[StatusReasonEnum](StatusReasonEnum.hipFormat) and
         (__ \ "businessIncomePriorTo2Years").readNullable[BigDecimal]
     )(HipItsaStatusDetails.apply _)
 
