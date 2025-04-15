@@ -42,4 +42,5 @@ class RetrieveItsaStatusIfsConnector @Inject() (val http: HttpClient, val appCon
 
     get(IfsUri(s"income-tax/$nino/person-itd/itsa-status/${taxYear.asTysDownstream}?futureYears=$futureYears&history=$history"))
   }
+
 }
