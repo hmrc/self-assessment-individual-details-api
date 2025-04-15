@@ -86,7 +86,7 @@ class Def1_RetrieveItsaStatusHipControllerISpec extends IntegrationBaseSpec {
         input.foreach(args => (validationErrorTest _).tupled(args))
       }
 
-      "downstream service error" when {
+      "downstream service error in error -> type format" when {
         def serviceErrorTest(downstreamStatus: Int, downstreamCode: String, expectedStatus: Int, expectedBody: MtdError): Unit = {
           s"downstream returns an $downstreamCode error and status $downstreamStatus" in new Test {
 
@@ -108,8 +108,8 @@ class Def1_RetrieveItsaStatusHipControllerISpec extends IntegrationBaseSpec {
              |  "response": {
              |    "failures": [
              |      {
-             |        "type": "$errorType",
-             |        "reason": "Reason for Failure"
+             |        "errorCode": "$errorType",
+             |        "errorDescription": "Reason for Failure"
              |      }
              |    ]
              |  }
@@ -124,10 +124,47 @@ class Def1_RetrieveItsaStatusHipControllerISpec extends IntegrationBaseSpec {
           (BAD_REQUEST, "INVALID_CORRELATION_ID", INTERNAL_SERVER_ERROR, InternalError),
           (NOT_FOUND, "NOT_FOUND", NOT_FOUND, NotFoundError),
           (INTERNAL_SERVER_ERROR, "SERVER_ERROR", INTERNAL_SERVER_ERROR, InternalError),
-          (SERVICE_UNAVAILABLE, "SERVICE_UNAVAILABLE", INTERNAL_SERVER_ERROR, InternalError)
+          (SERVICE_UNAVAILABLE, "SERVICE_UNAVAILABLE", INTERNAL_SERVER_ERROR, InternalError),
+          (BAD_REQUEST, "1117", BAD_REQUEST, TaxYearFormatError),
+          (BAD_REQUEST, "1215", BAD_REQUEST, NinoFormatError),
+          (BAD_REQUEST, "5000", BAD_REQUEST, NinoFormatError),
+          (BAD_REQUEST, "5001", BAD_REQUEST, NinoFormatError),
+          (BAD_REQUEST, "1216", INTERNAL_SERVER_ERROR, InternalError)
         )
         input.foreach(args => (serviceErrorTest _).tupled(args))
       }
+    }
+
+    "return downstream error codes in error -> code format" when {
+      def serviceErrorTest(downstreamStatus: Int, downstreamCode: String, expectedStatus: Int, expectedBody: MtdError): Unit = {
+        s"downstream returns an $downstreamCode error and status $downstreamStatus" in new Test {
+
+          override def setupStubs(): Unit = {
+            DownstreamStub.onError(DownstreamStub.GET, downstreamUri, downstreamStatus, errorBody(downstreamCode))
+          }
+
+          val response: WSResponse = await(request.withQueryStringParameters("futureYears" -> futureYears, "history" -> history).get())
+          response.status shouldBe expectedStatus
+          response.json shouldBe Json.toJson(expectedBody)
+          response.header("Content-Type") shouldBe Some("application/json")
+        }
+      }
+
+      def errorBody(errorType: String): String =
+        s"""
+           |[
+           |  {
+           |    "errorCode": "$errorType",
+           |    "errorDescription": "string"
+           |  }
+           |]
+            """.stripMargin
+
+      val input = List(
+        (UNAUTHORIZED, "5009", INTERNAL_SERVER_ERROR, InternalError),
+        (NOT_FOUND, "5010", NOT_FOUND, NotFoundError)
+      )
+      input.foreach(args => (serviceErrorTest _).tupled(args))
     }
   }
 

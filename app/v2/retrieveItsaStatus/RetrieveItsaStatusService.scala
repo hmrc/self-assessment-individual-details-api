@@ -64,9 +64,11 @@ class RetrieveItsaStatusService @Inject() (ifsConnector: RetrieveItsaStatusIfsCo
   private val hipErrorMap: Map[String, MtdError] =
     ifsErrorMap ++ Map(
       "1215" -> NinoFormatError,
-      "1117" -> InternalError,
-      "1122" -> InternalError,
-      "1216" -> TaxYearFormatError,
+      "1117" -> TaxYearFormatError,
+      "1216" -> InternalError,
+      "5000" -> NinoFormatError,
+      "5001" -> NinoFormatError,
+      "5009" -> InternalError,
       "5010" -> NotFoundError
     )
 
