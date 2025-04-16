@@ -34,9 +34,9 @@ class RetrieveItsaStatusService @Inject() (connector: RetrieveItsaStatusConnecto
       ec: ExecutionContext): Future[ServiceOutcome[RetrieveItsaStatusResponse]] =
     connector
       .retrieve(request)
-      .map(_.leftMap(mapDownstreamErrors(downstreamErrorMap)))
+      .map(_.leftMap(mapDownstreamErrors(ifsErrorMap ++ hipErrorMap)))
 
-  private val downstreamErrorMap: Map[String, MtdError] =
+  private val ifsErrorMap: Map[String, MtdError] =
     Map(
       "INVALID_TAXABLE_ENTITY_ID" -> NinoFormatError,
       "INVALID_TAX_YEAR"          -> TaxYearFormatError,
@@ -46,6 +46,17 @@ class RetrieveItsaStatusService @Inject() (connector: RetrieveItsaStatusConnecto
       "NOT_FOUND"                 -> NotFoundError,
       "SERVER_ERROR"              -> InternalError,
       "SERVICE_UNAVAILABLE"       -> InternalError
+    )
+
+  private val hipErrorMap: Map[String, MtdError] =
+    Map(
+      "1215" -> NinoFormatError,
+      "1117" -> TaxYearFormatError,
+      "1216" -> InternalError,
+      "5000" -> NinoFormatError,
+      "5001" -> NinoFormatError,
+      "5009" -> InternalError,
+      "5010" -> NotFoundError
     )
 
 }

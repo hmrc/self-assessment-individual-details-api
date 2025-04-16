@@ -26,7 +26,6 @@ object RetrieveItsaStatusResponse extends JsonWritesUtil {
 
   implicit val writes: OWrites[RetrieveItsaStatusResponse] = writesFrom { case def1: Def1_RetrieveItsaStatusResponse =>
     Json.toJson(def1).as[JsObject]
-
   }
 
 }

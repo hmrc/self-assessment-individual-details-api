@@ -23,5 +23,4 @@ case class ItsaStatuses(taxYear: String, itsaStatusDetails: Option[Seq[ItsaStatu
 object ItsaStatuses {
 
   implicit val format: OFormat[ItsaStatuses] = Json.format[ItsaStatuses]
-
 }

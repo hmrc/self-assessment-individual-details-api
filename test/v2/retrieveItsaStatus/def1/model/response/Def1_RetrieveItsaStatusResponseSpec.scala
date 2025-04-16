@@ -24,7 +24,7 @@ import v2.models.domain.StatusReasonEnum.{`ITSA Q4 declaration`, `Sign up - retu
 class Def1_RetrieveItsaStatusResponseSpec extends UnitSpec {
 
   "The RetrieveItsaStatusResponse JSON writes" should {
-    "parse a top-level JSON array" in {
+    "parse a top-level JSON array with IFS status and statusReason format" in {
       val json =
         s"""
            |[
@@ -35,7 +35,7 @@ class Def1_RetrieveItsaStatusResponseSpec extends UnitSpec {
            |        "submittedOn": "2023-06-01T10:19:00.303Z",
            |        "status": "No Status",
            |        "statusReason": "Sign up - return available",
-           |        "businessIncome2YearsPrior": 99999999999.99
+           |        "businessIncomePriorTo2Years": 99999999999.99
            |      }
            |    ]
            |  },
@@ -46,7 +46,68 @@ class Def1_RetrieveItsaStatusResponseSpec extends UnitSpec {
            |        "submittedOn": "2022-05-01T10:19:00.101Z",
            |        "status": "MTD Mandated",
            |        "statusReason": "ITSA Q4 declaration",
-           |        "businessIncome2YearsPrior": 8.88
+           |        "businessIncomePriorTo2Years": 8.88
+           |      }
+           |    ]
+           |  },
+           |  {
+           |    "taxYear": "2019-20",
+           |    "itsaStatusDetails": [
+           |    ]
+           |  },
+           |  {
+           |    "taxYear": "2018-19"
+           |  }
+           |]
+           |""".stripMargin
+
+      val result =
+        Json
+          .parse(json)
+          .as[Def1_RetrieveItsaStatusResponse]
+
+      result shouldBe Def1_RetrieveItsaStatusResponse(itsaStatuses = List(
+        ItsaStatuses(
+          "2021-22",
+          Some(
+            List(
+              ItsaStatusDetails("2023-06-01T10:19:00.303Z", `No Status`, `Sign up - return available`, Some(BigDecimal("99999999999.99")))
+            ))),
+        ItsaStatuses(
+          "2020-21",
+          Some(
+            List(
+              ItsaStatusDetails("2022-05-01T10:19:00.101Z", `MTD Mandated`, `ITSA Q4 declaration`, Some(BigDecimal("8.88")))
+            ))),
+        ItsaStatuses("2019-20", Some(Nil)),
+        ItsaStatuses("2018-19", None)
+      ))
+
+    }
+
+    "parse a top-level JSON array with HIP status and statusReason format" in {
+      val json =
+        """
+           |[
+           |  {
+           |    "taxYear": "2021-22",
+           |    "itsaStatusDetails": [
+           |      {
+           |        "submittedOn": "2023-06-01T10:19:00.303Z",
+           |        "status": "00",
+           |        "statusReason": "00",
+           |        "businessIncomePriorTo2Years": 99999999999.99
+           |      }
+           |    ]
+           |  },
+           |  {
+           |    "taxYear": "2020-21",
+           |    "itsaStatusDetails": [
+           |      {
+           |        "submittedOn": "2022-05-01T10:19:00.101Z",
+           |        "status": "01",
+           |        "statusReason": "03",
+           |        "businessIncomePriorTo2Years": 8.88
            |      }
            |    ]
            |  },
