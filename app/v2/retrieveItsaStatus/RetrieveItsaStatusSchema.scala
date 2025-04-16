@@ -18,21 +18,16 @@ package v2.retrieveItsaStatus
 
 import play.api.libs.json.Reads
 import shared.schema.DownstreamReadable
-import model.response.RetrieveItsaStatusResponse
-import def1.model.response.ItsaStatusResponse.{Def1_RetrieveItsaStatusIfsResponse, Def1_RetrieveItsaStatusHipResponse}
+import v2.retrieveItsaStatus.def1.model.response.Def1_RetrieveItsaStatusResponse
+import v2.retrieveItsaStatus.model.response.RetrieveItsaStatusResponse
 
 sealed trait RetrieveItsaStatusSchema extends DownstreamReadable[RetrieveItsaStatusResponse]
 
 object RetrieveItsaStatusSchema {
 
-  case object IfsDef1 extends RetrieveItsaStatusSchema {
-    type DownstreamResp = Def1_RetrieveItsaStatusIfsResponse
-    val connectorReads: Reads[DownstreamResp] = Def1_RetrieveItsaStatusIfsResponse.reads
-  }
-
-  case object HipDef1 extends RetrieveItsaStatusSchema {
-    override type DownstreamResp = Def1_RetrieveItsaStatusHipResponse
-    val connectorReads: Reads[DownstreamResp] = Def1_RetrieveItsaStatusHipResponse.reads
+  case object Def1 extends RetrieveItsaStatusSchema {
+    type DownstreamResp = Def1_RetrieveItsaStatusResponse
+    val connectorReads: Reads[DownstreamResp] = Def1_RetrieveItsaStatusResponse.reads
   }
 
 }

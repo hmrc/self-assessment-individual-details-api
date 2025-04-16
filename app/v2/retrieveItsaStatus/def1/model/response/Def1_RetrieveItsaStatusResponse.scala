@@ -14,21 +14,20 @@
  * limitations under the License.
  */
 
-package v2.retrieveItsaStatus.def1.model.response.ItsaStatusResponse
+package v2.retrieveItsaStatus.def1.model.response
 
 import play.api.libs.json.{Json, OWrites, Reads}
-import v2.retrieveItsaStatus.def1.model.response.IfsItsaStatuses
 import v2.retrieveItsaStatus.model.response.RetrieveItsaStatusResponse
 
-case class Def1_RetrieveItsaStatusIfsResponse(itsaStatuses: Seq[IfsItsaStatuses]) extends RetrieveItsaStatusResponse
+case class Def1_RetrieveItsaStatusResponse(itsaStatuses: Seq[ItsaStatuses]) extends RetrieveItsaStatusResponse
 
-object Def1_RetrieveItsaStatusIfsResponse {
+object Def1_RetrieveItsaStatusResponse {
 
-  implicit val writes: OWrites[Def1_RetrieveItsaStatusIfsResponse] = Json.writes[Def1_RetrieveItsaStatusIfsResponse]
+  implicit val writes: OWrites[Def1_RetrieveItsaStatusResponse] = Json.writes[Def1_RetrieveItsaStatusResponse]
 
-  implicit val reads: Reads[Def1_RetrieveItsaStatusIfsResponse] = json =>
+  implicit val reads: Reads[Def1_RetrieveItsaStatusResponse] = json =>
     json
-      .validate[Seq[IfsItsaStatuses]]
-      .map(itsaStatuses => Def1_RetrieveItsaStatusIfsResponse(itsaStatuses))
+      .validate[Seq[ItsaStatuses]]
+      .map(itsaStatuses => Def1_RetrieveItsaStatusResponse(itsaStatuses))
 
 }

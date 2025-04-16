@@ -14,35 +14,49 @@
  * limitations under the License.
  */
 
-package v2.retrieveItsaStatus.connectors
+package v2.retrieveItsaStatus
 
+import play.api.Configuration
 import shared.connectors.{ConnectorSpec, DownstreamOutcome}
 import shared.models.domain.{Nino, TaxYear}
 import shared.models.outcomes.ResponseWrapper
 import v2.models.domain.StatusEnum.`No Status`
 import v2.models.domain.StatusReasonEnum.`Sign up - return available`
 import v2.retrieveItsaStatus.def1.model.request.Def1_RetrieveItsaStatusRequestData
-import v2.retrieveItsaStatus.def1.model.response.ItsaStatusResponse.Def1_RetrieveItsaStatusIfsResponse
-import v2.retrieveItsaStatus.def1.model.response.{IfsItsaStatusDetails, IfsItsaStatuses}
+import v2.retrieveItsaStatus.def1.model.response.{Def1_RetrieveItsaStatusResponse, ItsaStatusDetails, ItsaStatuses}
 import v2.retrieveItsaStatus.model.response.RetrieveItsaStatusResponse
 
 import scala.concurrent.Future
 
-class RetrieveItsaStatusIfsConnectorSpec extends ConnectorSpec {
+class RetrieveItsaStatusConnectorSpec extends ConnectorSpec {
 
   private val nino    = "AA111111A"
   private val taxYear = TaxYear.fromMtd("2023-24")
 
-  private val itsaStatusDetails = IfsItsaStatusDetails("2023-05-23T12:29:27.566Z", `No Status`, `Sign up - return available`, Some(23600.99))
-  private val itsaStatuses      = IfsItsaStatuses(taxYear.asMtd, Some(List(itsaStatusDetails)))
-  private val responseModel     = Def1_RetrieveItsaStatusIfsResponse(List(itsaStatuses))
+  private val itsaStatusDetails = ItsaStatusDetails("2023-05-23T12:29:27.566Z", `No Status`, `Sign up - return available`, Some(23600.99))
+  private val itsaStatuses      = ItsaStatuses(taxYear.asMtd, Some(List(itsaStatusDetails)))
+  private val responseModel     = Def1_RetrieveItsaStatusResponse(List(itsaStatuses))
 
   private val outcome = Right(ResponseWrapper(correlationId, responseModel))
 
   "RetrieveItsaStatusConnector" should {
-    "return a 200 status and expected response for a success scenario" in new IfsTest with Test {
+    "return a 200 status and expected response for a success scenario with hip feature flag set to false" in new IfsTest with Test {
+
+      MockedSharedAppConfig.featureSwitchConfig returns Configuration("ifs_hip_migration_1878.enabled" -> false)
 
       willGet(url = s"$baseUrl/income-tax/$nino/person-itd/itsa-status/${taxYear.asTysDownstream}?futureYears=true&history=true")
+        .returns(Future.successful(outcome))
+
+      val result: DownstreamOutcome[RetrieveItsaStatusResponse] = await(connector.retrieve(request))
+
+      result shouldBe outcome
+    }
+
+    "return a 200 status and expected response for a success scenario with hip feature flag set to true" in new HipTest with Test {
+
+      MockedSharedAppConfig.featureSwitchConfig returns Configuration("ifs_hip_migration_1878.enabled" -> true)
+
+      willGet(url = s"$baseUrl/itsd/person-itd/itsa-status/$nino?taxYear=${taxYear.asTysDownstream}&futureYears=true&history=true")
         .returns(Future.successful(outcome))
 
       val result: DownstreamOutcome[RetrieveItsaStatusResponse] = await(connector.retrieve(request))
@@ -54,7 +68,7 @@ class RetrieveItsaStatusIfsConnectorSpec extends ConnectorSpec {
   private trait Test {
     _: ConnectorTest =>
 
-    val connector: RetrieveItsaStatusIfsConnector = new RetrieveItsaStatusIfsConnector(
+    val connector: RetrieveItsaStatusConnector = new RetrieveItsaStatusConnector(
       http = mockHttpClient,
       appConfig = mockSharedAppConfig
     )
