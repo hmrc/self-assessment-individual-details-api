@@ -17,37 +17,24 @@
 package v2.retrieveItsaStatus
 
 import cats.implicits._
-import shared.config.{ConfigFeatureSwitches, SharedAppConfig}
 import shared.controllers.RequestContext
 import shared.models.errors._
 import shared.services.{BaseService, ServiceOutcome}
 import v2.models.errors.{FutureYearsFormatError, HistoryFormatError}
-import model.request.RetrieveItsaStatusRequestData
-import model.response.RetrieveItsaStatusResponse
-import connectors.{RetrieveItsaStatusIfsConnector, RetrieveItsaStatusHipConnector}
+import v2.retrieveItsaStatus.model.request.RetrieveItsaStatusRequestData
+import v2.retrieveItsaStatus.model.response.RetrieveItsaStatusResponse
 
 import javax.inject.Inject
 import scala.concurrent.{ExecutionContext, Future}
 
-class RetrieveItsaStatusService @Inject() (ifsConnector: RetrieveItsaStatusIfsConnector, hipConnector: RetrieveItsaStatusHipConnector)(implicit
-    appConfig: SharedAppConfig)
-    extends BaseService {
+class RetrieveItsaStatusService @Inject() (connector: RetrieveItsaStatusConnector) extends BaseService {
 
   def retrieve(request: RetrieveItsaStatusRequestData)(implicit
       ctx: RequestContext,
-      ec: ExecutionContext): Future[ServiceOutcome[RetrieveItsaStatusResponse]] = {
-
-    if (ConfigFeatureSwitches().isEnabled("ifs_hip_migration_1878")) {
-      hipConnector
-        .retrieve(request)
-        .map(_.leftMap(mapDownstreamErrors(hipErrorMap)))
-    } else {
-      ifsConnector
-        .retrieve(request)
-        .map(_.leftMap(mapDownstreamErrors(ifsErrorMap)))
-    }
-
-  }
+      ec: ExecutionContext): Future[ServiceOutcome[RetrieveItsaStatusResponse]] =
+    connector
+      .retrieve(request)
+      .map(_.leftMap(mapDownstreamErrors(ifsErrorMap ++ hipErrorMap)))
 
   private val ifsErrorMap: Map[String, MtdError] =
     Map(
@@ -62,7 +49,7 @@ class RetrieveItsaStatusService @Inject() (ifsConnector: RetrieveItsaStatusIfsCo
     )
 
   private val hipErrorMap: Map[String, MtdError] =
-    ifsErrorMap ++ Map(
+    Map(
       "1215" -> NinoFormatError,
       "1117" -> TaxYearFormatError,
       "1216" -> InternalError,

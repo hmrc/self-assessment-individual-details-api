@@ -16,27 +16,19 @@
 
 package v2.models.domain
 
-import play.api.libs.json.{Format, JsonValidationError, Reads}
+import play.api.libs.json.{Reads, Writes}
 import shared.utils.enums.Enums
-import shared.utils.enums.Enums.typeName
-import shared.utils.enums.Values.MkValues
 
 sealed trait StatusReasonEnum {
   val hipValue: String
 }
 
 object StatusReasonEnum {
-  val parser: PartialFunction[String, StatusReasonEnum] = Enums.parser[StatusReasonEnum]
-  implicit val format: Format[StatusReasonEnum]         = Enums.format[StatusReasonEnum]
 
-  private def reads: Reads[StatusReasonEnum] = {
-    val hipParser: PartialFunction[String, StatusReasonEnum] =
-      implicitly[MkValues[StatusReasonEnum]].values.map(e => e.hipValue -> e).toMap
+  implicit val reads: Reads[StatusReasonEnum] =
+    Enums.readsFrom[StatusReasonEnum](_.hipValue).orElse(Enums.reads[StatusReasonEnum])
 
-    implicitly[Reads[String]].collect(JsonValidationError(s"error.expected.$typeName"))(hipParser)
-  }
-
-  val hipFormat: Format[StatusReasonEnum] = Format(reads, Enums.writes[StatusReasonEnum])
+  implicit val writes: Writes[StatusReasonEnum] = Enums.writes[StatusReasonEnum]
 
   case object `Sign up - return available` extends StatusReasonEnum {
     val hipValue: String = "00"

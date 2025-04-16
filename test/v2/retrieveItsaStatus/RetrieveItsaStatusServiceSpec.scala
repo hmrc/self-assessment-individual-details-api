@@ -16,18 +16,16 @@
 
 package v2.retrieveItsaStatus
 
+import shared.config.MockSharedAppConfig
 import shared.models.domain.{Nino, TaxYear}
 import shared.models.errors._
 import shared.models.outcomes.ResponseWrapper
 import shared.services.ServiceSpec
 import v2.models.domain.StatusEnum._
 import v2.models.domain.StatusReasonEnum.`Sign up - return available`
-import def1.model.request.Def1_RetrieveItsaStatusRequestData
-import def1.model.response.{IfsItsaStatusDetails, IfsItsaStatuses}
-import def1.model.response.ItsaStatusResponse._
-import play.api.Configuration
-import shared.config.MockSharedAppConfig
 import v2.models.errors.{FutureYearsFormatError, HistoryFormatError}
+import v2.retrieveItsaStatus.def1.model.request.Def1_RetrieveItsaStatusRequestData
+import v2.retrieveItsaStatus.def1.model.response.{Def1_RetrieveItsaStatusResponse, ItsaStatusDetails, ItsaStatuses}
 
 import scala.concurrent.Future
 
@@ -37,113 +35,58 @@ class RetrieveItsaStatusServiceSpec extends ServiceSpec with MockRetrieveItsaSta
   private val taxYear = "2019-20"
   private val request = Def1_RetrieveItsaStatusRequestData(Nino(nino), TaxYear.fromMtd(taxYear), futureYears = true, history = true)
 
-  private val itsaStatusDetails = IfsItsaStatusDetails("2023-05-23T12:29:27.566Z", `No Status`, `Sign up - return available`, Some(23600.99))
-  private val itsaStatuses      = IfsItsaStatuses(taxYear, Some(List(itsaStatusDetails)))
-  private val responseModel     = Def1_RetrieveItsaStatusIfsResponse(List(itsaStatuses))
+  private val itsaStatusDetails = ItsaStatusDetails("2023-05-23T12:29:27.566Z", `No Status`, `Sign up - return available`, Some(23600.99))
+  private val itsaStatuses      = ItsaStatuses(taxYear, Some(List(itsaStatusDetails)))
+  private val responseModel     = Def1_RetrieveItsaStatusResponse(List(itsaStatuses))
 
-  private val service = new RetrieveItsaStatusService(mockRetrieveItsaStatusIfsConnector, mockRetrieveItsaStatusHipConnector)
+  private val service = new RetrieveItsaStatusService(mockRetrieveItsaStatusConnector)
 
   "RetrieveItsaStatusService" should {
-    "HIP feature switch is false" should {
-      "return correct result for a success" when {
-        "a valid request is made" in {
+    "return correct result for a success" when {
+      "a valid request is made" in {
 
-          val outcome: Right[Nothing, ResponseWrapper[Def1_RetrieveItsaStatusIfsResponse]] = Right(ResponseWrapper(correlationId, responseModel))
+        val outcome: Right[Nothing, ResponseWrapper[Def1_RetrieveItsaStatusResponse]] = Right(ResponseWrapper(correlationId, responseModel))
+        MockedRetrieveItsaStatusConnector
+          .retrieve(request)
+          .returns(Future.successful(outcome))
 
-          MockedSharedAppConfig.featureSwitchConfig returns Configuration("ifs_hip_migration_1878.enabled" -> false)
+        val result = await(service.retrieve(request))
 
-          MockedRetrieveItsaStatusIfsConnector
-            .retrieve(request)
-            .returns(Future.successful(outcome))
-
-          val result = await(service.retrieve(request))
-
-          result shouldBe Right(ResponseWrapper(correlationId, responseModel))
-        }
-
-        "map errors according to spec" when {
-          def serviceError(downstreamErrorCode: String, error: MtdError): Unit =
-            s"a $downstreamErrorCode error is returned from the service" in {
-
-              MockedSharedAppConfig.featureSwitchConfig returns Configuration("ifs_hip_migration_1878.enabled" -> false)
-
-              MockedRetrieveItsaStatusIfsConnector
-                .retrieve(request)
-                .returns(Future.successful(Left(ResponseWrapper(correlationId, DownstreamErrors.single(DownstreamErrorCode(downstreamErrorCode))))))
-
-              val result = await(service.retrieve(request))
-
-              result shouldBe Left(ErrorWrapper(correlationId, error))
-            }
-
-          val input = List(
-            ("INVALID_TAXABLE_ENTITY_ID", NinoFormatError),
-            ("INVALID_TAX_YEAR", TaxYearFormatError),
-            ("INVALID_FUTURES_YEAR", FutureYearsFormatError),
-            ("INVALID_HISTORY", HistoryFormatError),
-            ("INVALID_CORRELATION_ID", InternalError),
-            ("NOT_FOUND", NotFoundError),
-            ("SERVER_ERROR", InternalError),
-            ("SERVICE_UNAVAILABLE", InternalError)
-          )
-
-          input.foreach((serviceError _).tupled)
-        }
+        result shouldBe Right(ResponseWrapper(correlationId, responseModel))
       }
-    }
 
-    "HIP feature switch is true" should {
-      "return correct result for a success" when {
-        "a valid request is made" in {
+      "map errors according to spec" when {
+        def serviceError(downstreamErrorCode: String, error: MtdError): Unit =
+          s"a $downstreamErrorCode error is returned from the service" in {
 
-          val outcome: Right[Nothing, ResponseWrapper[Def1_RetrieveItsaStatusIfsResponse]] = Right(ResponseWrapper(correlationId, responseModel))
+            MockedRetrieveItsaStatusConnector
+              .retrieve(request)
+              .returns(Future.successful(Left(ResponseWrapper(correlationId, DownstreamErrors.single(DownstreamErrorCode(downstreamErrorCode))))))
 
-          MockedSharedAppConfig.featureSwitchConfig returns Configuration("ifs_hip_migration_1878.enabled" -> true)
+            val result = await(service.retrieve(request))
 
-          MockedRetrieveItsaStatusHipConnector
-            .retrieve(request)
-            .returns(Future.successful(outcome))
+            result shouldBe Left(ErrorWrapper(correlationId, error))
+          }
 
-          val result = await(service.retrieve(request))
+        val input = List(
+          ("INVALID_TAXABLE_ENTITY_ID", NinoFormatError),
+          ("INVALID_TAX_YEAR", TaxYearFormatError),
+          ("INVALID_FUTURES_YEAR", FutureYearsFormatError),
+          ("INVALID_HISTORY", HistoryFormatError),
+          ("INVALID_CORRELATION_ID", InternalError),
+          ("NOT_FOUND", NotFoundError),
+          ("SERVER_ERROR", InternalError),
+          ("SERVICE_UNAVAILABLE", InternalError),
+          ("1117", TaxYearFormatError),
+          ("1215", NinoFormatError),
+          ("1216", InternalError),
+          ("5000", NinoFormatError),
+          ("5001", NinoFormatError),
+          ("5009", InternalError),
+          ("5010", NotFoundError)
+        )
 
-          result shouldBe Right(ResponseWrapper(correlationId, responseModel))
-        }
-
-        "map errors according to spec" when {
-          def serviceError(downstreamErrorCode: String, error: MtdError): Unit =
-            s"a $downstreamErrorCode error is returned from the service" in {
-
-              MockedSharedAppConfig.featureSwitchConfig returns Configuration("ifs_hip_migration_1878.enabled" -> true)
-
-              MockedRetrieveItsaStatusHipConnector
-                .retrieve(request)
-                .returns(Future.successful(Left(ResponseWrapper(correlationId, DownstreamErrors.single(DownstreamErrorCode(downstreamErrorCode))))))
-
-              val result = await(service.retrieve(request))
-
-              result shouldBe Left(ErrorWrapper(correlationId, error))
-            }
-
-          val input = List(
-            ("INVALID_TAXABLE_ENTITY_ID", NinoFormatError),
-            ("INVALID_TAX_YEAR", TaxYearFormatError),
-            ("INVALID_FUTURES_YEAR", FutureYearsFormatError),
-            ("INVALID_HISTORY", HistoryFormatError),
-            ("INVALID_CORRELATION_ID", InternalError),
-            ("NOT_FOUND", NotFoundError),
-            ("SERVER_ERROR", InternalError),
-            ("SERVICE_UNAVAILABLE", InternalError),
-            ("1117", TaxYearFormatError),
-            ("1215", NinoFormatError),
-            ("1216", InternalError),
-            ("5000", NinoFormatError),
-            ("5001", NinoFormatError),
-            ("5009", InternalError),
-            ("5010", NotFoundError)
-          )
-
-          input.foreach((serviceError _).tupled)
-        }
+        input.foreach((serviceError _).tupled)
       }
     }
   }

@@ -30,9 +30,8 @@ import shared.services.MockAuditService
 import v2.models.domain.StatusEnum.`No Status`
 import v2.models.domain.StatusReasonEnum.`Sign up - return available`
 import v2.models.errors.FutureYearsFormatError
-import def1.model.request.Def1_RetrieveItsaStatusRequestData
-import def1.model.response.{IfsItsaStatusDetails, IfsItsaStatuses}
-import def1.model.response.ItsaStatusResponse.Def1_RetrieveItsaStatusIfsResponse
+import v2.retrieveItsaStatus.def1.model.request.Def1_RetrieveItsaStatusRequestData
+import v2.retrieveItsaStatus.def1.model.response.{Def1_RetrieveItsaStatusResponse, ItsaStatusDetails, ItsaStatuses}
 
 import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.Future
@@ -51,9 +50,9 @@ class RetrieveItsaStatusControllerSpec
   private val userDetails = UserDetails("mtdId", userType, None)
   private val requestData = Def1_RetrieveItsaStatusRequestData(nino, taxYear, futureYears = false, history = false)
 
-  private val itsaStatusDetails = IfsItsaStatusDetails("2023-05-23T12:29:27.566Z", `No Status`, `Sign up - return available`, Some(23600.99))
-  private val itsaStatuses      = IfsItsaStatuses(taxYear.asMtd, Some(List(itsaStatusDetails)))
-  private val response          = Def1_RetrieveItsaStatusIfsResponse(List(itsaStatuses))
+  private val itsaStatusDetails = ItsaStatusDetails("2023-05-23T12:29:27.566Z", `No Status`, `Sign up - return available`, Some(23600.99))
+  private val itsaStatuses      = ItsaStatuses(taxYear.asMtd, Some(List(itsaStatusDetails)))
+  private val response          = Def1_RetrieveItsaStatusResponse(List(itsaStatuses))
 
   private val mtdResponse = Json.parse(
     """

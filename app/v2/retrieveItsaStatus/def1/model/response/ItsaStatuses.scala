@@ -18,18 +18,9 @@ package v2.retrieveItsaStatus.def1.model.response
 
 import play.api.libs.json.{Json, OFormat}
 
-sealed trait ItsaStatuses
+case class ItsaStatuses(taxYear: String, itsaStatusDetails: Option[Seq[ItsaStatusDetails]])
 
-case class IfsItsaStatuses(taxYear: String, itsaStatusDetails: Option[Seq[IfsItsaStatusDetails]]) extends ItsaStatuses
+object ItsaStatuses {
 
-object IfsItsaStatuses {
-
-  implicit val format: OFormat[IfsItsaStatuses] = Json.format[IfsItsaStatuses]
-
-}
-
-case class HipItsaStatuses(taxYear: String, itsaStatusDetails: Option[Seq[HipItsaStatusDetails]]) extends ItsaStatuses
-
-object HipItsaStatuses {
-  implicit val format: OFormat[HipItsaStatuses] = Json.format[HipItsaStatuses]
+  implicit val format: OFormat[ItsaStatuses] = Json.format[ItsaStatuses]
 }

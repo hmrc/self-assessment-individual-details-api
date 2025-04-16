@@ -138,7 +138,7 @@ class Def1_RetrieveItsaStatusIfsControllerISpec extends IntegrationBaseSpec {
         |        "submittedOn": "2023-05-23T12:29:27.566Z",
         |        "status": "No Status",
         |        "statusReason": "Sign up - return available",
-        |        "businessIncome2YearsPrior": 23600.99
+        |        "businessIncomePriorTo2Years": 23600.99
         |      }
         |    ]
         |  }

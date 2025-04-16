@@ -20,38 +20,20 @@ import org.scalamock.handlers.CallHandler
 import org.scalamock.scalatest.MockFactory
 import shared.connectors.DownstreamOutcome
 import uk.gov.hmrc.http.HeaderCarrier
-import model.request.RetrieveItsaStatusRequestData
-import model.response.RetrieveItsaStatusResponse
-import connectors._
+import v2.retrieveItsaStatus.model.request.RetrieveItsaStatusRequestData
+import v2.retrieveItsaStatus.model.response.RetrieveItsaStatusResponse
 
 import scala.concurrent.{ExecutionContext, Future}
 
 trait MockRetrieveItsaStatusConnector extends MockFactory {
 
-  val mockRetrieveItsaStatusIfsConnector: RetrieveItsaStatusIfsConnector = mock[RetrieveItsaStatusIfsConnector]
-  val mockRetrieveItsaStatusHipConnector: RetrieveItsaStatusHipConnector = mock[RetrieveItsaStatusHipConnector]
+  val mockRetrieveItsaStatusConnector: RetrieveItsaStatusConnector = mock[RetrieveItsaStatusConnector]
 
-  object MockedRetrieveItsaStatusIfsConnector {
-
-    def retrieve(requestData: RetrieveItsaStatusRequestData): CallHandler[Future[DownstreamOutcome[RetrieveItsaStatusResponse]]] = {
-      (
-        mockRetrieveItsaStatusIfsConnector
-          .retrieve(_: RetrieveItsaStatusRequestData)(
-            _: HeaderCarrier,
-            _: ExecutionContext,
-            _: String
-          )
-        )
-        .expects(requestData, *, *, *)
-    }
-
-  }
-
-  object MockedRetrieveItsaStatusHipConnector {
+  object MockedRetrieveItsaStatusConnector {
 
     def retrieve(requestData: RetrieveItsaStatusRequestData): CallHandler[Future[DownstreamOutcome[RetrieveItsaStatusResponse]]] = {
       (
-        mockRetrieveItsaStatusHipConnector
+        mockRetrieveItsaStatusConnector
           .retrieve(_: RetrieveItsaStatusRequestData)(
             _: HeaderCarrier,
             _: ExecutionContext,

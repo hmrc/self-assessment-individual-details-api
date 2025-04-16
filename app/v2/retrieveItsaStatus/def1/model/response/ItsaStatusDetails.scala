@@ -20,38 +20,22 @@ import play.api.libs.functional.syntax.toFunctionalBuilderOps
 import play.api.libs.json.{JsObject, JsResult, JsValue, Json, OFormat, Reads, __}
 import v2.models.domain.{StatusEnum, StatusReasonEnum}
 
-sealed trait ItsaStatusDetails
+case class ItsaStatusDetails(submittedOn: String, status: StatusEnum, statusReason: StatusReasonEnum, businessIncome2YearsPrior: Option[BigDecimal])
 
-case class IfsItsaStatusDetails(submittedOn: String,
-                                status: StatusEnum,
-                                statusReason: StatusReasonEnum,
-                                businessIncome2YearsPrior: Option[BigDecimal])
-    extends ItsaStatusDetails
+object ItsaStatusDetails {
 
-object IfsItsaStatusDetails {
-  implicit val format: OFormat[IfsItsaStatusDetails] = Json.format[IfsItsaStatusDetails]
-}
+  implicit val formats: OFormat[ItsaStatusDetails] = new OFormat[ItsaStatusDetails] {
 
-case class HipItsaStatusDetails(submittedOn: String,
-                                status: StatusEnum,
-                                statusReason: StatusReasonEnum,
-                                businessIncome2YearsPrior: Option[BigDecimal])
-    extends ItsaStatusDetails
-
-object HipItsaStatusDetails {
-
-  implicit val formats: OFormat[HipItsaStatusDetails] = new OFormat[HipItsaStatusDetails] {
-
-    val hipReads: Reads[HipItsaStatusDetails] = (
+    val hipReads: Reads[ItsaStatusDetails] = (
       (__ \ "submittedOn").read[String] and
-        (__ \ "status").read[StatusEnum](StatusEnum.hipFormat) and
-        (__ \ "statusReason").read[StatusReasonEnum](StatusReasonEnum.hipFormat) and
+        (__ \ "status").read[StatusEnum] and
+        (__ \ "statusReason").read[StatusReasonEnum] and
         (__ \ "businessIncomePriorTo2Years").readNullable[BigDecimal]
-    )(HipItsaStatusDetails.apply _)
+    )(ItsaStatusDetails.apply _)
 
-    override def writes(o: HipItsaStatusDetails): JsObject = Json.writes.writes(o)
+    override def writes(o: ItsaStatusDetails): JsObject = Json.writes.writes(o)
 
-    override def reads(json: JsValue): JsResult[HipItsaStatusDetails] = json.validate[HipItsaStatusDetails](hipReads)
+    override def reads(json: JsValue): JsResult[ItsaStatusDetails] = json.validate[ItsaStatusDetails](hipReads)
   }
 
 }
