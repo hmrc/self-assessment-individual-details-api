@@ -1,5 +1,5 @@
 /*
- * Copyright 2023 HM Revenue & Customs
+ * Copyright 2025 HM Revenue & Customs
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,12 +16,11 @@
 
 package v2.retrieveItsaStatus
 
-import shared.config.MockSharedAppConfig
 import shared.models.domain.{Nino, TaxYear}
 import shared.models.errors._
 import shared.models.outcomes.ResponseWrapper
 import shared.services.ServiceSpec
-import v2.models.domain.StatusEnum._
+import v2.models.domain.StatusEnum.`No Status`
 import v2.models.domain.StatusReasonEnum.`Sign up - return available`
 import v2.models.errors.{FutureYearsFormatError, HistoryFormatError}
 import v2.retrieveItsaStatus.def1.model.request.Def1_RetrieveItsaStatusRequestData
@@ -29,7 +28,7 @@ import v2.retrieveItsaStatus.def1.model.response.{Def1_RetrieveItsaStatusRespons
 
 import scala.concurrent.Future
 
-class RetrieveItsaStatusServiceSpec extends ServiceSpec with MockRetrieveItsaStatusConnector with MockSharedAppConfig {
+class RetrieveItsaStatusServiceSpec extends ServiceSpec with MockRetrieveItsaStatusConnector {
 
   private val nino    = "AA112233A"
   private val taxYear = "2019-20"
@@ -46,6 +45,7 @@ class RetrieveItsaStatusServiceSpec extends ServiceSpec with MockRetrieveItsaSta
       "a valid request is made" in {
 
         val outcome: Right[Nothing, ResponseWrapper[Def1_RetrieveItsaStatusResponse]] = Right(ResponseWrapper(correlationId, responseModel))
+
         MockedRetrieveItsaStatusConnector
           .retrieve(request)
           .returns(Future.successful(outcome))
@@ -68,7 +68,7 @@ class RetrieveItsaStatusServiceSpec extends ServiceSpec with MockRetrieveItsaSta
             result shouldBe Left(ErrorWrapper(correlationId, error))
           }
 
-        val input = List(
+        val ifsErrors = List(
           ("INVALID_TAXABLE_ENTITY_ID", NinoFormatError),
           ("INVALID_TAX_YEAR", TaxYearFormatError),
           ("INVALID_FUTURES_YEAR", FutureYearsFormatError),
@@ -76,17 +76,17 @@ class RetrieveItsaStatusServiceSpec extends ServiceSpec with MockRetrieveItsaSta
           ("INVALID_CORRELATION_ID", InternalError),
           ("NOT_FOUND", NotFoundError),
           ("SERVER_ERROR", InternalError),
-          ("SERVICE_UNAVAILABLE", InternalError),
-          ("1117", TaxYearFormatError),
+          ("SERVICE_UNAVAILABLE", InternalError)
+        )
+
+        val hipErrors = List(
           ("1215", NinoFormatError),
+          ("1117", TaxYearFormatError),
           ("1216", InternalError),
-          ("5000", NinoFormatError),
-          ("5001", NinoFormatError),
-          ("5009", InternalError),
           ("5010", NotFoundError)
         )
 
-        input.foreach((serviceError _).tupled)
+        (ifsErrors ++ hipErrors).foreach((serviceError _).tupled)
       }
     }
   }

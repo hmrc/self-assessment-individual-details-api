@@ -1,5 +1,5 @@
 /*
- * Copyright 2023 HM Revenue & Customs
+ * Copyright 2025 HM Revenue & Customs
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -34,10 +34,10 @@ class RetrieveItsaStatusService @Inject() (connector: RetrieveItsaStatusConnecto
       ec: ExecutionContext): Future[ServiceOutcome[RetrieveItsaStatusResponse]] =
     connector
       .retrieve(request)
-      .map(_.leftMap(mapDownstreamErrors(ifsErrorMap ++ hipErrorMap)))
+      .map(_.leftMap(mapDownstreamErrors(downstreamErrorMap)))
 
-  private val ifsErrorMap: Map[String, MtdError] =
-    Map(
+  private val downstreamErrorMap: Map[String, MtdError] = {
+    val ifsErrors = Map(
       "INVALID_TAXABLE_ENTITY_ID" -> NinoFormatError,
       "INVALID_TAX_YEAR"          -> TaxYearFormatError,
       "INVALID_FUTURES_YEAR"      -> FutureYearsFormatError,
@@ -48,15 +48,14 @@ class RetrieveItsaStatusService @Inject() (connector: RetrieveItsaStatusConnecto
       "SERVICE_UNAVAILABLE"       -> InternalError
     )
 
-  private val hipErrorMap: Map[String, MtdError] =
-    Map(
+    val hipErrors = Map(
       "1215" -> NinoFormatError,
       "1117" -> TaxYearFormatError,
       "1216" -> InternalError,
-      "5000" -> NinoFormatError,
-      "5001" -> NinoFormatError,
-      "5009" -> InternalError,
       "5010" -> NotFoundError
     )
+
+    ifsErrors ++ hipErrors
+  }
 
 }

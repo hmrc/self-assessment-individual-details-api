@@ -1,5 +1,5 @@
 /*
- * Copyright 2023 HM Revenue & Customs
+ * Copyright 2025 HM Revenue & Customs
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -20,66 +20,66 @@ import play.api.libs.json.{Reads, Writes}
 import shared.utils.enums.Enums
 
 sealed trait StatusReasonEnum {
-  val hipValue: String
+  val fromDownstream: String
 }
 
 object StatusReasonEnum {
 
   implicit val reads: Reads[StatusReasonEnum] =
-    Enums.readsFrom[StatusReasonEnum](_.hipValue).orElse(Enums.reads[StatusReasonEnum])
+    Enums.readsFrom[StatusReasonEnum](_.fromDownstream).orElse(Enums.reads[StatusReasonEnum])
 
   implicit val writes: Writes[StatusReasonEnum] = Enums.writes[StatusReasonEnum]
 
   case object `Sign up - return available` extends StatusReasonEnum {
-    val hipValue: String = "00"
+    override val fromDownstream: String = "00"
   }
 
   case object `Sign up - no return available` extends StatusReasonEnum {
-    override val hipValue: String = "01"
+    override val fromDownstream: String = "01"
   }
 
   case object `ITSA final declaration` extends StatusReasonEnum {
-    override val hipValue: String = "02"
+    override val fromDownstream: String = "02"
   }
 
   case object `ITSA Q4 declaration` extends StatusReasonEnum {
-    override val hipValue: String = "03"
+    override val fromDownstream: String = "03"
   }
 
   case object `CESA SA return` extends StatusReasonEnum {
-    override val hipValue: String = "04"
+    override val fromDownstream: String = "04"
   }
 
   case object Complex extends StatusReasonEnum {
-    override val hipValue: String = "05"
+    override val fromDownstream: String = "05"
   }
 
   case object `Ceased income source` extends StatusReasonEnum {
-    override val hipValue: String = "06"
+    override val fromDownstream: String = "06"
   }
 
   case object `Reinstated income source` extends StatusReasonEnum {
-    override val hipValue: String = "07"
+    override val fromDownstream: String = "07"
   }
 
   case object Rollover extends StatusReasonEnum {
-    override val hipValue: String = "08"
+    override val fromDownstream: String = "08"
   }
 
   case object `Income Source Latency Changes` extends StatusReasonEnum {
-    override val hipValue: String = "09"
+    override val fromDownstream: String = "09"
   }
 
   case object `MTD ITSA Opt-Out` extends StatusReasonEnum {
-    override val hipValue: String = "10"
+    override val fromDownstream: String = "10"
   }
 
   case object `MTD ITSA Opt-In` extends StatusReasonEnum {
-    override val hipValue: String = "11"
+    override val fromDownstream: String = "11"
   }
 
   case object `Digitally Exempt` extends StatusReasonEnum {
-    override val hipValue: String = "12"
+    override val fromDownstream: String = "12"
   }
 
 }

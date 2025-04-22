@@ -17,10 +17,12 @@
 package v2.retrieveItsaStatus.model.request
 
 import shared.models.domain.{Nino, TaxYear}
+import v2.retrieveItsaStatus.RetrieveItsaStatusSchema
 
 trait RetrieveItsaStatusRequestData {
   def nino: Nino
   def taxYear: TaxYear
   def futureYears: Boolean
   def history: Boolean
+  val schema: RetrieveItsaStatusSchema
 }

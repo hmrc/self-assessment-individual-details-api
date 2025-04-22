@@ -1,5 +1,5 @@
 /*
- * Copyright 2023 HM Revenue & Customs
+ * Copyright 2025 HM Revenue & Customs
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -27,13 +27,16 @@ import shared.services.{AuditStub, AuthStub, DownstreamStub, MtdIdLookupStub}
 import shared.support.IntegrationBaseSpec
 import v2.models.errors.{FutureYearsFormatError, HistoryFormatError}
 
-class Def1_RetrieveItsaStatusHipControllerISpec extends IntegrationBaseSpec {
+class Def1_RetrieveItsaStatusControllerIfsISpec extends IntegrationBaseSpec {
+
+  override def servicesConfig: Map[String, Any] =
+    Map("feature-switch.ifs_hip_migration_1878.enabled" -> false) ++ super.servicesConfig
 
   "Calling the 'Retrieve ITSA Status' endpoint" should {
     "return a 200 status code" when {
       "any valid request is made" in new Test {
 
-        val downstreamQueryParams: Map[String, String] = Map("taxYear" -> downstreamTaxYear, "futureYears" -> futureYears, "history" -> history)
+        val downstreamQueryParams: Map[String, String] = Map("futureYears" -> futureYears, "history" -> history)
 
         override def setupStubs(): Unit = {
           DownstreamStub.onSuccess(DownstreamStub.GET, downstreamUri, downstreamQueryParams, OK, downstreamResponse)
@@ -62,15 +65,7 @@ class Def1_RetrieveItsaStatusHipControllerISpec extends IntegrationBaseSpec {
             override val futureYears: String = requestFutureYears
             override val history: String     = requestHistory
 
-            val response: WSResponse =
-              await(
-                request
-                  .withQueryStringParameters(
-                    "futureYears" -> futureYears,
-                    "history"     -> history
-                  )
-                  .get())
-
+            val response: WSResponse = await(request.withQueryStringParameters("futureYears" -> futureYears, "history" -> history).get())
             response.status shouldBe expectedStatus
             response.json shouldBe Json.toJson(expectedBody)
             response.header("Content-Type") shouldBe Some("application/json")
@@ -86,7 +81,7 @@ class Def1_RetrieveItsaStatusHipControllerISpec extends IntegrationBaseSpec {
         input.foreach(args => (validationErrorTest _).tupled(args))
       }
 
-      "downstream service error in error -> type format" when {
+      "downstream service error" when {
         def serviceErrorTest(downstreamStatus: Int, downstreamCode: String, expectedStatus: Int, expectedBody: MtdError): Unit = {
           s"downstream returns an $downstreamCode error and status $downstreamStatus" in new Test {
 
@@ -101,18 +96,11 @@ class Def1_RetrieveItsaStatusHipControllerISpec extends IntegrationBaseSpec {
           }
         }
 
-        def errorBody(errorType: String): String =
+        def errorBody(code: String): String =
           s"""
              |{
-             |  "origin": "HIP",
-             |  "response": {
-             |    "failures": [
-             |      {
-             |        "errorCode": "$errorType",
-             |        "errorDescription": "Reason for Failure"
-             |      }
-             |    ]
-             |  }
+             |   "code": "$code",
+             |   "reason": "downstream message"
              |}
             """.stripMargin
 
@@ -124,53 +112,16 @@ class Def1_RetrieveItsaStatusHipControllerISpec extends IntegrationBaseSpec {
           (BAD_REQUEST, "INVALID_CORRELATION_ID", INTERNAL_SERVER_ERROR, InternalError),
           (NOT_FOUND, "NOT_FOUND", NOT_FOUND, NotFoundError),
           (INTERNAL_SERVER_ERROR, "SERVER_ERROR", INTERNAL_SERVER_ERROR, InternalError),
-          (SERVICE_UNAVAILABLE, "SERVICE_UNAVAILABLE", INTERNAL_SERVER_ERROR, InternalError),
-          (BAD_REQUEST, "1117", BAD_REQUEST, TaxYearFormatError),
-          (BAD_REQUEST, "1215", BAD_REQUEST, NinoFormatError),
-          (BAD_REQUEST, "5000", BAD_REQUEST, NinoFormatError),
-          (BAD_REQUEST, "5001", BAD_REQUEST, NinoFormatError),
-          (BAD_REQUEST, "1216", INTERNAL_SERVER_ERROR, InternalError)
+          (SERVICE_UNAVAILABLE, "SERVICE_UNAVAILABLE", INTERNAL_SERVER_ERROR, InternalError)
         )
         input.foreach(args => (serviceErrorTest _).tupled(args))
       }
-    }
-
-    "return downstream error codes in error -> code format" when {
-      def serviceErrorTest(downstreamStatus: Int, downstreamCode: String, expectedStatus: Int, expectedBody: MtdError): Unit = {
-        s"downstream returns an $downstreamCode error and status $downstreamStatus" in new Test {
-
-          override def setupStubs(): Unit = {
-            DownstreamStub.onError(DownstreamStub.GET, downstreamUri, downstreamStatus, errorBody(downstreamCode))
-          }
-
-          val response: WSResponse = await(request.withQueryStringParameters("futureYears" -> futureYears, "history" -> history).get())
-          response.status shouldBe expectedStatus
-          response.json shouldBe Json.toJson(expectedBody)
-          response.header("Content-Type") shouldBe Some("application/json")
-        }
-      }
-
-      def errorBody(errorType: String): String =
-        s"""
-           |[
-           |  {
-           |    "errorCode": "$errorType",
-           |    "errorDescription": "string"
-           |  }
-           |]
-            """.stripMargin
-
-      val input = List(
-        (UNAUTHORIZED, "5009", INTERNAL_SERVER_ERROR, InternalError),
-        (NOT_FOUND, "5010", NOT_FOUND, NotFoundError)
-      )
-      input.foreach(args => (serviceErrorTest _).tupled(args))
     }
   }
 
   private trait Test {
 
-    lazy val downstreamTaxYear: String = TaxYear.fromMtd(mtdTaxYear).asTysDownstream
+    private lazy val downstreamTaxYear: String = TaxYear.fromMtd(mtdTaxYear).asTysDownstream
 
     val nino: String        = "AA123456A"
     val mtdTaxYear: String  = "2023-24"
@@ -185,8 +136,8 @@ class Def1_RetrieveItsaStatusHipControllerISpec extends IntegrationBaseSpec {
         |    "itsaStatusDetails": [
         |      {
         |        "submittedOn": "2023-05-23T12:29:27.566Z",
-        |        "status": "00",
-        |        "statusReason": "00",
+        |        "status": "No Status",
+        |        "statusReason": "Sign up - return available",
         |        "businessIncomePriorTo2Years": 23600.99
         |      }
         |    ]
@@ -215,7 +166,7 @@ class Def1_RetrieveItsaStatusHipControllerISpec extends IntegrationBaseSpec {
     """.stripMargin
     )
 
-    def downstreamUri: String = s"/itsd/person-itd/itsa-status/$nino"
+    def downstreamUri: String = s"/income-tax/$nino/person-itd/itsa-status/$downstreamTaxYear"
 
     def request: WSRequest = {
       AuditStub.audit()
@@ -225,7 +176,7 @@ class Def1_RetrieveItsaStatusHipControllerISpec extends IntegrationBaseSpec {
       buildRequest(uri)
         .withHttpHeaders(
           (ACCEPT, "application/vnd.hmrc.2.0+json"),
-          (AUTHORIZATION, "Bearer 123")
+          (AUTHORIZATION, "Bearer 123") // some bearer token
         )
     }
 

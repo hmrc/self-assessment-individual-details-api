@@ -1,5 +1,5 @@
 /*
- * Copyright 2023 HM Revenue & Customs
+ * Copyright 2025 HM Revenue & Customs
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,14 +16,11 @@
 
 package v2.retrieveItsaStatus
 
-import play.api.libs.json.Reads
 import shared.config.{ConfigFeatureSwitches, SharedAppConfig}
 import shared.connectors.DownstreamUri.{HipUri, IfsUri}
 import shared.connectors.httpparsers.StandardDownstreamHttpParser.reads
-import shared.connectors.{BaseDownstreamConnector, DownstreamOutcome}
+import shared.connectors.{BaseDownstreamConnector, DownstreamOutcome, DownstreamUri}
 import uk.gov.hmrc.http.{HeaderCarrier, HttpClient}
-import v2.retrieveItsaStatus.RetrieveItsaStatusSchema.Def1
-import v2.retrieveItsaStatus.def1.model.response.Def1_RetrieveItsaStatusResponse
 import v2.retrieveItsaStatus.model.request.RetrieveItsaStatusRequestData
 import v2.retrieveItsaStatus.model.response.RetrieveItsaStatusResponse
 
@@ -36,17 +33,21 @@ class RetrieveItsaStatusConnector @Inject() (val http: HttpClient, val appConfig
       hc: HeaderCarrier,
       ec: ExecutionContext,
       correlationId: String): Future[DownstreamOutcome[RetrieveItsaStatusResponse]] = {
+
     import request._
+    import schema._
 
-    implicit val schema: Reads[Def1_RetrieveItsaStatusResponse] = Def1.connectorReads
+    val downstreamUri: DownstreamUri[DownstreamResp] = if (ConfigFeatureSwitches().isEnabled("ifs_hip_migration_1878")) {
+      HipUri[DownstreamResp](
+        s"itsd/person-itd/itsa-status/$nino?taxYear=${taxYear.asTysDownstream}&futureYears=$futureYears&history=$history"
+      )
+    } else {
+      IfsUri[DownstreamResp](
+        s"income-tax/$nino/person-itd/itsa-status/${taxYear.asTysDownstream}?futureYears=$futureYears&history=$history"
+      )
+    }
 
-    val url =
-      if (ConfigFeatureSwitches().isEnabled("ifs_hip_migration_1878"))
-        HipUri(s"itsd/person-itd/itsa-status/$nino?taxYear=${taxYear.asTysDownstream}&futureYears=$futureYears&history=$history")
-      else
-        IfsUri(s"income-tax/$nino/person-itd/itsa-status/${taxYear.asTysDownstream}?futureYears=$futureYears&history=$history")
-
-    get(url)
+    get(downstreamUri)
   }
 
 }

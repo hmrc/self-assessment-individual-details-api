@@ -1,5 +1,5 @@
 /*
- * Copyright 2025 HM Revenue & Customs
+ * Copyright 2023 HM Revenue & Customs
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,18 +16,18 @@
 
 package v2.retrieveItsaStatus.def1.model.response
 
-import play.api.libs.json.{Json, OWrites, Reads}
+import play.api.libs.json._
 import v2.retrieveItsaStatus.model.response.RetrieveItsaStatusResponse
 
 case class Def1_RetrieveItsaStatusResponse(itsaStatuses: Seq[ItsaStatuses]) extends RetrieveItsaStatusResponse
 
 object Def1_RetrieveItsaStatusResponse {
 
-  implicit val writes: OWrites[Def1_RetrieveItsaStatusResponse] = Json.writes[Def1_RetrieveItsaStatusResponse]
-
   implicit val reads: Reads[Def1_RetrieveItsaStatusResponse] = json =>
     json
       .validate[Seq[ItsaStatuses]]
       .map(itsaStatuses => Def1_RetrieveItsaStatusResponse(itsaStatuses))
+
+  implicit val writes: OWrites[Def1_RetrieveItsaStatusResponse] = Json.writes[Def1_RetrieveItsaStatusResponse]
 
 }

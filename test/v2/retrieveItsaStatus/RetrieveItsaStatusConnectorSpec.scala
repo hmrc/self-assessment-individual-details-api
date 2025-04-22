@@ -1,5 +1,5 @@
 /*
- * Copyright 2023 HM Revenue & Customs
+ * Copyright 2025 HM Revenue & Customs
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -40,7 +40,7 @@ class RetrieveItsaStatusConnectorSpec extends ConnectorSpec {
   private val outcome = Right(ResponseWrapper(correlationId, responseModel))
 
   "RetrieveItsaStatusConnector" should {
-    "return a 200 status and expected response for a success scenario with hip feature flag set to false" in new IfsTest with Test {
+    "return a 200 status and expected response for a success scenario with HIP migration feature flag set to false" in new IfsTest with Test {
 
       MockedSharedAppConfig.featureSwitchConfig returns Configuration("ifs_hip_migration_1878.enabled" -> false)
 
@@ -52,7 +52,7 @@ class RetrieveItsaStatusConnectorSpec extends ConnectorSpec {
       result shouldBe outcome
     }
 
-    "return a 200 status and expected response for a success scenario with hip feature flag set to true" in new HipTest with Test {
+    "return a 200 status and expected response for a success scenario with HIP migration feature flag set to true" in new HipTest with Test {
 
       MockedSharedAppConfig.featureSwitchConfig returns Configuration("ifs_hip_migration_1878.enabled" -> true)
 

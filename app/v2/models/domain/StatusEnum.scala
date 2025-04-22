@@ -1,5 +1,5 @@
 /*
- * Copyright 2023 HM Revenue & Customs
+ * Copyright 2025 HM Revenue & Customs
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -20,42 +20,42 @@ import play.api.libs.json.{Reads, Writes}
 import shared.utils.enums.Enums
 
 sealed trait StatusEnum {
-  val hipValue: String
+  val fromDownstream: String
 }
 
 object StatusEnum {
 
   implicit val reads: Reads[StatusEnum] =
-    Enums.readsFrom[StatusEnum](_.hipValue).orElse(Enums.reads[StatusEnum])
+    Enums.readsFrom[StatusEnum](_.fromDownstream).orElse(Enums.reads[StatusEnum])
 
   implicit val writes: Writes[StatusEnum] = Enums.writes[StatusEnum]
 
   case object `No Status` extends StatusEnum {
-    override val hipValue: String = "00"
+    override val fromDownstream: String = "00"
   }
 
   case object `MTD Mandated` extends StatusEnum {
-    override val hipValue: String = "01"
+    override val fromDownstream: String = "01"
   }
 
   case object `MTD Voluntary` extends StatusEnum {
-    override val hipValue: String = "02"
+    override val fromDownstream: String = "02"
   }
 
   case object Annual extends StatusEnum {
-    override val hipValue: String = "03"
+    override val fromDownstream: String = "03"
   }
 
   case object `Non Digital` extends StatusEnum {
-    override val hipValue: String = "04"
+    override val fromDownstream: String = "04"
   }
 
   case object Dormant extends StatusEnum {
-    override val hipValue: String = "05"
+    override val fromDownstream: String = "05"
   }
 
   case object `MTD Exempt` extends StatusEnum {
-    override val hipValue: String = "99"
+    override val fromDownstream: String = "99"
   }
 
 }

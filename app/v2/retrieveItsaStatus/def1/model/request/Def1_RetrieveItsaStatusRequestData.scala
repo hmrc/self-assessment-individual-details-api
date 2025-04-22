@@ -17,7 +17,12 @@
 package v2.retrieveItsaStatus.def1.model.request
 
 import shared.models.domain.{Nino, TaxYear}
+import v2.retrieveItsaStatus.RetrieveItsaStatusSchema
+import v2.retrieveItsaStatus.RetrieveItsaStatusSchema.Def1
 import v2.retrieveItsaStatus.model.request.RetrieveItsaStatusRequestData
 
 case class Def1_RetrieveItsaStatusRequestData(nino: Nino, taxYear: TaxYear, futureYears: Boolean, history: Boolean)
-    extends RetrieveItsaStatusRequestData
+    extends RetrieveItsaStatusRequestData {
+
+  override val schema: RetrieveItsaStatusSchema = Def1
+}

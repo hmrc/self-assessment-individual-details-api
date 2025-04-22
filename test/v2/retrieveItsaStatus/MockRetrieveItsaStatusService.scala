@@ -20,8 +20,8 @@ import org.scalamock.handlers.CallHandler
 import org.scalamock.scalatest.MockFactory
 import shared.controllers.RequestContext
 import shared.services.ServiceOutcome
-import model.request.RetrieveItsaStatusRequestData
-import model.response.RetrieveItsaStatusResponse
+import v2.retrieveItsaStatus.model.request.RetrieveItsaStatusRequestData
+import v2.retrieveItsaStatus.model.response.RetrieveItsaStatusResponse
 
 import scala.concurrent.{ExecutionContext, Future}
 
