@@ -14,11 +14,7 @@
  * limitations under the License.
  */
 
-import sbt.Keys.{baseDirectory, parallelExecution, unmanagedClasspath}
 import sbt.*
-import uk.gov.hmrc.DefaultBuildSettings.{addTestReportOption, defaultSettings}
-import uk.gov.hmrc.versioning.SbtGitVersioning.autoImport.majorVersion
-import org.scalafmt.sbt.ScalafmtPlugin
 import uk.gov.hmrc.DefaultBuildSettings
 
 ThisBuild / scalaVersion := "2.13.16"
