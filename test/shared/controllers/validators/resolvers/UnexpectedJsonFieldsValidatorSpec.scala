@@ -33,6 +33,8 @@ class UnexpectedJsonFieldsValidatorSpec extends UnitSpec {
 
   case class Bar(a: Option[String] = None, b: Option[String] = None, e: Option[SomeEnum] = None)
 
+  given SchemaStructureSource[Bar] = SchemaStructureSource.derived
+
   case class Foo(bar: Bar, bars: Option[Seq[Bar]] = None, bar2: Option[Bar] = None)
 
   implicit val someEnumChecker: SchemaStructureSource[SomeEnum] = SchemaStructureSource.leaf
@@ -200,7 +202,7 @@ class UnexpectedJsonFieldsValidatorSpec extends UnitSpec {
           val dataA4 = Foo2(A4(true))
           val dataA5 = Foo2(A5(BigInt(3)))
           val dataA6 = Foo2(A6(BigDecimal(4.0)))
-          val dataA7 = Foo2(A7(TaxYear("2023")))
+          val dataA7 = Foo2(A7(TaxYear.ending(2023)))
 
           val extraPathCheckerA1 = SchemaStructureSource[A1]
           val extraPathCheckerA2 = SchemaStructureSource[A2]

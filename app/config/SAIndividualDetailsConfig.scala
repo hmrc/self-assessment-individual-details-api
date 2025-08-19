@@ -17,18 +17,17 @@
 package config
 
 import play.api.Configuration
-import shared.config.FeatureSwitches
-import uk.gov.hmrc.play.bootstrap.config.ServicesConfig
+import shared.config.{FeatureSwitches, SharedAppConfig}
 
 import javax.inject.{Inject, Singleton}
 
 /** Put API-specific config here...
   */
 @Singleton
-class SAIndividualDetailsConfig @Inject() (config: ServicesConfig, configuration: Configuration) {
+class SAIndividualDetailsConfig @Inject() (configuration: Configuration) {
 
   def featureSwitchConfig: Configuration = configuration.getOptional[Configuration](s"feature-switch").getOrElse(Configuration.empty)
 
-  def featureSwitches: FeatureSwitches = SAIndividualDetailsFeatureSwitches(featureSwitchConfig)
+  def featureSwitches(implicit appConfig: SharedAppConfig): FeatureSwitches = SAIndividualDetailsFeatureSwitches()
 
 }
