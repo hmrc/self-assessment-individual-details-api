@@ -76,16 +76,10 @@ class DownstreamResponseMappingSupportSpec extends UnitSpec {
       }
     }
 
-    "downstream returns INVALID_CORRELATION_ID or INVALID_CORRELATIONID" must {
+    "downstream returns INVALID_CORRELATION_ID" must {
       "return InternalError for INVALID_CORRELATION_ID" in {
         mapping.mapDownstreamErrors(errorCodeMap)(
           ResponseWrapper(correlationId, DownstreamErrors.single(DownstreamErrorCode("INVALID_CORRELATION_ID")))) shouldBe
-          ErrorWrapper(correlationId, InternalError)
-      }
-
-      "return InternalError for INVALID_CORRELATIONID" in {
-        mapping.mapDownstreamErrors(errorCodeMap)(
-          ResponseWrapper(correlationId, DownstreamErrors.single(DownstreamErrorCode("INVALID_CORRELATIONID")))) shouldBe
           ErrorWrapper(correlationId, InternalError)
       }
     }

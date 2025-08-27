@@ -22,33 +22,9 @@ import shared.utils.UnitSpec
 
 class ApiModelSpec extends UnitSpec {
 
-  private val access: Access               = Access("restricted", Seq("01", "04", "05"))
-  private val parameter: Parameter         = Parameter("Some parameter", true)
-  private val anotherParameter: Parameter  = Parameter("Another parameter")
   private val apiVersion: APIVersion       = APIVersion(Version3, APIStatus.ALPHA, endpointsEnabled = true)
   private val apiDefinition: APIDefinition = APIDefinition("b", "c", "d", List("category"), List(apiVersion), Some(false))
   private val definition                   = Definition(apiDefinition)
-
-  private val accessJson: JsValue = Json.parse(s"""
-     |{
-     | "type": "restricted",
-     | "whitelistedApplicationIds": ["01", "04", "05"]
-     |}
-     |""".stripMargin)
-
-  private val parameterJson: JsValue = Json.parse(s"""
-     |{
-     | "name": "Some parameter",
-     | "required": true
-     |}
-     |""".stripMargin)
-
-  private val anotherParameterJson: JsValue = Json.parse(s"""
-     |{
-     | "name": "Another parameter",
-     | "required": false
-     |}
-     |""".stripMargin)
 
   private val apiVersionJson: JsValue = Json.parse(s"""
        |{
@@ -72,40 +48,6 @@ class ApiModelSpec extends UnitSpec {
        |"api": $apiDefinitionJson
        |}
        |""".stripMargin)
-
-  "Access" when {
-    "the full model is present" should {
-      "correctly write the model to json" in {
-        Json.toJson(access) shouldBe accessJson
-      }
-    }
-
-    "the full Json is present" should {
-      "correctly read JSON to a model" in {
-        accessJson.as[Access] shouldBe access
-      }
-    }
-  }
-
-  "Parameter" when {
-    "the full model is present" should {
-      "correctly write the model to json" in {
-        Json.toJson(parameter) shouldBe parameterJson
-      }
-    }
-
-    "the minimal model is present" should {
-      "correctly write the model to json" in {
-        Json.toJson(anotherParameter) shouldBe anotherParameterJson
-      }
-    }
-
-    "the full Json is present" should {
-      "correctly read JSON to a model" in {
-        parameterJson.as[Parameter] shouldBe parameter
-      }
-    }
-  }
 
   "Definition" when {
     "the full model is present" should {
