@@ -14,11 +14,11 @@
  * limitations under the License.
  */
 
-package v2.models.domain
+package v2.retrieveItsaStatus.def2.model.response
 
 import shared.utils.UnitSpec
 import shared.utils.enums.EnumJsonSpecSupport
-import v2.models.domain.StatusEnum.*
+import v2.retrieveItsaStatus.def2.model.response.StatusEnum.*
 
 class StatusEnumSpec extends UnitSpec with EnumJsonSpecSupport {
 
@@ -27,7 +27,7 @@ class StatusEnumSpec extends UnitSpec with EnumJsonSpecSupport {
     ("01", `MTD Mandated`),
     ("02", `MTD Voluntary`),
     ("03", Annual),
-    ("04", `Non Digital`),
+    ("04", `Digitally Exempt`),
     ("05", Dormant),
     ("99", `MTD Exempt`)
   )
@@ -37,7 +37,7 @@ class StatusEnumSpec extends UnitSpec with EnumJsonSpecSupport {
     ("MTD Mandated", `MTD Mandated`),
     ("MTD Voluntary", `MTD Voluntary`),
     ("Annual", Annual),
-    ("Non Digital", `Non Digital`),
+    ("Digitally Exempt", `Digitally Exempt`),
     ("Dormant", Dormant),
     ("MTD Exempt", `MTD Exempt`)
   )

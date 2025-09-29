@@ -14,12 +14,12 @@
  * limitations under the License.
  */
 
-package v2.retrieveItsaStatus.def1.model.response
+package v2.retrieveItsaStatus.def2.model.response
 
 import play.api.libs.json.{JsValue, Json}
 import shared.utils.UnitSpec
 import v2.models.domain.StatusReasonEnum.*
-import v2.retrieveItsaStatus.def1.model.response.StatusEnum.`MTD Voluntary`
+import v2.retrieveItsaStatus.def2.model.response.StatusEnum.`MTD Voluntary`
 
 class ItsaStatusesSpec extends UnitSpec {
 

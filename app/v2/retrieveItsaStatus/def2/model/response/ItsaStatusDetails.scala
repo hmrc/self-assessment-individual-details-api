@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package v2.retrieveItsaStatus.def1.model.response
+package v2.retrieveItsaStatus.def2.model.response
 
 import play.api.libs.functional.syntax.toFunctionalBuilderOps
 import play.api.libs.json.{JsPath, Json, OWrites, Reads}

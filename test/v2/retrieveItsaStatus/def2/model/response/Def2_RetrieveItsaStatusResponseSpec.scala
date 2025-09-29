@@ -14,13 +14,13 @@
  * limitations under the License.
  */
 
-package v2.retrieveItsaStatus.def1.model.response
+package v2.retrieveItsaStatus.def2.model.response
 
 import play.api.libs.json.{JsError, JsObject, JsValue, Json}
 import shared.utils.UnitSpec
 import v2.models.domain.StatusReasonEnum
 
-class Def1_RetrieveItsaStatusResponseSpec extends UnitSpec {
+class Def2_RetrieveItsaStatusResponseSpec extends UnitSpec {
 
   private def mtdJson(status: String, statusReason: String): JsValue = Json.parse(
     s"""
@@ -61,8 +61,8 @@ class Def1_RetrieveItsaStatusResponseSpec extends UnitSpec {
       """.stripMargin
     )
 
-  private def model(status: StatusEnum, statusReason: StatusReasonEnum): Def1_RetrieveItsaStatusResponse =
-    Def1_RetrieveItsaStatusResponse(
+  private def model(status: StatusEnum, statusReason: StatusReasonEnum): Def2_RetrieveItsaStatusResponse =
+    Def2_RetrieveItsaStatusResponse(
       itsaStatuses = List(
         ItsaStatuses(
           taxYear = "2025-26",
@@ -85,7 +85,7 @@ class Def1_RetrieveItsaStatusResponseSpec extends UnitSpec {
     StatusEnum.`MTD Mandated`,
     StatusEnum.`MTD Voluntary`,
     StatusEnum.Annual,
-    StatusEnum.`Non Digital`,
+    StatusEnum.`Digitally Exempt`,
     StatusEnum.Dormant,
     StatusEnum.`MTD Exempt`
   )
@@ -113,7 +113,7 @@ class Def1_RetrieveItsaStatusResponseSpec extends UnitSpec {
           statusReasonValues.foreach { statusReason =>
             val json: JsValue = downstreamJson(status.toString, statusReason.toString)
 
-            json.as[Def1_RetrieveItsaStatusResponse] shouldBe model(status, statusReason)
+            json.as[Def2_RetrieveItsaStatusResponse] shouldBe model(status, statusReason)
           }
         }
       }
@@ -123,7 +123,7 @@ class Def1_RetrieveItsaStatusResponseSpec extends UnitSpec {
           statusReasonValues.foreach { statusReason =>
             val json: JsValue = downstreamJson(status.fromDownstream, statusReason.fromDownstream)
 
-            json.as[Def1_RetrieveItsaStatusResponse] shouldBe model(status, statusReason)
+            json.as[Def2_RetrieveItsaStatusResponse] shouldBe model(status, statusReason)
           }
         }
       }
@@ -133,7 +133,7 @@ class Def1_RetrieveItsaStatusResponseSpec extends UnitSpec {
       "produce a JsError" in {
         val invalidJson: JsObject = JsObject.empty
 
-        invalidJson.validate[Def1_RetrieveItsaStatusResponse] shouldBe a[JsError]
+        invalidJson.validate[Def2_RetrieveItsaStatusResponse] shouldBe a[JsError]
       }
     }
 
@@ -141,9 +141,9 @@ class Def1_RetrieveItsaStatusResponseSpec extends UnitSpec {
       "produce the expected JSON" in {
         statusValues.foreach { status =>
           statusReasonValues.foreach { statusReason =>
-            val expectedModel: Def1_RetrieveItsaStatusResponse = model(status, statusReason)
+            val expectedModel: Def2_RetrieveItsaStatusResponse = model(status, statusReason)
 
-            Json.toJson[Def1_RetrieveItsaStatusResponse](expectedModel) shouldBe mtdJson(
+            Json.toJson[Def2_RetrieveItsaStatusResponse](expectedModel) shouldBe mtdJson(
               status.toString,
               statusReason.toString
             )

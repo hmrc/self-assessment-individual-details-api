@@ -20,7 +20,7 @@ import shared.models.domain.{Nino, TaxYear}
 import shared.models.errors.*
 import shared.models.outcomes.ResponseWrapper
 import shared.services.ServiceSpec
-import v2.models.domain.StatusEnum.`No Status`
+import v2.retrieveItsaStatus.def1.model.response.StatusEnum.`No Status`
 import v2.models.domain.StatusReasonEnum.`Sign up - return available`
 import v2.models.errors.{FutureYearsFormatError, HistoryFormatError}
 import v2.retrieveItsaStatus.def1.model.request.Def1_RetrieveItsaStatusRequestData

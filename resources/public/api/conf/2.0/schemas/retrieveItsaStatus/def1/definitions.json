@@ -13,8 +13,8 @@
     },
     "status": {
       "type": "string",
-      "description": "The ITSA Status for the Tax Year.",
       {{#if (enabled '1878_digitally_exempt_docs')}}
+      "description": "The ITSA Status for the Tax Year. The value `Non Digital` is deprecated and will be removed in the future",
       "enum": [
         "No Status",
         "MTD Mandated",

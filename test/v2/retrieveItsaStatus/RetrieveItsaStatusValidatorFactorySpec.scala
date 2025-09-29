@@ -18,22 +18,37 @@ package v2.retrieveItsaStatus
 
 import shared.utils.UnitSpec
 import v2.retrieveItsaStatus.def1.Def1_RetrieveItsaStatusValidator
+import v2.retrieveItsaStatus.def2.Def2_RetrieveItsaStatusValidator
+
+import java.time.{Clock, Instant, ZoneId}
 
 class RetrieveItsaStatusValidatorFactorySpec extends UnitSpec {
 
   private val validNino    = "AA123456A"
   private val validTaxYear = "2023-24"
 
-  private val validatorFactory = new RetrieveItsaStatusValidatorFactory
-
   "validator factory" when {
-    "given any request for schema 1" should {
+    "given any request for schema and the tax year is 2025-26 or before" should {
+      val validatorFactory = new RetrieveItsaStatusValidatorFactory
       "return the Validator for schema definition 1" in {
         validatorFactory.validator(validNino, validTaxYear, None, None) shouldBe a[Def1_RetrieveItsaStatusValidator]
       }
 
-      "return the Validator for schema definition 1 when request specifies futureYears and history" in {
+      "return the Validator for schema definition when request specifies futureYears and history and the tax year is 2025-26 or before" in {
         validatorFactory.validator(validNino, validTaxYear, Some("true"), Some("true")) shouldBe a[Def1_RetrieveItsaStatusValidator]
+
+      }
+    }
+
+    "given any request for schema and the tax year is 2026-27 or after" should {
+      implicit val clock: Clock = Clock.fixed(Instant.parse("2026-07-11T10:00:00.00Z"), ZoneId.of("UTC"))
+      val validatorFactory      = new RetrieveItsaStatusValidatorFactory
+      "return the Validator for schema definition 2" in {
+        validatorFactory.validator(validNino, validTaxYear, None, None) shouldBe a[Def2_RetrieveItsaStatusValidator]
+      }
+
+      "return the Validator for schema definition when request specifies futureYears and history and the tax year is 2026-27 or after" in {
+        validatorFactory.validator(validNino, validTaxYear, Some("true"), Some("true")) shouldBe a[Def2_RetrieveItsaStatusValidator]
 
       }
     }

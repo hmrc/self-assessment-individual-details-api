@@ -25,6 +25,8 @@ import shared.controllers.validators.Validator
 import shared.models.errors.MtdError
 import v2.retrieveItsaStatus.model.request.RetrieveItsaStatusRequestData
 
+import java.time.Clock
+
 trait MockRetrieveItsaStatusValidatorFactory extends TestSuite with MockFactory {
 
   val mockRetrieveItsaStatusValidatorFactory: RetrieveItsaStatusValidatorFactory = mock[RetrieveItsaStatusValidatorFactory]
@@ -32,7 +34,7 @@ trait MockRetrieveItsaStatusValidatorFactory extends TestSuite with MockFactory 
   object MockedRetrieveItsaStatusValidatorFactory {
 
     def validator(): CallHandler[Validator[RetrieveItsaStatusRequestData]] =
-      (mockRetrieveItsaStatusValidatorFactory.validator(_: String, _: String, _: Option[String], _: Option[String])).expects(*, *, *, *)
+      (mockRetrieveItsaStatusValidatorFactory.validator(_: String, _: String, _: Option[String], _: Option[String])(_: Clock)).expects(*, *, *, *, *)
 
   }
 

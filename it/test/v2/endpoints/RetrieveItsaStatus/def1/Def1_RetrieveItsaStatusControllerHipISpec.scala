@@ -25,6 +25,8 @@ import shared.services.{AuditStub, AuthStub, DownstreamStub, MtdIdLookupStub}
 import shared.support.IntegrationBaseSpec
 import v2.models.errors.{FutureYearsFormatError, HistoryFormatError}
 
+import java.time.{Clock, Instant, ZoneId}
+
 class Def1_RetrieveItsaStatusControllerHipISpec extends IntegrationBaseSpec {
 
   "Calling the 'Retrieve ITSA Status' endpoint" should {
@@ -132,7 +134,7 @@ class Def1_RetrieveItsaStatusControllerHipISpec extends IntegrationBaseSpec {
         |    "itsaStatusDetails": [
         |      {
         |        "submittedOn": "2023-05-23T12:29:27.566Z",
-        |        "status": "00",
+        |        "status": "04",
         |        "statusReason": "00",
         |        "businessIncomePriorTo2Years": 23600.99
         |      }
@@ -151,7 +153,7 @@ class Def1_RetrieveItsaStatusControllerHipISpec extends IntegrationBaseSpec {
         |      "itsaStatusDetails": [
         |        {
         |          "submittedOn": "2023-05-23T12:29:27.566Z",
-        |          "status": "No Status",
+        |          "status": "Non Digital",
         |          "statusReason": "Sign up - return available",
         |          "businessIncome2YearsPrior": 23600.99
         |        }

@@ -17,9 +17,14 @@
 package v2.retrieveItsaStatus
 
 import play.api.libs.json.Reads
+import shared.models.domain.TaxYear
 import shared.schema.DownstreamReadable
 import v2.retrieveItsaStatus.def1.model.response.Def1_RetrieveItsaStatusResponse
+import v2.retrieveItsaStatus.def2.model.response.Def2_RetrieveItsaStatusResponse
 import v2.retrieveItsaStatus.model.response.RetrieveItsaStatusResponse
+
+import java.time.Clock
+import scala.math.Ordered.orderingToOrdered
 
 sealed trait RetrieveItsaStatusSchema extends DownstreamReadable[RetrieveItsaStatusResponse]
 
@@ -28,6 +33,15 @@ object RetrieveItsaStatusSchema {
   case object Def1 extends RetrieveItsaStatusSchema {
     type DownstreamResp = Def1_RetrieveItsaStatusResponse
     val connectorReads: Reads[DownstreamResp] = Def1_RetrieveItsaStatusResponse.reads
+  }
+
+  case object Def2 extends RetrieveItsaStatusSchema {
+    type DownstreamResp = Def2_RetrieveItsaStatusResponse
+    val connectorReads: Reads[DownstreamResp] = Def2_RetrieveItsaStatusResponse.reads
+  }
+
+  def schemaFor(implicit clock: Clock): RetrieveItsaStatusSchema = {
+    if (TaxYear.currentTaxYear(clock) >= TaxYear.ending(2027)) Def2 else Def1
   }
 
 }

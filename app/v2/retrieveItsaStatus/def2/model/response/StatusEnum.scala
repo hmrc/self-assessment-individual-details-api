@@ -14,19 +14,19 @@
  * limitations under the License.
  */
 
-package v2.models.domain
+package v2.retrieveItsaStatus.def2.model.response
 
 import play.api.libs.json.*
 import shared.utils.enums.Enums
 
 enum StatusEnum(val fromDownstream: String) {
-  case `No Status`     extends StatusEnum("00")
-  case `MTD Mandated`  extends StatusEnum("01")
-  case `MTD Voluntary` extends StatusEnum("02")
-  case Annual          extends StatusEnum("03")
-  case `Non Digital`   extends StatusEnum("04")
-  case Dormant         extends StatusEnum("05")
-  case `MTD Exempt`    extends StatusEnum("99")
+  case `No Status`        extends StatusEnum("00")
+  case `MTD Mandated`     extends StatusEnum("01")
+  case `MTD Voluntary`    extends StatusEnum("02")
+  case Annual             extends StatusEnum("03")
+  case `Digitally Exempt` extends StatusEnum("04")
+  case Dormant            extends StatusEnum("05")
+  case `MTD Exempt`       extends StatusEnum("99")
 }
 
 object StatusEnum {
