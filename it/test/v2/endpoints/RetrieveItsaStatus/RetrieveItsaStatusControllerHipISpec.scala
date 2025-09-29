@@ -14,33 +14,25 @@
  * limitations under the License.
  */
 
-package v2.endpoints.RetrieveItsaStatus.def1
+package v2.endpoints.RetrieveItsaStatus
 
-import play.api.http.HeaderNames.ACCEPT
-import play.api.http.Status.*
 import play.api.libs.json.{JsValue, Json}
 import play.api.libs.ws.{WSRequest, WSResponse}
-import play.api.test.Helpers.AUTHORIZATION
+import play.api.test.Helpers.*
 import shared.models.domain.TaxYear
 import shared.models.errors.*
 import shared.services.{AuditStub, AuthStub, DownstreamStub, MtdIdLookupStub}
 import shared.support.IntegrationBaseSpec
 import v2.models.errors.{FutureYearsFormatError, HistoryFormatError}
 
-class Def1_RetrieveItsaStatusControllerIfsISpec extends IntegrationBaseSpec {
-
-  override def servicesConfig: Map[String, Any] =
-    Map("feature-switch.ifs_hip_migration_1878.enabled" -> false) ++ super.servicesConfig
+class RetrieveItsaStatusControllerHipISpec extends IntegrationBaseSpec {
 
   "Calling the 'Retrieve ITSA Status' endpoint" should {
     "return a 200 status code" when {
       "any valid request is made" in new Test {
 
-        val downstreamQueryParams: Map[String, String] = Map("futureYears" -> futureYears, "history" -> history)
-
-        override def setupStubs(): Unit = {
+        override def setupStubs(): Unit =
           DownstreamStub.onSuccess(DownstreamStub.GET, downstreamUri, downstreamQueryParams, OK, downstreamResponse)
-        }
 
         val response: WSResponse = await(request.withQueryStringParameters("futureYears" -> futureYears, "history" -> history).get())
         response.status shouldBe OK
@@ -83,11 +75,10 @@ class Def1_RetrieveItsaStatusControllerIfsISpec extends IntegrationBaseSpec {
 
       "downstream service error" when {
         def serviceErrorTest(downstreamStatus: Int, downstreamCode: String, expectedStatus: Int, expectedBody: MtdError): Unit = {
-          s"downstream returns an $downstreamCode error and status $downstreamStatus" in new Test {
+          s"downstream returns a code $downstreamCode error and status $downstreamStatus" in new Test {
 
-            override def setupStubs(): Unit = {
-              DownstreamStub.onError(DownstreamStub.GET, downstreamUri, downstreamStatus, errorBody(downstreamCode))
-            }
+            override def setupStubs(): Unit =
+              DownstreamStub.onError(DownstreamStub.GET, downstreamUri, downstreamQueryParams, downstreamStatus, errorBody(downstreamCode))
 
             val response: WSResponse = await(request.withQueryStringParameters("futureYears" -> futureYears, "history" -> history).get())
             response.status shouldBe expectedStatus
@@ -98,22 +89,21 @@ class Def1_RetrieveItsaStatusControllerIfsISpec extends IntegrationBaseSpec {
 
         def errorBody(code: String): String =
           s"""
-             |{
-             |   "code": "$code",
-             |   "reason": "downstream message"
-             |}
-            """.stripMargin
+            |[
+            |    {
+            |        "errorCode": "$code",
+            |        "errorDescription": "error description"
+            |    }
+            |]
+          """.stripMargin
 
-        val input = List(
-          (BAD_REQUEST, "INVALID_TAXABLE_ENTITY_ID", BAD_REQUEST, NinoFormatError),
-          (BAD_REQUEST, "INVALID_TAX_YEAR", BAD_REQUEST, TaxYearFormatError),
-          (BAD_REQUEST, "INVALID_FUTURES_YEAR", BAD_REQUEST, FutureYearsFormatError),
-          (BAD_REQUEST, "INVALID_HISTORY", BAD_REQUEST, HistoryFormatError),
-          (BAD_REQUEST, "INVALID_CORRELATION_ID", INTERNAL_SERVER_ERROR, InternalError),
-          (NOT_FOUND, "NOT_FOUND", NOT_FOUND, NotFoundError),
-          (INTERNAL_SERVER_ERROR, "SERVER_ERROR", INTERNAL_SERVER_ERROR, InternalError),
-          (SERVICE_UNAVAILABLE, "SERVICE_UNAVAILABLE", INTERNAL_SERVER_ERROR, InternalError)
+        val input = Seq(
+          (BAD_REQUEST, "1215", BAD_REQUEST, NinoFormatError),
+          (BAD_REQUEST, "1117", BAD_REQUEST, TaxYearFormatError),
+          (BAD_REQUEST, "1216", INTERNAL_SERVER_ERROR, InternalError),
+          (NOT_FOUND, "5010", NOT_FOUND, NotFoundError)
         )
+
         input.foreach(args => serviceErrorTest.tupled(args))
       }
     }
@@ -121,12 +111,18 @@ class Def1_RetrieveItsaStatusControllerIfsISpec extends IntegrationBaseSpec {
 
   private trait Test {
 
-    private lazy val downstreamTaxYear: String = TaxYear.fromMtd(mtdTaxYear).asTysDownstream
-
     val nino: String        = "AA123456A"
     val mtdTaxYear: String  = "2023-24"
     val futureYears: String = "true"
     val history: String     = "true"
+
+    private def downstreamTaxYear: String = TaxYear.fromMtd(mtdTaxYear).asTysDownstream
+
+    def downstreamQueryParams: Map[String, String] = Map(
+      "taxYear"     -> downstreamTaxYear,
+      "futureYears" -> futureYears,
+      "history"     -> history
+    )
 
     val downstreamResponse: JsValue = Json.parse(
       """
@@ -136,14 +132,14 @@ class Def1_RetrieveItsaStatusControllerIfsISpec extends IntegrationBaseSpec {
         |    "itsaStatusDetails": [
         |      {
         |        "submittedOn": "2023-05-23T12:29:27.566Z",
-        |        "status": "No Status",
-        |        "statusReason": "Sign up - return available",
+        |        "status": "04",
+        |        "statusReason": "00",
         |        "businessIncomePriorTo2Years": 23600.99
         |      }
         |    ]
         |  }
         |]
-    """.stripMargin
+      """.stripMargin
     )
 
     val mtdResponse: JsValue = Json.parse(
@@ -155,7 +151,7 @@ class Def1_RetrieveItsaStatusControllerIfsISpec extends IntegrationBaseSpec {
         |      "itsaStatusDetails": [
         |        {
         |          "submittedOn": "2023-05-23T12:29:27.566Z",
-        |          "status": "No Status",
+        |          "status": "Non Digital",
         |          "statusReason": "Sign up - return available",
         |          "businessIncome2YearsPrior": 23600.99
         |        }
@@ -163,10 +159,10 @@ class Def1_RetrieveItsaStatusControllerIfsISpec extends IntegrationBaseSpec {
         |    }
         |  ]
         |}
-    """.stripMargin
+      """.stripMargin
     )
 
-    def downstreamUri: String = s"/income-tax/$nino/person-itd/itsa-status/$downstreamTaxYear"
+    def downstreamUri: String = s"/itsd/person-itd/itsa-status/$nino"
 
     def request: WSRequest = {
       AuditStub.audit()
@@ -176,7 +172,7 @@ class Def1_RetrieveItsaStatusControllerIfsISpec extends IntegrationBaseSpec {
       buildRequest(uri)
         .withHttpHeaders(
           (ACCEPT, "application/vnd.hmrc.2.0+json"),
-          (AUTHORIZATION, "Bearer 123") // some bearer token
+          (AUTHORIZATION, "Bearer 123")
         )
     }
 

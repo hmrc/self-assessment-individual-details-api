@@ -19,11 +19,11 @@ package v2.retrieveItsaStatus.def1.model.response
 import play.api.libs.json.{JsValue, Json}
 import shared.utils.UnitSpec
 import v2.models.domain.StatusReasonEnum.*
-import v2.retrieveItsaStatus.def1.model.response.StatusEnum.`MTD Voluntary`
+import v2.retrieveItsaStatus.def1.model.response.StatusEnum.`Non Digital`
 
 class ItsaStatusesSpec extends UnitSpec {
 
-  private val itsaStatusDetails: ItsaStatusDetails = ItsaStatusDetails("2018-01-01", `MTD Voluntary`, `MTD ITSA Opt-In`, Some(50000.25))
+  private val itsaStatusDetails: ItsaStatusDetails = ItsaStatusDetails("2018-01-01", `Non Digital`, `MTD ITSA Opt-In`, Some(50000.25))
   private val itsaStatuses: ItsaStatuses           = ItsaStatuses("2017", Some(Seq(itsaStatusDetails)))
   private val minimalItsaStatuses: ItsaStatuses    = ItsaStatuses("2017", None)
 
@@ -31,7 +31,7 @@ class ItsaStatusesSpec extends UnitSpec {
     s"""
       |{
       | "submittedOn": "2018-01-01",
-      | "status": "MTD Voluntary",
+      | "status": "Non Digital",
       | "statusReason": "MTD ITSA Opt-In",
       | "businessIncome2YearsPrior": 50000.25
       |}
@@ -42,7 +42,7 @@ class ItsaStatusesSpec extends UnitSpec {
     s"""
        |{
        | "submittedOn": "2018-01-01",
-       | "status": "MTD Voluntary",
+       | "status": "Non Digital",
        | "statusReason": "MTD ITSA Opt-In",
        | "businessIncomePriorTo2Years": 50000.25
        |}
