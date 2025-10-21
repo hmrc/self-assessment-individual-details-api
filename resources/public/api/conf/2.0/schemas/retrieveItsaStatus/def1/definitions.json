@@ -26,6 +26,7 @@
         "MTD Exempt"
       ]
       {{else}}
+      "description": "The ITSA Status for the Tax Year.",
       "enum": [
         "No Status",
         "MTD Mandated",
