@@ -130,6 +130,22 @@ class AuthHipISpec extends IntegrationBaseSpec {
     }
   }
 
+  "User does not have an MTD enrolment" should {
+
+    "return 403 with specific enrolment error" in new Test {
+      override val nino: String = "AA123456A"
+
+      override def setupStubs(): StubMapping = {
+        AuditStub.audit()
+        MtdIdLookupStub.ninoFound(nino)
+        AuthStub.insufficientEnrolments()
+      }
+
+      val response: WSResponse = await(request().get())
+      response.status shouldBe FORBIDDEN
+    }
+  }
+
   private trait Test {
     val nino               = "AA123456A"
     private val mtdTaxYear = "2022-23"
