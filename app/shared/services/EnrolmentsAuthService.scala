@@ -72,7 +72,7 @@ class EnrolmentsAuthService @Inject() (val connector: AuthConnector, val appConf
                   }
               case _: InsufficientEnrolments =>
                 logger.warn(s"[EnrolmentsAuthService][authorised] Agent enrolment not found for MTDITID: $mtdId")
-                Future.successful(Left(ClientOrAgentNotAuthorisedError))
+                Future.successful(Left(ClientNotEnrolledError))
             }
         case _ =>
           logger.warn(s"[EnrolmentsAuthService][authorised] Invalid AffinityGroup.")
