@@ -20,6 +20,7 @@ import com.github.tomakehurst.wiremock.stubbing.StubMapping
 import play.api.libs.json.{JsValue, Json}
 import play.api.libs.ws.{WSRequest, WSResponse}
 import play.api.test.Helpers.*
+import shared.models.errors.{ClientNotEnrolledError, ClientOrAgentNotAuthorisedError}
 import shared.services.{AuditStub, AuthStub, DownstreamStub, MtdIdLookupStub}
 import shared.support.IntegrationBaseSpec
 
@@ -127,6 +128,7 @@ class AuthHipISpec extends IntegrationBaseSpec {
 
       val response: WSResponse = await(request().get())
       response.status shouldBe FORBIDDEN
+      response.json shouldBe Json.toJson(ClientOrAgentNotAuthorisedError)
     }
   }
 
@@ -143,6 +145,7 @@ class AuthHipISpec extends IntegrationBaseSpec {
 
       val response: WSResponse = await(request().get())
       response.status shouldBe FORBIDDEN
+      response.json shouldBe Json.toJson(ClientNotEnrolledError)
     }
   }
 
