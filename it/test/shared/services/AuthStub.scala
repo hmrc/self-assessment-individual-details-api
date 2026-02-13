@@ -69,6 +69,10 @@ object AuthStub extends WireMockMethods {
     when(method = POST, uri = authoriseUri)
       .thenReturn(status = UNAUTHORIZED, headers = Map("WWW-Authenticate" -> """MDTP detail="InvalidBearerToken""""))
 
+  def insufficientEnrolments(): StubMapping =
+    when(method = POST, uri = authoriseUri)
+      .thenReturn(status = UNAUTHORIZED, headers = Map("WWW-Authenticate" -> """MDTP detail="InsufficientEnrolments""""))
+
   private def authorisedWith(affinityGroup: String): StubMapping =
     when(method = POST, uri = authoriseUri)
       .withRequestBody(initialRetrievalsRequestBody)
@@ -109,67 +113,67 @@ object AuthStub extends WireMockMethods {
 
   private val initialRetrievalsRequestBody =
     Json.parse("""
-      |{
-      |	"authorise": [
-      |		{
-      |		    "$or":
-      |		    [
-      |		        [
-      |		            {
-      |		                "affinityGroup": "Individual"
-      |		            },
-      |		            {
-      |		                "confidenceLevel": 200
-      |		            },
-      |		            {
-      |		                "identifiers":
-      |		                [
-      |		                    {
-      |		                        "key": "MTDITID",
-      |		                        "value": "1234567890"
-      |		                    }
-      |		                ],
-      |		                "state": "Activated",
-      |		                "delegatedAuthRule": "mtd-it-auth",
-      |		                "enrolment": "HMRC-MTD-IT"
-      |		            }
-      |		        ],
-      |		        [
-      |		            {
-      |		                "affinityGroup": "Organisation"
-      |		            },
-      |		            {
-      |		                "identifiers":
-      |		                [
-      |		                    {
-      |		                        "key": "MTDITID",
-      |		                        "value": "1234567890"
-      |		                    }
-      |		                ],
-      |		                "state": "Activated",
-      |		                "delegatedAuthRule": "mtd-it-auth",
-      |		                "enrolment": "HMRC-MTD-IT"
-      |		            }
-      |		        ],
-      |		        [
-      |		            {
-      |		                "affinityGroup": "Agent"
-      |		            },
-      |		            {
-      |		                "identifiers":
-      |		                [],
-      |		                "state": "Activated",
-      |		                "enrolment": "HMRC-AS-AGENT"
-      |		            }
-      |		        ]
-      |		    ]
-      |		}
-      |	],
-      |	"retrieve": [
-      |		"affinityGroup",
-      |		"authorisedEnrolments"
-      |	]
-      |}
-      |""".stripMargin)
+                 |{
+                 |	"authorise": [
+                 |		{
+                 |		    "$or":
+                 |		    [
+                 |		        [
+                 |		            {
+                 |		                "affinityGroup": "Individual"
+                 |		            },
+                 |		            {
+                 |		                "confidenceLevel": 200
+                 |		            },
+                 |		            {
+                 |		                "identifiers":
+                 |		                [
+                 |		                    {
+                 |		                        "key": "MTDITID",
+                 |		                        "value": "1234567890"
+                 |		                    }
+                 |		                ],
+                 |		                "state": "Activated",
+                 |		                "delegatedAuthRule": "mtd-it-auth",
+                 |		                "enrolment": "HMRC-MTD-IT"
+                 |		            }
+                 |		        ],
+                 |		        [
+                 |		            {
+                 |		                "affinityGroup": "Organisation"
+                 |		            },
+                 |		            {
+                 |		                "identifiers":
+                 |		                [
+                 |		                    {
+                 |		                        "key": "MTDITID",
+                 |		                        "value": "1234567890"
+                 |		                    }
+                 |		                ],
+                 |		                "state": "Activated",
+                 |		                "delegatedAuthRule": "mtd-it-auth",
+                 |		                "enrolment": "HMRC-MTD-IT"
+                 |		            }
+                 |		        ],
+                 |		        [
+                 |		            {
+                 |		                "affinityGroup": "Agent"
+                 |		            },
+                 |		            {
+                 |		                "identifiers":
+                 |		                [],
+                 |		                "state": "Activated",
+                 |		                "enrolment": "HMRC-AS-AGENT"
+                 |		            }
+                 |		        ]
+                 |		    ]
+                 |		}
+                 |	],
+                 |	"retrieve": [
+                 |		"affinityGroup",
+                 |		"authorisedEnrolments"
+                 |	]
+                 |}
+                 |""".stripMargin)
 
 }

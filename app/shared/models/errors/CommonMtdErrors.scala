@@ -73,6 +73,8 @@ object ClientOrAgentNotAuthorisedError extends MtdError("CLIENT_OR_AGENT_NOT_AUT
   def withStatus401: MtdError = copy(httpStatus = UNAUTHORIZED)
 }
 
+object ClientNotEnrolledError extends MtdError("CLIENT_NOT_MTD_ENROLLED", "The client does not have an active MTD enrolment", FORBIDDEN)
+
 object InvalidBearerTokenError extends MtdError("UNAUTHORIZED", "Bearer token is missing or not authorized", UNAUTHORIZED)
 
 // Accept header Errors

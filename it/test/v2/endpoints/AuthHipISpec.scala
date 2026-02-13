@@ -20,6 +20,7 @@ import com.github.tomakehurst.wiremock.stubbing.StubMapping
 import play.api.libs.json.{JsValue, Json}
 import play.api.libs.ws.{WSRequest, WSResponse}
 import play.api.test.Helpers.*
+import shared.models.errors.{ClientNotEnrolledError, ClientOrAgentNotAuthorisedError}
 import shared.services.{AuditStub, AuthStub, DownstreamStub, MtdIdLookupStub}
 import shared.support.IntegrationBaseSpec
 
@@ -127,6 +128,24 @@ class AuthHipISpec extends IntegrationBaseSpec {
 
       val response: WSResponse = await(request().get())
       response.status shouldBe FORBIDDEN
+      response.json shouldBe Json.toJson(ClientOrAgentNotAuthorisedError)
+    }
+  }
+
+  "User does not have an MTD enrolment" should {
+
+    "return 403 with specific enrolment error" in new Test {
+      override val nino: String = "AA123456A"
+
+      override def setupStubs(): StubMapping = {
+        AuditStub.audit()
+        MtdIdLookupStub.ninoFound(nino)
+        AuthStub.insufficientEnrolments()
+      }
+
+      val response: WSResponse = await(request().get())
+      response.status shouldBe FORBIDDEN
+      response.json shouldBe Json.toJson(ClientNotEnrolledError)
     }
   }
 
