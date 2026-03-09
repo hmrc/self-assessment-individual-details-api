@@ -140,7 +140,7 @@ class EnrolmentsAuthService @Inject() (val connector: AuthConnector,
             Future.successful(Left(ClientOrAgentNotAuthorisedError))
           } else {
             println(Console.RED_B + "New!!2" + Console.RESET)
-            enrolmentsAuthConnector.getMtdIds(mtdId)
+            enrolmentsAuthConnector.getMtdIds(mtdId).map(Left(_))
           }
         case null =>
           Future.successful(Left(InternalError))

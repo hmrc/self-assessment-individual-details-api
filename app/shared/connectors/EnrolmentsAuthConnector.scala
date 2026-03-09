@@ -16,18 +16,15 @@
 
 package shared.connectors
 
-import cats.data.EitherT
 import play.api.http.Status.*
-import play.api.mvc.Request
-import shared.utils.Logging
 import shared.config.SharedAppConfig
 import shared.models.errors.{ClientNotEnrolledError, ClientOrAgentNotAuthorisedError, InternalError, MtdError}
 import uk.gov.hmrc.http.client.HttpClientV2
-import uk.gov.hmrc.http.{HeaderCarrier, HttpException, HttpResponse, StringContextOps, UpstreamErrorResponse}
+import uk.gov.hmrc.http.{HeaderCarrier, HttpResponse, StringContextOps}
+import uk.gov.hmrc.http.HttpReads.Implicits.readRaw
 
 import javax.inject.Inject
 import scala.concurrent.{ExecutionContext, Future}
-import scala.util.Try
 
 class EnrolmentsAuthConnector @Inject() (http: HttpClientV2, appConfig: SharedAppConfig) {
 
@@ -37,14 +34,13 @@ class EnrolmentsAuthConnector @Inject() (http: HttpClientV2, appConfig: SharedAp
       mtdId: String
   )(implicit
       hc: HeaderCarrier,
-      request: Request[?]
-  ): EitherT[Future, UpstreamErrorResponse, MtdError] = {
+      ec: ExecutionContext
+  ): Future[MtdError] = {
+
     val url = s"$baseUrl/enrolment-store/enrolments/HMRC-MTD-IT~MTDITID~$mtdId/groups"
-    read(
-      http
-        .get(url"$url")
-        .execute[Either[UpstreamErrorResponse, HttpResponse]]
-    )
+    http
+      .get(url"$url")
+      .execute[HttpResponse]
       .map { response =>
         response.status match {
           case OK         => ClientOrAgentNotAuthorisedError
@@ -53,10 +49,5 @@ class EnrolmentsAuthConnector @Inject() (http: HttpClientV2, appConfig: SharedAp
         }
       }
   }
-
-  def read(
-      response: Future[Either[UpstreamErrorResponse, HttpResponse]]
-  ): EitherT[Future, UpstreamErrorResponse, HttpResponse] =
-    EitherT(response)
 
 }
