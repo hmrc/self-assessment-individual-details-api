@@ -43,9 +43,15 @@ class EnrolmentsAuthConnector @Inject() (http: HttpClientV2, appConfig: SharedAp
       .execute[HttpResponse]
       .map { response =>
         response.status match {
-          case OK         => ClientOrAgentNotAuthorisedError
-          case NO_CONTENT => ClientNotEnrolledError
-          case _          => InternalError
+          case OK | NOT_FOUND =>
+            println(Console.RED_B + "enrolmentStoreProxy 200 - ClientOrAgentNotAuthorisedError" + Console.RESET)
+            ClientOrAgentNotAuthorisedError
+          case NO_CONTENT =>
+            println(Console.RED_B + "enrolmentStoreProxy 204 - ClientNotEnrolledError" + Console.RESET)
+            ClientNotEnrolledError
+          case _ =>
+            println(Console.RED_B + "enrolmentStoreProxy else - InternalError" + Console.RESET)
+            InternalError
         }
       }
   }
