@@ -56,64 +56,39 @@ class EnrolmentsAuthService @Inject() (val connector: AuthConnector,
   def authorised(mtdId: String, endpointAllowsSupportingAgents: Boolean = false)(implicit
       hc: HeaderCarrier,
       ec: ExecutionContext): Future[AuthOutcome] = {
-    println(Console.RED_B + "New Test" + Console.RESET)
-    println(Console.RED_B + "New Test" + Console.RESET)
-    println(Console.RED_B + "New Test" + Console.RESET)
-    println(Console.RED_B + "New Test" + Console.RESET)
-    println(Console.RED_B + "New Test" + Console.RESET)
-    println(Console.RED_B + "New Test" + Console.RESET)
-    println(Console.RED_B + "New Test" + Console.RESET)
-    println(Console.RED_B + "New Test" + Console.RESET)
-    println(Console.RED_B + "New Test" + Console.RESET)
-    println(Console.RED_B + "New Test" + Console.RESET)
-    println(Console.RED_B + "New Test" + Console.RESET)
-    println(Console.RED_B + "New Test" + Console.RESET)
-    println(Console.RED_B + "New Test" + Console.RESET)
-    println(Console.RED_B + "New Test" + Console.RESET)
-    println(Console.RED_B + "New Test" + Console.RESET)
     authFunction
       .authorised(initialPredicate(mtdId))
       .retrieve(affinityGroup and authorisedEnrolments and allEnrolments) {
         case Some(Individual) ~ _ ~ enrolments =>
-          println(Console.RED_B + "Individual success" + Console.RESET)
           Future.successful(Right(UserDetails(mtdId, "Individual", None)))
         case Some(Organisation) ~ _ ~ enrolments =>
-          println(Console.RED_B + "Organisation success" + Console.RESET)
           Future.successful(Right(UserDetails(mtdId, "Organisation", None)))
         case Some(Agent) ~ authorisedEnrolments ~ enrolments =>
-          println(Console.RED_B + "Agent Hit" + Console.RESET)
           authFunction
             .authorised(EnrolmentsAuthService.mtdEnrolmentPredicate(mtdId)) {
-              println(Console.RED_B + "Agent Success" + Console.RESET)
               Future.successful(agentDetails(mtdId, authorisedEnrolments, "Agent"))
             }
             .recoverWith {
               case _: AuthorisationException if endpointAllowsSupportingAgents =>
-                println(Console.RED_B + "Supporting Agent" + Console.RESET)
                 authFunction
                   .authorised(EnrolmentsAuthService.supportingAgentAuthPredicate(mtdId)) {
                     Future.successful(agentDetails(mtdId, authorisedEnrolments, "Supporting Agent"))
                   }
               case _: InsufficientEnrolments =>
-                println(Console.RED_B + "Agent InsufficientEnrolments" + Console.RESET)
                 logger.warn(s"[EnrolmentsAuthService][authorised] Agent enrolment not found for MTDITID: $mtdId")
                 Future.successful(Left(NinoFormatError))
             }
         case _ =>
           logger.warn(s"[EnrolmentsAuthService][authorised] Invalid AffinityGroup.")
-          println(Console.RED_B + "Non Agent, Org or Individual" + Console.RESET)
           Future.successful(Left(ClientOrAgentNotAuthorisedError))
       }
       .recoverWith {
         case _: InsufficientEnrolments =>
-          println(Console.RED_B + "General InsufficientEnrolments" + Console.RESET)
           logger.warn(s"[EnrolmentsAuthService][authorised] Insufficient Enrolments")
           insufficientEnrolments(mtdId)
         case _: AuthorisationException =>
-          println(Console.RED_B + "General Fail AuthorisationException" + Console.RESET)
           Future.successful(Left(ClientOrAgentNotAuthorisedError))
         case error =>
-          println(Console.RED_B + "General Catch All" + Console.RESET)
           logger.warn(s"[EnrolmentsAuthService][authorised] An unexpected error occurred: $error")
           Future.successful(Left(InternalError))
       }
@@ -136,11 +111,8 @@ class EnrolmentsAuthService @Inject() (val connector: AuthConnector,
       .retrieve(allEnrolments) {
         case enrolments: Enrolments =>
           if enrolments.enrolments.contains(Enrolment("HMRC-MTD-IT")) then {
-            println(Console.RED_B + "New!!" + Console.RESET)
             Future.successful(Left(ClientOrAgentNotAuthorisedError))
           } else {
-            println(Console.RED_B + "New!!2" + Console.RESET)
-            println(Console.RED_B + enrolmentsAuthConnector.getMtdIds(mtdId).map(Left(_)) + Console.RESET)
             enrolmentsAuthConnector.getMtdIds(mtdId).map(Left(_))
           }
         case null =>
@@ -148,10 +120,8 @@ class EnrolmentsAuthService @Inject() (val connector: AuthConnector,
       }
       .recoverWith {
         case _: AuthorisationException =>
-          println(Console.RED_B + "General Fail AuthorisationException 2" + Console.RESET)
           Future.successful(Left(ClientOrAgentNotAuthorisedError))
         case error =>
-          println(Console.RED_B + "General Catch All 2" + Console.RESET)
           logger.warn(s"[EnrolmentsAuthService][authorised] An unexpected error occurred: $error")
           Future.successful(Left(InternalError))
       }

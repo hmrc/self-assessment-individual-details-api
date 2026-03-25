@@ -37,20 +37,17 @@ class EnrolmentsAuthConnector @Inject() (http: HttpClientV2, appConfig: SharedAp
       ec: ExecutionContext
   ): Future[MtdError] = {
 
-    val url = s"$baseUrl/enrolment-store/enrolments/HMRC-MTD-IT~MTDITID~$mtdId/groups"
+    val url = s"$baseUrl/enrolment-store-proxy/enrolment-store/enrolments/HMRC-MTD-IT~MTDITID~$mtdId/groups"
     http
       .get(url"$url")
       .execute[HttpResponse]
       .map { response =>
         response.status match {
           case OK | NOT_FOUND =>
-            println(Console.RED_B + "enrolmentStoreProxy 200 - ClientOrAgentNotAuthorisedError" + Console.RESET)
             ClientOrAgentNotAuthorisedError
           case NO_CONTENT =>
-            println(Console.RED_B + "enrolmentStoreProxy 204 - ClientNotEnrolledError" + Console.RESET)
             ClientNotEnrolledError
           case _ =>
-            println(Console.RED_B + "enrolmentStoreProxy else - InternalError" + Console.RESET)
             InternalError
         }
       }

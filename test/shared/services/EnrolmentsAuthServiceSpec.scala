@@ -18,8 +18,9 @@ package shared.services
 
 import org.scalamock.handlers.CallHandler
 import shared.config.{ConfidenceLevelConfig, MockSharedAppConfig}
+import shared.connectors.EnrolmentsAuthConnector
 import shared.models.auth.UserDetails
-import shared.models.errors.{ClientNotEnrolledError, ClientOrAgentNotAuthorisedError, InternalError}
+import shared.models.errors.{ClientNotEnrolledError, ClientOrAgentNotAuthorisedError, InternalError, MtdError}
 import shared.models.outcomes.AuthOutcome
 import shared.services.EnrolmentsAuthService.{
   authorisationDisabledPredicate,
@@ -90,6 +91,10 @@ class EnrolmentsAuthServiceSpec extends ServiceSpec with MockSharedAppConfig {
           .once()
           .returns(Future.successful(retrievalsResult))
 
+        MockedEnrolmentsAuthConnector
+          .getMtdId(mtdId)
+          .returns(Future.successful(ClientOrAgentNotAuthorisedError))
+
         val result: AuthOutcome = await(enrolmentsAuthService.authorised(mtdId))
         result shouldBe Right(UserDetails(mtdId, "Individual", None))
       }
@@ -103,6 +108,10 @@ class EnrolmentsAuthServiceSpec extends ServiceSpec with MockSharedAppConfig {
           .authorised(initialPredicate, affinityGroup and authorisedEnrolments)
           .once()
           .returns(Future.successful(retrievalsResult))
+
+        MockedEnrolmentsAuthConnector
+          .getMtdId(mtdId)
+          .returns(Future.successful(ClientOrAgentNotAuthorisedError))
 
         val result: AuthOutcome = await(enrolmentsAuthService.authorised(mtdId))
         result shouldBe Right(UserDetails(mtdId, "Organisation", None))
@@ -123,6 +132,10 @@ class EnrolmentsAuthServiceSpec extends ServiceSpec with MockSharedAppConfig {
           .authorised(initialPredicate, affinityGroup and authorisedEnrolments)
           .once()
           .returns(Future.successful(retrievalsResult))
+
+        MockedEnrolmentsAuthConnector
+          .getMtdId(mtdId)
+          .returns(Future.successful(ClientOrAgentNotAuthorisedError))
 
         val result: AuthOutcome = await(enrolmentsAuthService.authorised(mtdId))
         result shouldBe Left(InternalError)
@@ -156,6 +169,10 @@ class EnrolmentsAuthServiceSpec extends ServiceSpec with MockSharedAppConfig {
           .authorised(primaryAgentPredicate, EmptyRetrieval)
           .once()
           .returns(Future.successful(EmptyRetrieval))
+
+        MockedEnrolmentsAuthConnector
+          .getMtdId(mtdId)
+          .returns(Future.successful(ClientOrAgentNotAuthorisedError))
 
         mockConfidenceLevelCheckConfig(authValidationEnabled = authValidationEnabled)
 
@@ -197,6 +214,11 @@ class EnrolmentsAuthServiceSpec extends ServiceSpec with MockSharedAppConfig {
           .once()
           .returns(Future.successful(EmptyRetrieval))
 
+        MockedEnrolmentsAuthConnector
+          .getMtdId(mtdId)
+          .once()
+          .returns(Future.successful(ClientOrAgentNotAuthorisedError))
+
         mockConfidenceLevelCheckConfig(authValidationEnabled = authValidationEnabled)
 
         val result: AuthOutcome = await(enrolmentsAuthService.authorised(mtdId, endpointAllowsSupportingAgents = true))
@@ -231,6 +253,11 @@ class EnrolmentsAuthServiceSpec extends ServiceSpec with MockSharedAppConfig {
           .once()
           .returns(Future.failed(InsufficientEnrolments()))
 
+        MockedEnrolmentsAuthConnector
+          .getMtdId(mtdId)
+          .once()
+          .returns(Future.successful(ClientOrAgentNotAuthorisedError))
+
         mockConfidenceLevelCheckConfig(authValidationEnabled = authValidationEnabled)
 
         val result: AuthOutcome = await(enrolmentsAuthService.authorised(mtdId))
@@ -246,6 +273,11 @@ class EnrolmentsAuthServiceSpec extends ServiceSpec with MockSharedAppConfig {
           .once()
           .returns(Future.failed(MissingBearerToken()))
 
+        MockedEnrolmentsAuthConnector
+          .getMtdId(mtdId)
+          .once()
+          .returns(Future.successful(ClientOrAgentNotAuthorisedError))
+
         val result: AuthOutcome = await(enrolmentsAuthService.authorised(mtdId))
         result shouldBe Left(ClientOrAgentNotAuthorisedError)
       }
@@ -259,15 +291,21 @@ class EnrolmentsAuthServiceSpec extends ServiceSpec with MockSharedAppConfig {
           .once()
           .returns(Future.failed(InsufficientEnrolments()))
 
+        MockedEnrolmentsAuthConnector
+          .getMtdId(mtdId)
+          .once()
+          .returns(Future.successful(ClientOrAgentNotAuthorisedError))
+
         val result: AuthOutcome = await(enrolmentsAuthService.authorised(mtdId))
         result shouldBe Left(ClientNotEnrolledError)
       }
   }
 
   trait Test {
-    val mockAuthConnector: AuthConnector = mock[AuthConnector]
+    val mockAuthConnector: AuthConnector                     = mock[AuthConnector]
+    val mockEnrolmentsAuthConnector: EnrolmentsAuthConnector = mock[EnrolmentsAuthConnector]
 
-    lazy val enrolmentsAuthService = new EnrolmentsAuthService(mockAuthConnector, mockSharedAppConfig)
+    lazy val enrolmentsAuthService = new EnrolmentsAuthService(mockAuthConnector, mockEnrolmentsAuthConnector, mockSharedAppConfig)
 
     object MockedAuthConnector {
 
@@ -275,6 +313,16 @@ class EnrolmentsAuthServiceSpec extends ServiceSpec with MockSharedAppConfig {
         (mockAuthConnector
           .authorise[A](_: Predicate, _: Retrieval[A])(_: HeaderCarrier, _: ExecutionContext))
           .expects(predicate, retrievals, *, *)
+      }
+
+    }
+
+    object MockedEnrolmentsAuthConnector {
+
+      def getMtdId(mtdItId: String): CallHandler[Future[MtdError]] = {
+        (mockEnrolmentsAuthConnector
+          .getMtdIds(_: String)(_: HeaderCarrier, _: ExecutionContext))
+          .expects(mtdItId, *, *)
       }
 
     }
