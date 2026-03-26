@@ -91,10 +91,6 @@ class EnrolmentsAuthServiceSpec extends ServiceSpec with MockSharedAppConfig {
           .once()
           .returns(Future.successful(retrievalsResult))
 
-        MockedEnrolmentsAuthConnector
-          .getMtdId(mtdId)
-          .returns(Future.successful(ClientOrAgentNotAuthorisedError))
-
         val result: AuthOutcome = await(enrolmentsAuthService.authorised(mtdId))
         result shouldBe Right(UserDetails(mtdId, "Individual", None))
       }
@@ -108,10 +104,6 @@ class EnrolmentsAuthServiceSpec extends ServiceSpec with MockSharedAppConfig {
           .authorised(initialPredicate, affinityGroup and authorisedEnrolments)
           .once()
           .returns(Future.successful(retrievalsResult))
-
-        MockedEnrolmentsAuthConnector
-          .getMtdId(mtdId)
-          .returns(Future.successful(ClientOrAgentNotAuthorisedError))
 
         val result: AuthOutcome = await(enrolmentsAuthService.authorised(mtdId))
         result shouldBe Right(UserDetails(mtdId, "Organisation", None))
@@ -132,10 +124,6 @@ class EnrolmentsAuthServiceSpec extends ServiceSpec with MockSharedAppConfig {
           .authorised(initialPredicate, affinityGroup and authorisedEnrolments)
           .once()
           .returns(Future.successful(retrievalsResult))
-
-        MockedEnrolmentsAuthConnector
-          .getMtdId(mtdId)
-          .returns(Future.successful(ClientOrAgentNotAuthorisedError))
 
         val result: AuthOutcome = await(enrolmentsAuthService.authorised(mtdId))
         result shouldBe Left(InternalError)
@@ -169,10 +157,6 @@ class EnrolmentsAuthServiceSpec extends ServiceSpec with MockSharedAppConfig {
           .authorised(primaryAgentPredicate, EmptyRetrieval)
           .once()
           .returns(Future.successful(EmptyRetrieval))
-
-        MockedEnrolmentsAuthConnector
-          .getMtdId(mtdId)
-          .returns(Future.successful(ClientOrAgentNotAuthorisedError))
 
         mockConfidenceLevelCheckConfig(authValidationEnabled = authValidationEnabled)
 
@@ -214,11 +198,6 @@ class EnrolmentsAuthServiceSpec extends ServiceSpec with MockSharedAppConfig {
           .once()
           .returns(Future.successful(EmptyRetrieval))
 
-        MockedEnrolmentsAuthConnector
-          .getMtdId(mtdId)
-          .once()
-          .returns(Future.successful(ClientOrAgentNotAuthorisedError))
-
         mockConfidenceLevelCheckConfig(authValidationEnabled = authValidationEnabled)
 
         val result: AuthOutcome = await(enrolmentsAuthService.authorised(mtdId, endpointAllowsSupportingAgents = true))
@@ -253,11 +232,6 @@ class EnrolmentsAuthServiceSpec extends ServiceSpec with MockSharedAppConfig {
           .once()
           .returns(Future.failed(InsufficientEnrolments()))
 
-        MockedEnrolmentsAuthConnector
-          .getMtdId(mtdId)
-          .once()
-          .returns(Future.successful(ClientOrAgentNotAuthorisedError))
-
         mockConfidenceLevelCheckConfig(authValidationEnabled = authValidationEnabled)
 
         val result: AuthOutcome = await(enrolmentsAuthService.authorised(mtdId))
@@ -273,11 +247,6 @@ class EnrolmentsAuthServiceSpec extends ServiceSpec with MockSharedAppConfig {
           .once()
           .returns(Future.failed(MissingBearerToken()))
 
-        MockedEnrolmentsAuthConnector
-          .getMtdId(mtdId)
-          .once()
-          .returns(Future.successful(ClientOrAgentNotAuthorisedError))
-
         val result: AuthOutcome = await(enrolmentsAuthService.authorised(mtdId))
         result shouldBe Left(ClientOrAgentNotAuthorisedError)
       }
@@ -290,11 +259,6 @@ class EnrolmentsAuthServiceSpec extends ServiceSpec with MockSharedAppConfig {
           .authorised(initialPredicate, affinityGroup and authorisedEnrolments)
           .once()
           .returns(Future.failed(InsufficientEnrolments()))
-
-        MockedEnrolmentsAuthConnector
-          .getMtdId(mtdId)
-          .once()
-          .returns(Future.successful(ClientOrAgentNotAuthorisedError))
 
         val result: AuthOutcome = await(enrolmentsAuthService.authorised(mtdId))
         result shouldBe Left(ClientNotEnrolledError)

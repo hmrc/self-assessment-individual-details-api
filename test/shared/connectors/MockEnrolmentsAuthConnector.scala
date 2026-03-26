@@ -19,20 +19,21 @@ package shared.connectors
 import org.scalamock.handlers.CallHandler
 import org.scalamock.scalatest.MockFactory
 import org.scalatest.TestSuite
+import shared.models.errors.MtdError
 import uk.gov.hmrc.http.HeaderCarrier
 
 import scala.concurrent.{ExecutionContext, Future}
 
 trait MockEnrolmentsAuthConnector extends TestSuite with MockFactory {
 
-  val mockMtdIdLookupConnector: MtdIdLookupConnector = mock[MtdIdLookupConnector]
+  val mockEnrolmentsAuthConnector: EnrolmentsAuthConnector = mock[EnrolmentsAuthConnector]
 
-  object MockedMtdIdLookupConnector {
+  object MockedEnrolmentsAuthConnector {
 
-    def lookup(nino: String): CallHandler[Future[MtdIdLookupConnector.Outcome]] = {
-      (mockMtdIdLookupConnector
-        .getMtdId(_: String)(_: HeaderCarrier, _: ExecutionContext))
-        .expects(nino, *, *)
+    def getMtdId(mtdItId: String): CallHandler[Future[MtdError]] = {
+      (mockEnrolmentsAuthConnector
+        .getMtdIds(_: String)(_: HeaderCarrier, _: ExecutionContext))
+        .expects(mtdItId, *, *)
     }
 
   }

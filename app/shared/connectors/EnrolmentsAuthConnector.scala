@@ -28,8 +28,6 @@ import scala.concurrent.{ExecutionContext, Future}
 
 class EnrolmentsAuthConnector @Inject() (http: HttpClientV2, appConfig: SharedAppConfig) {
 
-  val baseUrl: String = appConfig.enrolmentStoreProxyUrl
-
   def getMtdIds(
       mtdId: String
   )(implicit
@@ -37,7 +35,7 @@ class EnrolmentsAuthConnector @Inject() (http: HttpClientV2, appConfig: SharedAp
       ec: ExecutionContext
   ): Future[MtdError] = {
 
-    val url = s"$baseUrl/enrolment-store-proxy/enrolment-store/enrolments/HMRC-MTD-IT~MTDITID~$mtdId/groups"
+    val url = s"${appConfig.enrolmentStoreProxyUrl}/enrolment-store/enrolments/HMRC-MTD-IT~MTDITID~$mtdId/groups"
     http
       .get(url"$url")
       .execute[HttpResponse]
