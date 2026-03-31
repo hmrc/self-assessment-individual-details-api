@@ -58,12 +58,12 @@ class EnrolmentsAuthService @Inject() (val connector: AuthConnector,
       ec: ExecutionContext): Future[AuthOutcome] = {
     authFunction
       .authorised(initialPredicate(mtdId))
-      .retrieve(affinityGroup and authorisedEnrolments and allEnrolments) {
-        case Some(Individual) ~ _ ~ enrolments =>
+      .retrieve(affinityGroup and authorisedEnrolments) {
+        case Some(Individual) ~ _ =>
           Future.successful(Right(UserDetails(mtdId, "Individual", None)))
-        case Some(Organisation) ~ _ ~ enrolments =>
+        case Some(Organisation) ~ _ =>
           Future.successful(Right(UserDetails(mtdId, "Organisation", None)))
-        case Some(Agent) ~ authorisedEnrolments ~ enrolments =>
+        case Some(Agent) ~ authorisedEnrolments =>
           authFunction
             .authorised(EnrolmentsAuthService.mtdEnrolmentPredicate(mtdId)) {
               Future.successful(agentDetails(mtdId, authorisedEnrolments, "Agent"))
@@ -76,7 +76,7 @@ class EnrolmentsAuthService @Inject() (val connector: AuthConnector,
                   }
               case _: InsufficientEnrolments =>
                 logger.warn(s"[EnrolmentsAuthService][authorised] Agent enrolment not found for MTDITID: $mtdId")
-                Future.successful(Left(NinoFormatError))
+                Future.successful(Left(ClientOrAgentNotAuthorisedError))
             }
         case _ =>
           logger.warn(s"[EnrolmentsAuthService][authorised] Invalid AffinityGroup.")

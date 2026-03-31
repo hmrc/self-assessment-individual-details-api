@@ -235,7 +235,7 @@ class EnrolmentsAuthServiceSpec extends ServiceSpec with MockSharedAppConfig {
         mockConfidenceLevelCheckConfig(authValidationEnabled = authValidationEnabled)
 
         val result: AuthOutcome = await(enrolmentsAuthService.authorised(mtdId))
-        result shouldBe Left(ClientNotEnrolledError)
+        result shouldBe Left(ClientOrAgentNotAuthorisedError)
       }
 
     def disallowWhenNoBearerToken(authValidationEnabled: Boolean, initialPredicate: Predicate): Unit =
@@ -259,6 +259,15 @@ class EnrolmentsAuthServiceSpec extends ServiceSpec with MockSharedAppConfig {
           .authorised(initialPredicate, affinityGroup and authorisedEnrolments)
           .once()
           .returns(Future.failed(InsufficientEnrolments()))
+
+        MockedAuthConnector
+          .authorised(initialPredicate, allEnrolments)
+          .once()
+          .returns(Future.successful(Enrolments(Set.empty)))
+
+        MockedEnrolmentsAuthConnector
+          .getMtdId(mtdId)
+          .returns(Future.successful(ClientNotEnrolledError))
 
         val result: AuthOutcome = await(enrolmentsAuthService.authorised(mtdId))
         result shouldBe Left(ClientNotEnrolledError)
