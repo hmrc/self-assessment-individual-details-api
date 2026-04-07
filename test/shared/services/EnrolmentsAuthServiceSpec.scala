@@ -262,8 +262,17 @@ class EnrolmentsAuthServiceSpec extends ServiceSpec with MockSharedAppConfig {
           .once()
           .returns(Future.failed(InsufficientEnrolments()))
 
+        MockedAuthConnector
+          .authorised(initialPredicate, allEnrolments)
+          .once()
+          .returns(Future.successful(Enrolments(Set.empty)))
+
+        MockedEnrolmentsAuthConnector
+          .getMtdId(mtdId)
+          .returns(Future.successful(ClientNotEnrolledError))
+
         val result: AuthOutcome = await(enrolmentsAuthService.authorised(mtdId))
-        result shouldBe Left(ClientOrAgentNotAuthorisedError)
+        result shouldBe Left(ClientNotEnrolledError)
       }
 
       "disallow users without enrolments With ES! call" in new Test {

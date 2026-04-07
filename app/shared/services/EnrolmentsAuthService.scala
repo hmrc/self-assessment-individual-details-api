@@ -55,8 +55,7 @@ class EnrolmentsAuthService @Inject() (val connector: AuthConnector,
 
   def authorised(mtdId: String, endpointAllowsSupportingAgents: Boolean = false)(implicit
       hc: HeaderCarrier,
-      ec: ExecutionContext,
-      appConfig: SharedAppConfig): Future[AuthOutcome] = {
+      ec: ExecutionContext): Future[AuthOutcome] =
     authFunction
       .authorised(initialPredicate(mtdId))
       .retrieve(affinityGroup and authorisedEnrolments) {
@@ -75,22 +74,18 @@ class EnrolmentsAuthService @Inject() (val connector: AuthConnector,
                   .authorised(EnrolmentsAuthService.supportingAgentAuthPredicate(mtdId)) {
                     Future.successful(agentDetails(mtdId, authorisedEnrolments, "Supporting Agent"))
                   }
-              case _: InsufficientEnrolments =>
-                logger.warn(s"[EnrolmentsAuthService][authorised] Agent enrolment not found for MTDITID: $mtdId")
-                Future.successful(Left(ClientOrAgentNotAuthorisedError))
+//              case _: InsufficientEnrolments =>
+//                logger.warn(s"[EnrolmentsAuthService][authorised] Agent enrolment not found for MTDITID: $mtdId")
+//                Future.successful(Left(ClientNotEnrolledError))
             }
         case _ =>
           logger.warn(s"[EnrolmentsAuthService][authorised] Invalid AffinityGroup.")
           Future.successful(Left(ClientOrAgentNotAuthorisedError))
       }
       .recoverWith {
-        case _: InsufficientEnrolments =>
-          logger.warn(s"[EnrolmentsAuthService][authorised] Insufficient Enrolments")
-          if (ConfigFeatureSwitches().isEnabled("ES1Call")) {
-            enrolmentsAuthConnector.getMtdIds(mtdId).map(Left(_))
-          } else {
-            Future.successful(Left(ClientOrAgentNotAuthorisedError))
-          }
+//        case _: InsufficientEnrolments =>
+//          logger.warn(s"[EnrolmentsAuthService][authorised] Insufficient Enrolments")
+//          Future.successful(Left(ClientNotEnrolledError))
         case _: AuthorisationException =>
           Future.successful(Left(ClientOrAgentNotAuthorisedError))
         case error =>
