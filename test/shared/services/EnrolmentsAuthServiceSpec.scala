@@ -17,11 +17,9 @@
 package shared.services
 
 import org.scalamock.handlers.CallHandler
-import play.api.Configuration
 import shared.config.{ConfidenceLevelConfig, MockSharedAppConfig}
-import shared.connectors.EnrolmentsAuthConnector
 import shared.models.auth.UserDetails
-import shared.models.errors.{ClientNotEnrolledError, ClientOrAgentNotAuthorisedError, InternalError, MtdError}
+import shared.models.errors.{ClientNotEnrolledError, ClientOrAgentNotAuthorisedError, InternalError}
 import shared.models.outcomes.AuthOutcome
 import shared.services.EnrolmentsAuthService.{
   authorisationDisabledPredicate,
@@ -236,7 +234,7 @@ class EnrolmentsAuthServiceSpec extends ServiceSpec with MockSharedAppConfig {
         mockConfidenceLevelCheckConfig(authValidationEnabled = authValidationEnabled)
 
         val result: AuthOutcome = await(enrolmentsAuthService.authorised(mtdId))
-        result shouldBe Left(ClientOrAgentNotAuthorisedError)
+        result shouldBe Left(ClientNotEnrolledError)
       }
 
     def disallowWhenNoBearerToken(authValidationEnabled: Boolean, initialPredicate: Predicate): Unit =
@@ -255,38 +253,11 @@ class EnrolmentsAuthServiceSpec extends ServiceSpec with MockSharedAppConfig {
     def disallowUsersWithoutEnrolments(authValidationEnabled: Boolean, initialPredicate: Predicate): Unit =
       "disallow users without enrolments" in new Test {
         mockConfidenceLevelCheckConfig(authValidationEnabled = authValidationEnabled)
-        MockedSharedAppConfig.featureSwitchConfig returns Configuration("ES1Call.enabled" -> false)
 
         MockedAuthConnector
           .authorised(initialPredicate, affinityGroup and authorisedEnrolments)
           .once()
           .returns(Future.failed(InsufficientEnrolments()))
-
-        MockedAuthConnector
-          .authorised(initialPredicate, allEnrolments)
-          .once()
-          .returns(Future.successful(Enrolments(Set.empty)))
-
-        MockedEnrolmentsAuthConnector
-          .getMtdId(mtdId)
-          .returns(Future.successful(ClientNotEnrolledError))
-
-        val result: AuthOutcome = await(enrolmentsAuthService.authorised(mtdId))
-        result shouldBe Left(ClientNotEnrolledError)
-      }
-
-      "disallow users without enrolments With ES! call" in new Test {
-        mockConfidenceLevelCheckConfig(authValidationEnabled = authValidationEnabled)
-        MockedSharedAppConfig.featureSwitchConfig returns Configuration("ES1Call.enabled" -> true)
-
-        MockedAuthConnector
-          .authorised(initialPredicate, affinityGroup and authorisedEnrolments)
-          .once()
-          .returns(Future.failed(InsufficientEnrolments()))
-
-        MockedEnrolmentsAuthConnector
-          .getMtdId(mtdId)
-          .returns(Future.successful(ClientNotEnrolledError))
 
         val result: AuthOutcome = await(enrolmentsAuthService.authorised(mtdId))
         result shouldBe Left(ClientNotEnrolledError)
@@ -294,10 +265,9 @@ class EnrolmentsAuthServiceSpec extends ServiceSpec with MockSharedAppConfig {
   }
 
   trait Test {
-    val mockAuthConnector: AuthConnector                     = mock[AuthConnector]
-    val mockEnrolmentsAuthConnector: EnrolmentsAuthConnector = mock[EnrolmentsAuthConnector]
+    val mockAuthConnector: AuthConnector = mock[AuthConnector]
 
-    lazy val enrolmentsAuthService = new EnrolmentsAuthService(mockAuthConnector, mockEnrolmentsAuthConnector, mockSharedAppConfig)
+    lazy val enrolmentsAuthService = new EnrolmentsAuthService(mockAuthConnector, mockSharedAppConfig)
 
     object MockedAuthConnector {
 
@@ -305,16 +275,6 @@ class EnrolmentsAuthServiceSpec extends ServiceSpec with MockSharedAppConfig {
         (mockAuthConnector
           .authorise[A](_: Predicate, _: Retrieval[A])(_: HeaderCarrier, _: ExecutionContext))
           .expects(predicate, retrievals, *, *)
-      }
-
-    }
-
-    object MockedEnrolmentsAuthConnector {
-
-      def getMtdId(mtdItId: String): CallHandler[Future[MtdError]] = {
-        (mockEnrolmentsAuthConnector
-          .getMtdIds(_: String)(_: HeaderCarrier, _: ExecutionContext))
-          .expects(mtdItId, *, *)
       }
 
     }
