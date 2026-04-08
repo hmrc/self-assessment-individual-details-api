@@ -20,7 +20,7 @@ import com.github.tomakehurst.wiremock.stubbing.StubMapping
 import play.api.libs.json.{JsValue, Json}
 import play.api.libs.ws.{WSRequest, WSResponse}
 import play.api.test.Helpers.*
-import shared.models.errors.ClientOrAgentNotAuthorisedError
+import shared.models.errors.{ClientNotEnrolledError, ClientOrAgentNotAuthorisedError}
 import shared.services.{AuditStub, AuthStub, DownstreamStub, MtdIdLookupStub}
 import shared.support.IntegrationBaseSpec
 
@@ -131,23 +131,35 @@ class AuthHipISpec extends IntegrationBaseSpec {
       response.json shouldBe Json.toJson(ClientOrAgentNotAuthorisedError)
     }
   }
-//  To Do
-//  "User does not have an MTD enrolment" should {
-//
-//    "return 403 with specific enrolment error" in new Test {
-//      override val nino: String = "AA123456A"
-//
-//      override def setupStubs(): StubMapping = {
-//        AuditStub.audit()
-//        MtdIdLookupStub.ninoFound(nino)
-//        AuthStub.insufficientEnrolments()
-//      }
-//
-//      val response: WSResponse = await(request().get())
-//      response.status shouldBe FORBIDDEN
-//      response.json shouldBe Json.toJson(ClientNotEnrolledError)
-//    }
-//  }
+  
+  "User does not have an MTD enrolment" should {
+
+    "return 403 with specific enrolment error" in new Test {
+      override val nino: String = "AA123456A"
+
+      override def setupStubs(): StubMapping = {
+        AuditStub.audit()
+        MtdIdLookupStub.ninoFound(nino)
+        //First Auth call
+        AuthStub.insufficientEnrolments()
+          .inScenario("AuthFlow")
+          .whenScenarioStateIs("Started")
+          .willSetStateTo("AfterInsufficient")
+          .thenReturn(UNAUTHORIZED, headers = Map("WWW-Authenticate" -> """MDTP detail="InsufficientEnrolments""""))
+        //Second Auth call
+        AuthStub.insufficientEnrolments()
+          .inScenario("AuthFlow")
+          .whenScenarioStateIs("Started")
+          .willSetStateTo("AfterInsufficient")
+          //Todo: change this to what your second auth call should return
+          .thenReturn(UNAUTHORIZED, headers = Map("WWW-Authenticate" -> """MDTP detail="InsufficientEnrolments""""))
+      }
+
+      val response: WSResponse = await(request().get())
+      response.status shouldBe FORBIDDEN
+      response.json shouldBe Json.toJson(ClientNotEnrolledError)
+    }
+  }
 
   private trait Test {
     val nino               = "AA123456A"
