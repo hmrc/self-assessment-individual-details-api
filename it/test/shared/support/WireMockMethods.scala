@@ -27,23 +27,23 @@ trait WireMockMethods {
   def resetAll(): Unit = WireMock.reset()
 
   def when(
-            method: HTTPMethod,
-            uri: String,
-            queryParams: Map[String, String] = Map.empty,
-            headers: Map[String, String] = Map.empty
-          ): Mapping =
+      method: HTTPMethod,
+      uri: String,
+      queryParams: Map[String, String] = Map.empty,
+      headers: Map[String, String] = Map.empty
+  ): Mapping =
     new Mapping(method, uri, queryParams, headers, None, None, None, None)
 
   class Mapping(
-                 method: HTTPMethod,
-                 uri: String,
-                 queryParams: Map[String, String],
-                 headers: Map[String, String],
-                 body: Option[String],
-                 scenarioName: Option[String],
-                 requiredState: Option[String],
-                 newState: Option[String]
-               ) {
+      method: HTTPMethod,
+      uri: String,
+      queryParams: Map[String, String],
+      headers: Map[String, String],
+      body: Option[String],
+      scenarioName: Option[String],
+      requiredState: Option[String],
+      newState: Option[String]
+  ) {
 
     private val mapping = {
       val uriMapping = method.wireMockMapping(urlPathMatching(uri))
@@ -58,7 +58,7 @@ trait WireMockMethods {
 
       body match {
         case Some(b) => withHeaders.withRequestBody(equalToJson(b))
-        case None => withHeaders
+        case None    => withHeaders
       }
     }
 
@@ -92,17 +92,17 @@ trait WireMockMethods {
       thenReturnInternal(status, headers, None)
 
     private def thenReturnInternal(
-                                    status: Int,
-                                    headers: Map[String, String],
-                                    body: Option[String]
-                                  ): StubMapping = {
+        status: Int,
+        headers: Map[String, String],
+        body: Option[String]
+    ): StubMapping = {
 
       val response = {
-        val base = aResponse().withStatus(status)
+        val base        = aResponse().withStatus(status)
         val withHeaders = headers.foldLeft(base) { case (res, (k, v)) => res.withHeader(k, v) }
         body match {
           case Some(b) => withHeaders.withBody(b)
-          case None => withHeaders
+          case None    => withHeaders
         }
       }
 
@@ -124,6 +124,7 @@ trait WireMockMethods {
 
       stubFor(builderWithScenario)
     }
+
   }
 
   sealed trait HTTPMethod {
@@ -145,4 +146,5 @@ trait WireMockMethods {
   case object PUT extends HTTPMethod {
     override def wireMockMapping(pattern: UrlPattern): MappingBuilder = put(pattern)
   }
+
 }
