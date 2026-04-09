@@ -27,4 +27,8 @@ object EnrolmentAuthStub extends WireMockMethods {
     when(method = GET, uri = lookupUrl())
       .thenReturn(status = status)
 
+  def error(status: Int): StubMapping =
+    when(method = GET, uri = lookupUrl())
+      .thenReturn(status)
+
 }

@@ -17,11 +17,11 @@
 package v2.endpoints
 
 import com.github.tomakehurst.wiremock.stubbing.StubMapping
-import play.api.libs.json.{JsValue, Json}
+import play.api.libs.json.{JsObject, JsValue, Json}
 import play.api.libs.ws.{WSRequest, WSResponse}
 import play.api.test.Helpers.*
 import shared.models.errors.{ClientNotEnrolledError, ClientOrAgentNotAuthorisedError}
-import shared.services.{AuditStub, AuthStub, DownstreamStub, MtdIdLookupStub}
+import shared.services.{AuditStub, AuthStub, DownstreamStub, EnrolmentAuthStub, MtdIdLookupStub}
 import shared.support.IntegrationBaseSpec
 
 class AuthHipISpec extends IntegrationBaseSpec {
@@ -137,22 +137,29 @@ class AuthHipISpec extends IntegrationBaseSpec {
     "return 403 with specific enrolment error" in new Test {
       override val nino: String = "AA123456A"
 
+      private val successfulAuthResponse: JsObject =
+        Json.obj(
+          "allEnrolments" -> List[String]()
+        )
+
       override def setupStubs(): StubMapping = {
         AuditStub.audit()
         MtdIdLookupStub.ninoFound(nino)
-        //First Auth call
-        AuthStub.insufficientEnrolments()
+        // First Auth call
+        AuthStub
+          .insufficientEnrolments()
           .inScenario("AuthFlow")
           .whenScenarioStateIs("Started")
           .willSetStateTo("AfterInsufficient")
           .thenReturn(UNAUTHORIZED, headers = Map("WWW-Authenticate" -> """MDTP detail="InsufficientEnrolments""""))
-        //Second Auth call
-        AuthStub.insufficientEnrolments()
+        // Second Auth call
+        AuthStub
+          .insufficientEnrolments()
           .inScenario("AuthFlow")
-          .whenScenarioStateIs("Started")
-          .willSetStateTo("AfterInsufficient")
-          //Todo: change this to what your second auth call should return
-          .thenReturn(UNAUTHORIZED, headers = Map("WWW-Authenticate" -> """MDTP detail="InsufficientEnrolments""""))
+          .whenScenarioStateIs("AfterInsufficient")
+          .thenReturn(status = OK, body = successfulAuthResponse)
+        // EnrolmentAuthConnector call
+        EnrolmentAuthStub.found(NO_CONTENT)
       }
 
       val response: WSResponse = await(request().get())
