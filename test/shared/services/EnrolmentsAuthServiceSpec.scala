@@ -17,6 +17,7 @@
 package shared.services
 
 import org.scalamock.handlers.CallHandler
+import play.api.Configuration
 import shared.config.{ConfidenceLevelConfig, MockSharedAppConfig}
 import shared.connectors.EnrolmentsAuthConnector
 import shared.models.auth.UserDetails
@@ -254,16 +255,25 @@ class EnrolmentsAuthServiceSpec extends ServiceSpec with MockSharedAppConfig {
     def disallowUsersWithoutEnrolments(authValidationEnabled: Boolean, initialPredicate: Predicate): Unit =
       "disallow users without enrolments" in new Test {
         mockConfidenceLevelCheckConfig(authValidationEnabled = authValidationEnabled)
+        MockedSharedAppConfig.featureSwitchConfig returns Configuration("ES1Call.enabled" -> false)
 
         MockedAuthConnector
           .authorised(initialPredicate, affinityGroup and authorisedEnrolments)
           .once()
           .returns(Future.failed(InsufficientEnrolments()))
 
+        val result: AuthOutcome = await(enrolmentsAuthService.authorised(mtdId))
+        result shouldBe Left(ClientOrAgentNotAuthorisedError)
+      }
+
+      "disallow users without enrolments With ES! call" in new Test {
+        mockConfidenceLevelCheckConfig(authValidationEnabled = authValidationEnabled)
+        MockedSharedAppConfig.featureSwitchConfig returns Configuration("ES1Call.enabled" -> true)
+
         MockedAuthConnector
-          .authorised(initialPredicate, allEnrolments)
+          .authorised(initialPredicate, affinityGroup and authorisedEnrolments)
           .once()
-          .returns(Future.successful(Enrolments(Set.empty)))
+          .returns(Future.failed(InsufficientEnrolments()))
 
         MockedEnrolmentsAuthConnector
           .getMtdId(mtdId)

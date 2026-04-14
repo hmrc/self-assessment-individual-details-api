@@ -16,7 +16,7 @@
 
 package shared.services
 
-import shared.config.SharedAppConfig
+import shared.config.{ConfigFeatureSwitches, SharedAppConfig}
 import shared.connectors.EnrolmentsAuthConnector
 import shared.models.auth.UserDetails
 import shared.models.errors.*
@@ -55,7 +55,8 @@ class EnrolmentsAuthService @Inject() (val connector: AuthConnector,
 
   def authorised(mtdId: String, endpointAllowsSupportingAgents: Boolean = false)(implicit
       hc: HeaderCarrier,
-      ec: ExecutionContext): Future[AuthOutcome] = {
+      ec: ExecutionContext,
+      appConfig: SharedAppConfig): Future[AuthOutcome] = {
     authFunction
       .authorised(initialPredicate(mtdId))
       .retrieve(affinityGroup and authorisedEnrolments) {
@@ -85,7 +86,11 @@ class EnrolmentsAuthService @Inject() (val connector: AuthConnector,
       .recoverWith {
         case _: InsufficientEnrolments =>
           logger.warn(s"[EnrolmentsAuthService][authorised] Insufficient Enrolments")
-          insufficientEnrolments(mtdId)
+          if (ConfigFeatureSwitches().isEnabled("ES1Call")) {
+            enrolmentsAuthConnector.getMtdIds(mtdId).map(Left(_))
+          } else {
+            Future.successful(Left(ClientOrAgentNotAuthorisedError))
+          }
         case _: AuthorisationException =>
           Future.successful(Left(ClientOrAgentNotAuthorisedError))
         case error =>
@@ -102,28 +107,6 @@ class EnrolmentsAuthService @Inject() (val connector: AuthConnector,
       .toRight {
         logger.warn("[EnrolmentsAuthService][authorised] No AgentReferenceNumber defined on agent enrolment.")
         InternalError
-      }
-  }
-
-  private def insufficientEnrolments(mtdId: String)(implicit hc: HeaderCarrier, ec: ExecutionContext): Future[AuthOutcome] = {
-    authFunction
-      .authorised(initialPredicate(mtdId))
-      .retrieve(allEnrolments) {
-        case enrolments: Enrolments =>
-          if enrolments.enrolments.contains(Enrolment("HMRC-MTD-IT")) then {
-            Future.successful(Left(ClientOrAgentNotAuthorisedError))
-          } else {
-            enrolmentsAuthConnector.getMtdIds(mtdId).map(Left(_))
-          }
-        case null =>
-          Future.successful(Left(InternalError))
-      }
-      .recoverWith {
-        case _: AuthorisationException =>
-          Future.successful(Left(ClientOrAgentNotAuthorisedError))
-        case error =>
-          logger.warn(s"[EnrolmentsAuthService][authorised] An unexpected error occurred: $error")
-          Future.successful(Left(InternalError))
       }
   }
 
