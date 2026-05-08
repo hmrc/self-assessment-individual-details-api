@@ -31,6 +31,6 @@ object MtdIdLookupStub extends WireMockMethods {
 
   def error(nino: String, status: Int): StubMapping =
     when(method = GET, uri = lookupUrl(nino))
-      .thenReturn(status, body = Json.obj())
+      .thenReturn(status, body = Json.obj("code" -> "ERROR_CODE", "message" -> "Error message", "httpStatus" -> status))
 
 }

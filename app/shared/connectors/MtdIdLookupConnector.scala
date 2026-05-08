@@ -17,6 +17,7 @@
 package shared.connectors
 
 import shared.config.SharedAppConfig
+import shared.models.errors.MtdError
 import uk.gov.hmrc.http.client.HttpClientV2
 import uk.gov.hmrc.http.{HeaderCarrier, StringContextOps}
 
@@ -24,7 +25,7 @@ import javax.inject.{Inject, Singleton}
 import scala.concurrent.{ExecutionContext, Future}
 
 object MtdIdLookupConnector {
-  case class Error(statusCode: Int) extends AnyVal
+  case class Error(error: MtdError) extends AnyVal
 
   type Outcome = Either[MtdIdLookupConnector.Error, String]
 

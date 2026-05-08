@@ -51,9 +51,19 @@ class MtdIdLookupServiceSpec extends ServiceSpec {
       }
     }
 
+    "the downstream service returns a 403 client not enrolled error status error" should {
+      "return ClientNotEnrolledError" in new Test {
+        MockedMtdIdLookupConnector.lookup(nino) returns Future.successful(
+          Left(MtdIdLookupConnector.Error(MtdError("CLIENT_NOT_MTD_ENROLLED", "", FORBIDDEN))))
+        val result: Outcome = await(target.lookup(nino))
+
+        result shouldBe Left(ClientNotEnrolledError)
+      }
+    }
+
     "the downstream service returns a 403 status error" should {
       "return ClientOrAgentNotAuthorisedError" in new Test {
-        MockedMtdIdLookupConnector.lookup(nino) returns Future.successful(Left(MtdIdLookupConnector.Error(FORBIDDEN)))
+        MockedMtdIdLookupConnector.lookup(nino) returns Future.successful(Left(MtdIdLookupConnector.Error(MtdError("", "", FORBIDDEN))))
         val result: Outcome = await(target.lookup(nino))
 
         result shouldBe Left(ClientOrAgentNotAuthorisedError)
@@ -62,7 +72,7 @@ class MtdIdLookupServiceSpec extends ServiceSpec {
 
     "the downstream service returns a 401 status error" should {
       "return InvalidBearerTokenError" in new Test {
-        MockedMtdIdLookupConnector.lookup(nino) returns Future.successful(Left(MtdIdLookupConnector.Error(UNAUTHORIZED)))
+        MockedMtdIdLookupConnector.lookup(nino) returns Future.successful(Left(MtdIdLookupConnector.Error(MtdError("", "", UNAUTHORIZED))))
         val result: Outcome = await(target.lookup(nino))
 
         result shouldBe Left(InvalidBearerTokenError)
@@ -71,7 +81,7 @@ class MtdIdLookupServiceSpec extends ServiceSpec {
 
     "the downstream service returns another status code" should {
       "return InternalError" in new Test {
-        MockedMtdIdLookupConnector.lookup(nino) returns Future.successful(Left(MtdIdLookupConnector.Error(IM_A_TEAPOT)))
+        MockedMtdIdLookupConnector.lookup(nino) returns Future.successful(Left(MtdIdLookupConnector.Error(MtdError("", "", IM_A_TEAPOT))))
         val result: Outcome = await(target.lookup(nino))
 
         result shouldBe Left(InternalError)

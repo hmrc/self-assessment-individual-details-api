@@ -22,6 +22,7 @@ import play.api.libs.json.{JsResultException, Json}
 import play.api.test.Helpers.OK
 import shared.connectors.MtdIdLookupConnector
 import shared.connectors.httpparsers.MtdIdLookupHttpParser.mtdIdLookupHttpReads
+import shared.models.errors.MtdError
 import shared.utils.UnitSpec
 import uk.gov.hmrc.http.HttpResponse
 
@@ -54,10 +55,10 @@ class MtdIdLookupHttpParserSpec extends UnitSpec {
     "the response contains a non-200 status" must {
       "return the status code as an error" in {
         val status   = IM_A_TEAPOT
-        val response = HttpResponse(status, "ignored")
+        val response = HttpResponse(status, """{"code": "TEST_ERROR_CODE", "message": "Test error message", "httpStatus": 418}""")
         val result   = mtdIdLookupHttpReads.read(method, url, response)
 
-        result shouldBe Left(MtdIdLookupConnector.Error(status))
+        result shouldBe Left(MtdIdLookupConnector.Error(MtdError("TEST_ERROR_CODE", "Test error message", status)))
       }
     }
   }

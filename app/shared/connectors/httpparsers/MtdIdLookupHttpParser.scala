@@ -20,6 +20,8 @@ import play.api.http.Status.OK
 import play.api.libs.json.*
 import shared.connectors
 import shared.connectors.MtdIdLookupConnector
+import shared.models.errors.MtdError
+import shared.models.errors.InternalError
 import uk.gov.hmrc.http.{HttpReads, HttpResponse}
 
 object MtdIdLookupHttpParser extends HttpParser {
@@ -28,8 +30,9 @@ object MtdIdLookupHttpParser extends HttpParser {
 
   implicit val mtdIdLookupHttpReads: HttpReads[connectors.MtdIdLookupConnector.Outcome] = (_: String, _: String, response: HttpResponse) => {
     response.status match {
-      case OK     => Right(response.json.as[String](mtdIdJsonReads))
-      case status => Left(MtdIdLookupConnector.Error(status))
+      case OK                                                   => Right(response.json.as[String](mtdIdJsonReads))
+      case status if response.json.validate[MtdError].isSuccess => Left(MtdIdLookupConnector.Error(response.json.as[MtdError]))
+      case _                                                    => Left(MtdIdLookupConnector.Error(InternalError))
     }
   }
 

@@ -38,12 +38,12 @@ class MtdIdLookupService @Inject() (val connector: MtdIdLookupConnector) {
     } else {
       connector.getMtdId(nino) map {
         case Right(mtdId) => Right(mtdId)
-        case Left(MtdIdLookupConnector.Error(statusCode)) =>
-          statusCode match {
-            case FORBIDDEN            => Left(ClientOrAgentNotAuthorisedError)
-            case UNAUTHORIZED         => Left(InvalidBearerTokenError)
-            case UNPROCESSABLE_ENTITY => Left(ClientNotEnrolledError)
-            case _                    => Left(InternalError)
+        case Left(MtdIdLookupConnector.Error(error)) =>
+          error.httpStatus match {
+            case FORBIDDEN if error.code == "CLIENT_NOT_MTD_ENROLLED" => Left(ClientNotEnrolledError)
+            case FORBIDDEN                                            => Left(ClientOrAgentNotAuthorisedError)
+            case UNAUTHORIZED                                         => Left(InvalidBearerTokenError)
+            case _                                                    => Left(InternalError)
           }
       }
     }

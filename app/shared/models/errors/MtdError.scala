@@ -17,7 +17,7 @@
 package shared.models.errors
 
 import play.api.libs.functional.syntax.*
-import play.api.libs.json.{JsObject, JsPath, Json, OWrites}
+import play.api.libs.json.{JsObject, JsPath, Json, OWrites, Reads}
 
 case class MtdError(code: String, message: String, httpStatus: Int, paths: Option[Seq[String]] = None) {
   val asJson: JsObject = Json.toJson(this).as[JsObject]
@@ -51,6 +51,8 @@ case class MtdError(code: String, message: String, httpStatus: Int, paths: Optio
 }
 
 object MtdError {
+
+  implicit val reads: Reads[MtdError] = Json.reads[MtdError]
 
   implicit val writes: OWrites[MtdError] = (
     (JsPath \ "code").write[String] and

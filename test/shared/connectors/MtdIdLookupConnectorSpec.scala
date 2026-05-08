@@ -19,6 +19,7 @@ package shared.connectors
 import shared.config.MockSharedAppConfig
 import shared.connectors.MtdIdLookupConnector.Outcome
 import shared.mocks.MockHttpClient
+import shared.models.errors.MtdError
 import uk.gov.hmrc.http.StringContextOps
 
 import scala.concurrent.Future
@@ -42,7 +43,7 @@ class MtdIdLookupConnectorSpec extends ConnectorSpec {
     "return an MtdId" when {
       "the http client returns a mtd id" in new Test {
         MockedHttpClient
-          .get[MtdIdLookupConnector.Outcome](url"$baseUrl/mtd-identifier-lookup/nino/$nino", dummyHeaderCarrierConfig)
+          .get[MtdIdLookupConnector.Outcome](url"$baseUrl/mtd-identifier-lookup/nino/$nino?notEnrolledFlag=true", dummyHeaderCarrierConfig)
           .returns(Future.successful(Right(mtdId)))
 
         val result: Outcome = await(connector.getMtdId(nino))
@@ -53,18 +54,18 @@ class MtdIdLookupConnectorSpec extends ConnectorSpec {
 
     "return an error" when {
       "the http client returns that error" in new Test {
-        val statusCode: Int = IM_A_TEAPOT
+        val error: MtdError = MtdError("", "", 418)
 
         MockedHttpClient
           .get[MtdIdLookupConnector.Outcome](
-            url = url"$baseUrl/mtd-identifier-lookup/nino/$nino",
+            url = url"$baseUrl/mtd-identifier-lookup/nino/$nino?notEnrolledFlag=true",
             config = dummyHeaderCarrierConfig
           )
-          .returns(Future.successful(Left(MtdIdLookupConnector.Error(statusCode))))
+          .returns(Future.successful(Left(MtdIdLookupConnector.Error(error))))
 
         val result: Outcome = await(connector.getMtdId(nino))
 
-        result shouldBe Left(MtdIdLookupConnector.Error(statusCode))
+        result shouldBe Left(MtdIdLookupConnector.Error(error))
       }
     }
   }
