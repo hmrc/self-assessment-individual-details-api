@@ -163,6 +163,20 @@ class ValidatorSpec extends UnitSpec with MockFactory {
         val result    = validator.validateAndWrapResult()
         result shouldBe Left(ErrorWrapper(correlationId, RuleIncorrectBody))
       }
+      "return RuleIncorrectBody when the JSON does not match the expected model" in {
+        val jsonRequestBody = Json.parse(
+          """
+            | {
+            |   "value1": 123,
+            |   "value2": true
+            | }
+            |""".stripMargin)
+
+        val validator = new TestValidator(jsonBody = jsonRequestBody)
+        val result = validator.validateAndWrapResult()
+
+        result shouldBe Left(ErrorWrapper(correlationId, RuleIncorrectBody))
+      }
     }
 
     "returningErrors()" should {
