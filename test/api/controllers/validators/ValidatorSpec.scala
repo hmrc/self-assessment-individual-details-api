@@ -180,7 +180,7 @@ class ValidatorSpec extends UnitSpec with MockFactory {
         val jsonRequestBody = Json.parse("{}")
 
         val validator = new TestValidator(jsonBody = jsonRequestBody)
-        val result = validator.validateAndWrapResult()
+        val result    = validator.validateAndWrapResult()
 
         result shouldBe Left(ErrorWrapper(correlationId, RuleIncorrectBody))
       }
