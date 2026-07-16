@@ -138,8 +138,7 @@ object RequestHandler {
               parsedRequest   <- EitherT.fromEither[Future](validator.validateAndWrapResult())
               serviceResponse <- EitherT(service(parsedRequest))
             } yield doWithContext(ctx.withCorrelationId(serviceResponse.correlationId)) { implicit ctx: RequestContext =>
-                  handleSuccess(parsedRequest, serviceResponse)
-              }
+              handleSuccess(parsedRequest, serviceResponse)
             }
           }
 
