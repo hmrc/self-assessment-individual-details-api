@@ -30,13 +30,6 @@ case class MtdError(code: String, message: String, httpStatus: Int, paths: Optio
     */
   def withPaths(paths: Seq[String]): MtdError = copy(paths = Some(paths))
 
-  /** If maybePath is defined, returns a copy of this error with the path, replacing any that were already present; otherwise returns the original
-    * error.
-    */
-
-  /** Returns a copy of this error with an additional path.
-    */
-
 }
 
 object MtdError {
