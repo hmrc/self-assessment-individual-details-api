@@ -18,7 +18,7 @@ package api.controllers.validators
 
 import api.controllers.validators.resolvers.{ResolveNino, ResolveTaxYear}
 import api.models.domain.{Nino, TaxYear}
-import api.models.errors.{MtdError, NinoFormatError, TaxYearFormatError, BadRequestError, DateFormatError, ErrorWrapper}
+import api.models.errors.{MtdError, NinoFormatError, TaxYearFormatError, BadRequestError, ErrorWrapper}
 import api.utils.UnitSpec
 import cats.data.Validated
 import cats.data.Validated.{Invalid, Valid}
@@ -116,10 +116,10 @@ class ValidatorSpec extends UnitSpec with MockFactory {
           Valid("any value"),
           Valid("any other value"),
           Invalid(List(NinoFormatError)),
-          Invalid(List(DateFormatError))
+          Invalid(List(TaxYearFormatError))
         )
 
-        result shouldBe Invalid(List(NinoFormatError, DateFormatError))
+        result shouldBe Invalid(List(NinoFormatError, TaxYearFormatError))
       }
     }
 
