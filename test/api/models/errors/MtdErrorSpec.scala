@@ -37,39 +37,17 @@ class MtdErrorSpec extends UnitSpec {
     }
   }
 
-  "maybeWithPath" should {
-    "add a path to the error" when {
-      "a path is provided" in {
-        val result = error.maybeWithPath(Some("path")).paths
-        result shouldBe Some(List("path"))
-      }
+  "withPath" should {
+    "replace existing paths with a single path" in {
+      val result = error.withPath("some/path")
+      result.paths shouldBe Some(Seq("some/path"))
     }
   }
 
-  "maybeWithExtraPath" should {
-    "add an extra path to the error" when {
-      "a path is provided" in {
-        val result = error.maybeWithExtraPath(Some("extra path")).paths
-        result shouldBe Some(List("extra path"))
-      }
-    }
-  }
-
-  "withExtraPath" when {
-    "paths are undefined" should {
-      "create a new error with paths" in {
-        val result = error.withExtraPath("aPath")
-        result shouldBe error.withPath("aPath")
-      }
-    }
-
-    "paths are defined" should {
-      "add the new path to the existing list of paths" in {
-        val dummyErrorWithPaths: MtdError = error.withPath("aPath")
-
-        val result = dummyErrorWithPaths.withExtraPath("aPath2")
-        result shouldBe dummyErrorWithPaths.withPaths(List("aPath", "aPath2"))
-      }
+  "withPaths" should {
+    "replace existing paths with multiple paths" in {
+      val result = error.withPaths(Seq("path/one", "path/two"))
+      result.paths shouldBe Some(Seq("path/one", "path/two"))
     }
   }
 

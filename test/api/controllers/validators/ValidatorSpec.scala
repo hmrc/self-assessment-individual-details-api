@@ -16,9 +16,9 @@
 
 package api.controllers.validators
 
-import api.controllers.validators.resolvers.{ResolveJsonObject, ResolveNino, ResolveTaxYear}
+import api.controllers.validators.resolvers.{ResolveNino, ResolveTaxYear}
 import api.models.domain.{Nino, TaxYear}
-import api.models.errors.*
+import api.models.errors.{MtdError, NinoFormatError, TaxYearFormatError, BadRequestError, ErrorWrapper}
 import api.utils.UnitSpec
 import cats.data.Validated
 import cats.data.Validated.{Invalid, Valid}
@@ -53,13 +53,14 @@ class ValidatorSpec extends UnitSpec with MockFactory {
   private class TestValidator(nino: String = "AA123456A", taxYear: String = "2023-24", jsonBody: JsValue = validBody)
       extends Validator[TestParsedRequest] {
 
-    private val jsonResolver = new ResolveJsonObject[TestParsedRequestBody]
+    private def resolveBody(body: JsValue): Validated[Seq[MtdError], TestParsedRequestBody] =
+      body.asOpt[TestParsedRequestBody].fold(Invalid(List(RuleIncorrectBody)))(Valid(_))
 
     def validate: Validated[Seq[MtdError], TestParsedRequest] =
       (
         ResolveNino(nino),
         ResolveTaxYear(taxYear),
-        jsonResolver(jsonBody)
+        resolveBody(jsonBody)
       ).mapN(TestParsedRequest.apply) andThen TestRulesValidator.validateBusinessRules
 
     override def invalid(error: MtdError): Invalid[Seq[MtdError]] = super.invalid(error)
@@ -85,6 +86,7 @@ class ValidatorSpec extends UnitSpec with MockFactory {
 
   private object RuleValue1Invalid extends MtdError("RULE_VALUE_1_INVALID", "value1 can only be 'value 1'", BAD_REQUEST)
   private object RuleValue2Invalid extends MtdError("RULE_VALUE_2_INVALID", "value2 can only be true", BAD_REQUEST)
+  private object RuleIncorrectBody extends MtdError("RULE_INCORRECT_BODY", "A non-matching body was submitted", BAD_REQUEST)
 
   "invalid(error)" should {
     "return the error wrapped in an Invalid(Seq)" in {
@@ -114,10 +116,10 @@ class ValidatorSpec extends UnitSpec with MockFactory {
           Valid("any value"),
           Valid("any other value"),
           Invalid(List(NinoFormatError)),
-          Invalid(List(DateFormatError))
+          Invalid(List(TaxYearFormatError))
         )
 
-        result shouldBe Invalid(List(NinoFormatError, DateFormatError))
+        result shouldBe Invalid(List(NinoFormatError, TaxYearFormatError))
       }
     }
 
@@ -159,7 +161,28 @@ class ValidatorSpec extends UnitSpec with MockFactory {
 
         val validator = new TestValidator(jsonBody = jsonRequestBody)
         val result    = validator.validateAndWrapResult()
-        result shouldBe Left(ErrorWrapper(correlationId, RuleIncorrectOrEmptyBodyError.withPath("/value2")))
+        result shouldBe Left(ErrorWrapper(correlationId, RuleIncorrectBody))
+      }
+      "return RuleIncorrectBody when the JSON does not match the expected model" in {
+        val jsonRequestBody = Json.parse("""
+            | {
+            |   "value1": 123,
+            |   "value2": true
+            | }
+            |""".stripMargin)
+
+        val validator = new TestValidator(jsonBody = jsonRequestBody)
+        val result    = validator.validateAndWrapResult()
+
+        result shouldBe Left(ErrorWrapper(correlationId, RuleIncorrectBody))
+      }
+      "return RuleIncorrectBody when the body is empty" in {
+        val jsonRequestBody = Json.parse("{}")
+
+        val validator = new TestValidator(jsonBody = jsonRequestBody)
+        val result    = validator.validateAndWrapResult()
+
+        result shouldBe Left(ErrorWrapper(correlationId, RuleIncorrectBody))
       }
     }
 
