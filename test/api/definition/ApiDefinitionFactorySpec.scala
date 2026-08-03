@@ -18,6 +18,7 @@ package api.definition
 
 import api.config.Deprecation.NotDeprecated
 import api.config.{AppConfig, MockAppConfig}
+import api.definition.APIAccessType.{CONTROLLED, PUBLIC}
 import api.definition.APIStatus.{ALPHA, BETA}
 import api.mocks.MockHttpClient
 import api.routing.*
@@ -67,10 +68,38 @@ class ApiDefinitionFactorySpec extends UnitSpec {
         exceptionMessage shouldBe "deprecatedOn date is required for a deprecated version"
       }
     }
+
+    "set the access level" when {
+      "the controlled access flag is enabled" should {
+        "to be CONTROLLED" in new Test(controlledAccessEnabled = true) {
+          MockedAppConfig.endpointsEnabled(Version3)
+          MockedAppConfig.apiStatus(Version3) returns "BETA"
+          MockedAppConfig.deprecationFor(Version3).returns(NotDeprecated.valid).anyNumberOfTimes()
+
+          MockedAppConfig.controlledAccessEnabled returns true
+
+          apiDefinitionFactory.definition.api.versions.head.access shouldBe APIAccessType.CONTROLLED
+        }
+      }
+
+      "the controlled access flag is disabled" should {
+        "return PUBLIC" in new Test(controlledAccessEnabled = false) {
+          MockedAppConfig.endpointsEnabled(Version3)
+          MockedAppConfig.apiStatus(Version3) returns "BETA"
+          MockedAppConfig.deprecationFor(Version3).returns(NotDeprecated.valid).anyNumberOfTimes()
+
+          MockedAppConfig.controlledAccessEnabled returns false
+
+          apiDefinitionFactory.definition.api.versions.head.access shouldBe APIAccessType.PUBLIC
+        }
+      }
+    }
   }
 
-  trait Test extends UnitSpec with MockHttpClient with MockAppConfig {
+  trait Test(controlledAccessEnabled: Boolean = true) extends UnitSpec with MockHttpClient with MockAppConfig {
     MockedAppConfig.apiGatewayContext returns "individuals/self-assessment/adjustable-summary"
+
+    val access = if (controlledAccessEnabled) CONTROLLED else PUBLIC
 
     val apiDefinitionFactory: ApiDefinitionFactory = new ApiDefinitionFactory {
       protected val appConfig: AppConfig = mockAppConfig
@@ -81,8 +110,9 @@ class ApiDefinitionFactorySpec extends UnitSpec {
           "description",
           "context",
           List("category"),
-          List(APIVersion(Version1, APIStatus.BETA, endpointsEnabled = true)),
-          None)
+          List(APIVersion(Version1, APIStatus.BETA, access, endpointsEnabled = true)),
+          None
+        )
       )
 
     }

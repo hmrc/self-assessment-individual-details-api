@@ -18,6 +18,7 @@ package definition
 
 import api.config.AppConfig
 import api.definition.*
+import api.definition.APIAccessType.{CONTROLLED, PUBLIC}
 import api.routing.Version2
 
 import javax.inject.{Inject, Singleton}
@@ -36,6 +37,7 @@ class SAIndividualDetailsApiDefinitionFactory @Inject() (protected val appConfig
           APIVersion(
             version = Version2,
             status = buildAPIStatus(Version2),
+            access = if (appConfig.controlledAccessEnabled) CONTROLLED else PUBLIC,
             endpointsEnabled = appConfig.endpointsEnabled(Version2)
           )
         ),

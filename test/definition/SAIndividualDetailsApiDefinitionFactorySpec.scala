@@ -39,6 +39,7 @@ class SAIndividualDetailsApiDefinitionFactorySpec extends UnitSpec with MockAppC
           MockedAppConfig.apiStatus(version) returns "BETA"
           MockedAppConfig.endpointsEnabled(version).returns(true).anyNumberOfTimes()
           MockedAppConfig.deprecationFor(version).returns(NotDeprecated.valid).anyNumberOfTimes()
+          MockedAppConfig.controlledAccessEnabled returns false
         }
 
         apiDefinitionFactory.definition shouldBe
@@ -52,6 +53,7 @@ class SAIndividualDetailsApiDefinitionFactorySpec extends UnitSpec with MockAppC
                 APIVersion(
                   Version2,
                   status = BETA,
+                  access = APIAccessType.PUBLIC,
                   endpointsEnabled = true
                 )
               ),
