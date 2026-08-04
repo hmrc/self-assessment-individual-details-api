@@ -1,5 +1,5 @@
 /*
- * Copyright 2023 HM Revenue & Customs
+ * Copyright 2026 HM Revenue & Customs
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -60,6 +60,32 @@ class SAIndividualDetailsApiDefinitionFactorySpec extends UnitSpec with MockAppC
               requiresTrust = None
             )
           )
+      }
+    }
+  }
+
+  "set the access level" when {
+    "the controlled access flag is enabled" should {
+      "to be CONTROLLED" in new Test {
+        MockedAppConfig.endpointsEnabled(Version2)
+        MockedAppConfig.apiStatus(Version2) returns "BETA"
+        MockedAppConfig.deprecationFor(Version2).returns(NotDeprecated.valid).anyNumberOfTimes()
+
+        MockedAppConfig.controlledAccessEnabled returns true
+
+        apiDefinitionFactory.definition.api.versions.head.access shouldBe APIAccessType.CONTROLLED
+      }
+    }
+
+    "the controlled access flag is disabled" should {
+      "return PUBLIC" in new Test {
+        MockedAppConfig.endpointsEnabled(Version2)
+        MockedAppConfig.apiStatus(Version2) returns "BETA"
+        MockedAppConfig.deprecationFor(Version2).returns(NotDeprecated.valid).anyNumberOfTimes()
+
+        MockedAppConfig.controlledAccessEnabled returns false
+
+        apiDefinitionFactory.definition.api.versions.head.access shouldBe APIAccessType.PUBLIC
       }
     }
   }
