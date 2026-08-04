@@ -99,7 +99,7 @@ class ApiDefinitionFactorySpec extends UnitSpec {
   trait Test(controlledAccessEnabled: Boolean = true) extends UnitSpec with MockHttpClient with MockAppConfig {
     MockedAppConfig.apiGatewayContext returns "individuals/self-assessment/adjustable-summary"
 
-    val access = if (controlledAccessEnabled) CONTROLLED else PUBLIC
+    val access: APIAccessType = if (controlledAccessEnabled) CONTROLLED else PUBLIC
 
     val apiDefinitionFactory: ApiDefinitionFactory = new ApiDefinitionFactory {
       protected val appConfig: AppConfig = mockAppConfig
