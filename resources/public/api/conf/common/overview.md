@@ -1,3 +1,5 @@
+> HMRC is no longer accepting production credential access requests for new 2026–27 quarterly update products, as the market window for these products has now closed.
+
 Use the Self Assessment Individual Details API to retrieve a customer’s Making Tax Digital status for a specific tax year to help advise the customer of their obligations and available options.
 
 This API is related to the following customer journeys:
