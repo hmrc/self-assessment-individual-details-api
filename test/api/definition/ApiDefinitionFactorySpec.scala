@@ -82,7 +82,8 @@ class ApiDefinitionFactorySpec extends UnitSpec {
           "context",
           List("category"),
           List(APIVersion(Version1, APIStatus.BETA, APIAccessType.PUBLIC, endpointsEnabled = true)),
-          None)
+          None
+        )
       )
 
     }
