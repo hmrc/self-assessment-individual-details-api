@@ -23,7 +23,7 @@ import uk.gov.hmrc.http.{HeaderCarrier, StringContextOps}
 import javax.inject.{Inject, Singleton}
 import scala.concurrent.{ExecutionContext, Future}
 
-object \ {
+object MtdIdLookupConnector {
   case class Error(statusCode: Int) extends AnyVal
 
   type Outcome = Either[MtdIdLookupConnector.Error, String]
