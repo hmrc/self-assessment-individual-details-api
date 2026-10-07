@@ -35,16 +35,6 @@ object ResolveTaxYear extends ResolverSupport {
     case _ => Invalid(List(TaxYearFormatError))
   }
 
-  def resolverWithCustomErrors(formatError: MtdError, rangeError: MtdError): Resolver[String, TaxYear] = {
-    case value @ taxYearFormat(start, end) =>
-      if (end.toInt - start.toInt == 1)
-        Valid(TaxYear.fromMtd(value))
-      else
-        Invalid(List(rangeError))
-
-    case _ => Invalid(List(formatError))
-  }
-
   def apply(value: String): Validated[Seq[MtdError], TaxYear] = resolver(value)
 
   def apply(value: Option[String]): Validated[Seq[MtdError], Option[TaxYear]] =
