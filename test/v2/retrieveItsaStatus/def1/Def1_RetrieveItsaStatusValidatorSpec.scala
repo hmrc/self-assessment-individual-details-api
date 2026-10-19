@@ -19,7 +19,6 @@ package v2.retrieveItsaStatus.def1
 import api.models.domain.{Nino, TaxYear}
 import api.models.errors.*
 import api.utils.UnitSpec
-import v2.models.errors.{FutureYearsFormatError, HistoryFormatError}
 import v2.retrieveItsaStatus.def1.model.request.Def1_RetrieveItsaStatusRequestData
 
 class Def1_RetrieveItsaStatusValidatorSpec extends UnitSpec {

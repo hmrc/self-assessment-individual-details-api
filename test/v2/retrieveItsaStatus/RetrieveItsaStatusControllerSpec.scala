@@ -20,7 +20,7 @@ import api.controllers.{ControllerBaseSpec, ControllerTestRunner}
 import api.models.audit.{AuditEvent, AuditResponse, FlattenedGenericAuditDetail}
 import api.models.auth.UserDetails
 import api.models.domain.{Nino, TaxYear}
-import api.models.errors.{ErrorWrapper, NinoFormatError}
+import api.models.errors.{ErrorWrapper, FutureYearsFormatError, NinoFormatError}
 import api.models.outcomes.ResponseWrapper
 import api.services.MockAuditService
 import play.api.Configuration
@@ -28,7 +28,6 @@ import play.api.libs.json.{JsValue, Json}
 import play.api.mvc.Result
 import v2.models.domain.StatusEnum.`No Status`
 import v2.models.domain.StatusReasonEnum.`Sign up - return available`
-import v2.models.errors.FutureYearsFormatError
 import v2.retrieveItsaStatus.def1.model.request.Def1_RetrieveItsaStatusRequestData
 import v2.retrieveItsaStatus.def1.model.response.{ItsaStatusDetails, ItsaStatuses}
 import v2.retrieveItsaStatus.model.response.Def1_RetrieveItsaStatusResponse
