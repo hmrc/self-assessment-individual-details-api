@@ -17,12 +17,5 @@
 package v2.retrieveItsaStatus.model.request
 
 import api.models.domain.{Nino, TaxYear}
-import v2.retrieveItsaStatus.RetrieveItsaStatusSchema
 
-trait RetrieveItsaStatusRequestData {
-  def nino: Nino
-  def taxYear: TaxYear
-  def futureYears: Boolean
-  def history: Boolean
-  val schema: RetrieveItsaStatusSchema
-}
+case class RetrieveItsaStatusRequestData(nino: Nino, taxYear: TaxYear, futureYears: Boolean, history: Boolean)

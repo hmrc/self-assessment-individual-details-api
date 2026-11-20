@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package v2.retrieveItsaStatus.def1
+package v2.retrieveItsaStatus
 
 import api.controllers.validators.Validator
 import api.controllers.validators.resolvers.{ResolveBoolean, ResolveNino, ResolveTaxYear}
@@ -22,13 +22,12 @@ import api.models.errors.{FutureYearsFormatError, HistoryFormatError, MtdError}
 import cats.data.Validated
 import cats.data.Validated.Valid
 import cats.implicits.catsSyntaxTuple4Semigroupal
-import v2.retrieveItsaStatus.def1.model.request.Def1_RetrieveItsaStatusRequestData
 import v2.retrieveItsaStatus.model.request.RetrieveItsaStatusRequestData
 
 import javax.inject.Singleton
 
 @Singleton
-class Def1_RetrieveItsaStatusValidator(nino: String, taxYear: String, futureYears: Option[String], history: Option[String])
+class RetrieveItsaStatusValidator(nino: String, taxYear: String, futureYears: Option[String], history: Option[String])
     extends Validator[RetrieveItsaStatusRequestData] {
 
   private val resolveFutureYears = ResolveBoolean(FutureYearsFormatError)
@@ -46,6 +45,6 @@ class Def1_RetrieveItsaStatusValidator(nino: String, taxYear: String, futureYear
         case Some(history) => resolveHistory(history)
         case None          => Valid(false)
       }
-    ).mapN(Def1_RetrieveItsaStatusRequestData.apply)
+    ).mapN(RetrieveItsaStatusRequestData.apply)
 
 }

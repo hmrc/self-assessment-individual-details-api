@@ -14,12 +14,14 @@
  * limitations under the License.
  */
 
-package v2.retrieveItsaStatus
+package v2.retrieveItsaStatus.model.response
 
-sealed trait RetrieveItsaStatusSchema
+import play.api.libs.json.{Json, OFormat}
 
-object RetrieveItsaStatusSchema {
+case class ItsaStatuses(taxYear: String, itsaStatusDetails: Option[Seq[ItsaStatusDetails]])
 
-  case object Def1 extends RetrieveItsaStatusSchema
+object ItsaStatuses {
+
+  implicit val format: OFormat[ItsaStatuses] = Json.format[ItsaStatuses]
 
 }

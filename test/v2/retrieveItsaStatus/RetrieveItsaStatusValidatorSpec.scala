@@ -14,14 +14,14 @@
  * limitations under the License.
  */
 
-package v2.retrieveItsaStatus.def1
+package v2.retrieveItsaStatus
 
 import api.models.domain.{Nino, TaxYear}
 import api.models.errors.*
 import api.utils.UnitSpec
-import v2.retrieveItsaStatus.def1.model.request.Def1_RetrieveItsaStatusRequestData
+import v2.retrieveItsaStatus.model.request.RetrieveItsaStatusRequestData
 
-class Def1_RetrieveItsaStatusValidatorSpec extends UnitSpec {
+class RetrieveItsaStatusValidatorSpec extends UnitSpec {
 
   private implicit val correlationId: String = "1234"
 
@@ -35,7 +35,7 @@ class Def1_RetrieveItsaStatusValidatorSpec extends UnitSpec {
   private val invalidTaxYear = "23-24"
 
   private def validator(nino: String, taxYear: String, futureYears: Option[String], history: Option[String]) =
-    new Def1_RetrieveItsaStatusValidator(nino, taxYear, futureYears, history)
+    new RetrieveItsaStatusValidator(nino, taxYear, futureYears, history)
 
   "validator" should {
     "return the parsed domain object" when {
@@ -43,7 +43,7 @@ class Def1_RetrieveItsaStatusValidatorSpec extends UnitSpec {
         val result = validator(validNino, validTaxYear, None, None).validateAndWrapResult()
 
         result shouldBe Right(
-          Def1_RetrieveItsaStatusRequestData(parsedNino, parsedTaxYear, futureYears = false, history = false)
+          RetrieveItsaStatusRequestData(parsedNino, parsedTaxYear, futureYears = false, history = false)
         )
       }
 
@@ -51,7 +51,7 @@ class Def1_RetrieveItsaStatusValidatorSpec extends UnitSpec {
         val result = validator(validNino, validTaxYear, futureYears = Some("true"), history = Some("true")).validateAndWrapResult()
 
         result shouldBe Right(
-          Def1_RetrieveItsaStatusRequestData(parsedNino, parsedTaxYear, futureYears = true, history = true)
+          RetrieveItsaStatusRequestData(parsedNino, parsedTaxYear, futureYears = true, history = true)
         )
       }
     }
