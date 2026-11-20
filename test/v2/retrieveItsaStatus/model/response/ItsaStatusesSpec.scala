@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package v2.retrieveItsaStatus.def1.model.response
+package v2.retrieveItsaStatus.model.response
 
 import api.utils.UnitSpec
 import play.api.libs.json.{JsValue, Json}

@@ -17,7 +17,6 @@
 package v2.retrieveItsaStatus
 
 import api.utils.UnitSpec
-import v2.retrieveItsaStatus.def1.Def1_RetrieveItsaStatusValidator
 
 class RetrieveItsaStatusValidatorFactorySpec extends UnitSpec {
 
@@ -27,13 +26,13 @@ class RetrieveItsaStatusValidatorFactorySpec extends UnitSpec {
   private val validatorFactory = new RetrieveItsaStatusValidatorFactory
 
   "validator factory" when {
-    "given any request for schema 1" should {
-      "return the Validator for schema definition 1" in {
-        validatorFactory.validator(validNino, validTaxYear, None, None) shouldBe a[Def1_RetrieveItsaStatusValidator]
+    "given any request" should {
+      "return the RetrieveItsaStatusValidator" in {
+        validatorFactory.validator(validNino, validTaxYear, None, None) shouldBe a[RetrieveItsaStatusValidator]
       }
 
-      "return the Validator for schema definition 1 when request specifies futureYears and history" in {
-        validatorFactory.validator(validNino, validTaxYear, Some("true"), Some("true")) shouldBe a[Def1_RetrieveItsaStatusValidator]
+      "return the RetrieveItsaStatusValidator when request specifies futureYears and history" in {
+        validatorFactory.validator(validNino, validTaxYear, Some("true"), Some("true")) shouldBe a[RetrieveItsaStatusValidator]
 
       }
     }

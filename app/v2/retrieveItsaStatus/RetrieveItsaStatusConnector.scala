@@ -22,9 +22,8 @@ import api.connectors.httpparsers.StandardDownstreamHttpParser.reads
 import api.connectors.{BaseDownstreamConnector, DownstreamOutcome, DownstreamUri}
 import uk.gov.hmrc.http.HeaderCarrier
 import uk.gov.hmrc.http.client.HttpClientV2
-import v2.retrieveItsaStatus.def1.model.request.Def1_RetrieveItsaStatusRequestData
 import v2.retrieveItsaStatus.model.request.RetrieveItsaStatusRequestData
-import v2.retrieveItsaStatus.model.response.{Def1_RetrieveItsaStatusResponse, RetrieveItsaStatusResponse}
+import v2.retrieveItsaStatus.model.response.RetrieveItsaStatusResponse
 
 import javax.inject.Inject
 import scala.concurrent.{ExecutionContext, Future}
@@ -36,17 +35,13 @@ class RetrieveItsaStatusConnector @Inject() (val http: HttpClientV2, val appConf
       ec: ExecutionContext,
       correlationId: String): Future[DownstreamOutcome[RetrieveItsaStatusResponse]] = {
 
-    request match {
-      case def1: Def1_RetrieveItsaStatusRequestData =>
-        import request.*
+    import request.*
 
-        val downstreamUri: DownstreamUri[Def1_RetrieveItsaStatusResponse] = HipUri[Def1_RetrieveItsaStatusResponse](
-          s"itsd/person-itd/itsa-status/$nino?taxYear=${taxYear.asTysDownstream}&futureYears=$futureYears&history=$history"
-        )
+    val downstreamUri: DownstreamUri[RetrieveItsaStatusResponse] = HipUri[RetrieveItsaStatusResponse](
+      s"itsd/person-itd/itsa-status/$nino?taxYear=${taxYear.asTysDownstream}&futureYears=$futureYears&history=$history"
+    )
 
-        get(downstreamUri)
-    }
-
+    get(downstreamUri)
   }
 
 }

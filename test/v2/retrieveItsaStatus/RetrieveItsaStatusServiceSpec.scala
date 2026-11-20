@@ -22,9 +22,8 @@ import api.models.outcomes.ResponseWrapper
 import api.services.ServiceSpec
 import v2.models.domain.StatusEnum.`No Status`
 import v2.models.domain.StatusReasonEnum.`Sign up - return available`
-import v2.retrieveItsaStatus.def1.model.request.Def1_RetrieveItsaStatusRequestData
-import v2.retrieveItsaStatus.def1.model.response.{ItsaStatusDetails, ItsaStatuses}
-import v2.retrieveItsaStatus.model.response.Def1_RetrieveItsaStatusResponse
+import v2.retrieveItsaStatus.model.request.RetrieveItsaStatusRequestData
+import v2.retrieveItsaStatus.model.response.{ItsaStatusDetails, ItsaStatuses, RetrieveItsaStatusResponse}
 
 import scala.concurrent.Future
 
@@ -32,11 +31,11 @@ class RetrieveItsaStatusServiceSpec extends ServiceSpec with MockRetrieveItsaSta
 
   private val nino    = "AA112233A"
   private val taxYear = "2019-20"
-  private val request = Def1_RetrieveItsaStatusRequestData(Nino(nino), TaxYear.fromMtd(taxYear), futureYears = true, history = true)
+  private val request = RetrieveItsaStatusRequestData(Nino(nino), TaxYear.fromMtd(taxYear), futureYears = true, history = true)
 
   private val itsaStatusDetails = ItsaStatusDetails("2023-05-23T12:29:27.566Z", `No Status`, `Sign up - return available`, Some(23600.99))
   private val itsaStatuses      = ItsaStatuses(taxYear, Some(List(itsaStatusDetails)))
-  private val responseModel     = Def1_RetrieveItsaStatusResponse(List(itsaStatuses))
+  private val responseModel     = RetrieveItsaStatusResponse(List(itsaStatuses))
 
   private val service = new RetrieveItsaStatusService(mockRetrieveItsaStatusConnector)
 
@@ -44,7 +43,7 @@ class RetrieveItsaStatusServiceSpec extends ServiceSpec with MockRetrieveItsaSta
     "return correct result for a success" when {
       "a valid request is made" in {
 
-        val outcome: Right[Nothing, ResponseWrapper[Def1_RetrieveItsaStatusResponse]] = Right(ResponseWrapper(correlationId, responseModel))
+        val outcome: Right[Nothing, ResponseWrapper[RetrieveItsaStatusResponse]] = Right(ResponseWrapper(correlationId, responseModel))
 
         MockedRetrieveItsaStatusConnector
           .retrieve(request)

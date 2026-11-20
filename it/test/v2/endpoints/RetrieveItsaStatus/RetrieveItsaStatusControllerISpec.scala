@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package v2.endpoints.RetrieveItsaStatus.def1
+package v2.endpoints.RetrieveItsaStatus
 
 import api.models.domain.TaxYear
 import api.models.errors.*
@@ -26,7 +26,7 @@ import play.api.libs.json.{JsValue, Json}
 import play.api.libs.ws.{WSRequest, WSResponse}
 import play.api.test.Helpers.AUTHORIZATION
 
-class Def1_RetrieveItsaStatusControllerISpec extends IntegrationBaseSpec {
+class RetrieveItsaStatusControllerISpec extends IntegrationBaseSpec {
 
   "Calling the 'Retrieve ITSA Status' endpoint" should {
     "return a 200 status code" when {
