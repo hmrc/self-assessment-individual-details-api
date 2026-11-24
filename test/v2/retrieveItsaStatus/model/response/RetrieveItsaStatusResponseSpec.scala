@@ -14,14 +14,13 @@
  * limitations under the License.
  */
 
-package v2.retrieveItsaStatus.def1.model.response
+package v2.retrieveItsaStatus.model.response
 
 import api.utils.UnitSpec
 import play.api.libs.json.{JsError, JsObject, JsValue, Json}
 import v2.models.domain.{StatusEnum, StatusReasonEnum}
-import v2.retrieveItsaStatus.model.response.Def1_RetrieveItsaStatusResponse
 
-class Def1_RetrieveItsaStatusResponseSpec extends UnitSpec {
+class RetrieveItsaStatusResponseSpec extends UnitSpec {
 
   private def mtdJson(status: String, statusReason: String): JsValue = Json.parse(
     s"""
@@ -62,8 +61,8 @@ class Def1_RetrieveItsaStatusResponseSpec extends UnitSpec {
       """.stripMargin
     )
 
-  private def model(status: StatusEnum, statusReason: StatusReasonEnum): Def1_RetrieveItsaStatusResponse =
-    Def1_RetrieveItsaStatusResponse(
+  private def model(status: StatusEnum, statusReason: StatusReasonEnum): RetrieveItsaStatusResponse =
+    RetrieveItsaStatusResponse(
       itsaStatuses = List(
         ItsaStatuses(
           taxYear = "2025-26",
@@ -114,7 +113,7 @@ class Def1_RetrieveItsaStatusResponseSpec extends UnitSpec {
     StatusReasonEnum.`Return not considered`
   )
 
-  "Def1_RetrieveItsaStatusResponse" when {
+  "RetrieveItsaStatusResponse" when {
     "read from a valid JSON" should {
 
       "produce the expected object" in {
@@ -122,7 +121,7 @@ class Def1_RetrieveItsaStatusResponseSpec extends UnitSpec {
           statusReasonValues.foreach { statusReason =>
             val json: JsValue = downstreamJson(status.fromDownstream, statusReason.fromDownstream)
 
-            json.as[Def1_RetrieveItsaStatusResponse] shouldBe model(status, statusReason)
+            json.as[RetrieveItsaStatusResponse] shouldBe model(status, statusReason)
           }
         }
       }
@@ -132,7 +131,7 @@ class Def1_RetrieveItsaStatusResponseSpec extends UnitSpec {
       "produce a JsError" in {
         val invalidJson: JsObject = JsObject.empty
 
-        invalidJson.validate[Def1_RetrieveItsaStatusResponse] shouldBe a[JsError]
+        invalidJson.validate[RetrieveItsaStatusResponse] shouldBe a[JsError]
       }
     }
 
@@ -140,9 +139,9 @@ class Def1_RetrieveItsaStatusResponseSpec extends UnitSpec {
       "produce the expected JSON" in {
         statusValues.foreach { status =>
           statusReasonValues.foreach { statusReason =>
-            val expectedModel: Def1_RetrieveItsaStatusResponse = model(status, statusReason)
+            val expectedModel: RetrieveItsaStatusResponse = model(status, statusReason)
 
-            Json.toJson[Def1_RetrieveItsaStatusResponse](expectedModel) shouldBe mtdJson(
+            Json.toJson[RetrieveItsaStatusResponse](expectedModel) shouldBe mtdJson(
               status.toString,
               statusReason.toString
             )

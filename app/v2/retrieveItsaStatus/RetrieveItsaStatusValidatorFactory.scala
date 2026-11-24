@@ -17,7 +17,6 @@
 package v2.retrieveItsaStatus
 
 import api.controllers.validators.Validator
-import v2.retrieveItsaStatus.def1.Def1_RetrieveItsaStatusValidator
 import v2.retrieveItsaStatus.model.request.RetrieveItsaStatusRequestData
 
 import javax.inject.Singleton
@@ -26,6 +25,6 @@ import javax.inject.Singleton
 class RetrieveItsaStatusValidatorFactory {
 
   def validator(nino: String, taxYear: String, futureYears: Option[String], history: Option[String]): Validator[RetrieveItsaStatusRequestData] =
-    new Def1_RetrieveItsaStatusValidator(nino, taxYear, futureYears, history)
+    new RetrieveItsaStatusValidator(nino, taxYear, futureYears, history)
 
 }

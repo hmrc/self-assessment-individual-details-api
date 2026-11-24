@@ -28,9 +28,8 @@ import play.api.libs.json.{JsValue, Json}
 import play.api.mvc.Result
 import v2.models.domain.StatusEnum.`No Status`
 import v2.models.domain.StatusReasonEnum.`Sign up - return available`
-import v2.retrieveItsaStatus.def1.model.request.Def1_RetrieveItsaStatusRequestData
-import v2.retrieveItsaStatus.def1.model.response.{ItsaStatusDetails, ItsaStatuses}
-import v2.retrieveItsaStatus.model.response.Def1_RetrieveItsaStatusResponse
+import v2.retrieveItsaStatus.model.request.RetrieveItsaStatusRequestData
+import v2.retrieveItsaStatus.model.response.{ItsaStatusDetails, ItsaStatuses, RetrieveItsaStatusResponse}
 
 import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.Future
@@ -46,11 +45,11 @@ class RetrieveItsaStatusControllerSpec
   private val taxYear     = TaxYear.fromMtd("2023-24")
   private val userType    = "Individual"
   private val userDetails = UserDetails("mtdId", userType, None)
-  private val requestData = Def1_RetrieveItsaStatusRequestData(nino, taxYear, futureYears = false, history = false)
+  private val requestData = RetrieveItsaStatusRequestData(nino, taxYear, futureYears = false, history = false)
 
   private val itsaStatusDetails = ItsaStatusDetails("2023-05-23T12:29:27.566Z", `No Status`, `Sign up - return available`, Some(23600.99))
   private val itsaStatuses      = ItsaStatuses(taxYear.asMtd, Some(List(itsaStatusDetails)))
-  private val response          = Def1_RetrieveItsaStatusResponse(List(itsaStatuses))
+  private val response          = RetrieveItsaStatusResponse(List(itsaStatuses))
 
   private val mtdResponse = Json.parse(
     """

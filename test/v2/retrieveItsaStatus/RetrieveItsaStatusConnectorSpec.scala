@@ -22,9 +22,8 @@ import api.models.outcomes.ResponseWrapper
 import uk.gov.hmrc.http.StringContextOps
 import v2.models.domain.StatusEnum.`No Status`
 import v2.models.domain.StatusReasonEnum.`Sign up - return available`
-import v2.retrieveItsaStatus.def1.model.request.Def1_RetrieveItsaStatusRequestData
-import v2.retrieveItsaStatus.def1.model.response.{ItsaStatusDetails, ItsaStatuses}
-import v2.retrieveItsaStatus.model.response.{Def1_RetrieveItsaStatusResponse, RetrieveItsaStatusResponse}
+import v2.retrieveItsaStatus.model.request.RetrieveItsaStatusRequestData
+import v2.retrieveItsaStatus.model.response.{ItsaStatusDetails, ItsaStatuses, RetrieveItsaStatusResponse}
 
 import scala.concurrent.Future
 
@@ -35,7 +34,7 @@ class RetrieveItsaStatusConnectorSpec extends ConnectorSpec {
 
   private val itsaStatusDetails = ItsaStatusDetails("2023-05-23T12:29:27.566Z", `No Status`, `Sign up - return available`, Some(23600.99))
   private val itsaStatuses      = ItsaStatuses(taxYear.asMtd, Some(List(itsaStatusDetails)))
-  private val responseModel     = Def1_RetrieveItsaStatusResponse(List(itsaStatuses))
+  private val responseModel     = RetrieveItsaStatusResponse(List(itsaStatuses))
 
   private val outcome = Right(ResponseWrapper(correlationId, responseModel))
 
@@ -59,7 +58,7 @@ class RetrieveItsaStatusConnectorSpec extends ConnectorSpec {
       appConfig = mockAppConfig
     )
 
-    val request: Def1_RetrieveItsaStatusRequestData = Def1_RetrieveItsaStatusRequestData(Nino(nino), taxYear, futureYears = true, history = true)
+    val request: RetrieveItsaStatusRequestData = RetrieveItsaStatusRequestData(Nino(nino), taxYear, futureYears = true, history = true)
 
   }
 

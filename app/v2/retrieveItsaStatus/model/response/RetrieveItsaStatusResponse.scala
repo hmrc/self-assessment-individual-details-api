@@ -16,30 +16,17 @@
 
 package v2.retrieveItsaStatus.model.response
 
-import api.utils.JsonWritesUtil
-import play.api.libs.json.{JsObject, Json, OWrites, Reads}
-import v2.retrieveItsaStatus.def1.model.response.ItsaStatuses
+import play.api.libs.json.{Json, OWrites, Reads}
 
-trait RetrieveItsaStatusResponse
+case class RetrieveItsaStatusResponse(itsaStatuses: Seq[ItsaStatuses])
 
-object RetrieveItsaStatusResponse extends JsonWritesUtil {
+object RetrieveItsaStatusResponse {
 
-  implicit val writes: OWrites[RetrieveItsaStatusResponse] = writesFrom { case def1: Def1_RetrieveItsaStatusResponse =>
-    Json.toJson(def1).as[JsObject]
-
-  }
-
-}
-
-case class Def1_RetrieveItsaStatusResponse(itsaStatuses: Seq[ItsaStatuses]) extends RetrieveItsaStatusResponse
-
-object Def1_RetrieveItsaStatusResponse {
-
-  implicit val reads: Reads[Def1_RetrieveItsaStatusResponse] = json =>
+  implicit val reads: Reads[RetrieveItsaStatusResponse] = json =>
     json
       .validate[Seq[ItsaStatuses]]
-      .map(itsaStatuses => Def1_RetrieveItsaStatusResponse(itsaStatuses))
+      .map(itsaStatuses => RetrieveItsaStatusResponse(itsaStatuses))
 
-  implicit val writes: OWrites[Def1_RetrieveItsaStatusResponse] = Json.writes[Def1_RetrieveItsaStatusResponse]
+  implicit val writes: OWrites[RetrieveItsaStatusResponse] = Json.writes[RetrieveItsaStatusResponse]
 
 }
