@@ -36,7 +36,9 @@ class MtdIdLookupConnector @Inject() (http: HttpClientV2, appConfig: AppConfig) 
   def getMtdId(nino: String)(implicit hc: HeaderCarrier, ec: ExecutionContext): Future[MtdIdLookupConnector.Outcome] = {
     import api.connectors.httpparsers.MtdIdLookupHttpParser.mtdIdLookupHttpReads
 
-    http.get(url"${appConfig.mtdIdBaseUrl}/mtd-identifier-lookup/nino/$nino?notEnrolledFlag=false").execute[MtdIdLookupConnector.Outcome]
+    val notEnrolledFlag: String = appConfig.featureSwitchConfig.get[Boolean]("additional-nino-validation").toString
+
+    http.get(url"${appConfig.mtdIdBaseUrl}/mtd-identifier-lookup/nino/$nino?notEnrolledFlag=$notEnrolledFlag").execute[MtdIdLookupConnector.Outcome]
   }
 
 }

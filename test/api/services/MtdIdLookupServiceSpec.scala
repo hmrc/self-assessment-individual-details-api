@@ -16,18 +16,19 @@
 
 package api.services
 
+import api.config.MockAppConfig
 import api.connectors.{MockMtdIdLookupConnector, MtdIdLookupConnector}
 import api.models.errors.*
 import api.services.MtdIdLookupService.Outcome
 
 import scala.concurrent.Future
 
-class MtdIdLookupServiceSpec extends ServiceSpec {
+class MtdIdLookupServiceSpec extends ServiceSpec with MockAppConfig with MockNinoAuthService {
 
   val nino = "AA123456A"
 
   trait Test extends MockMtdIdLookupConnector {
-    lazy val target = new MtdIdLookupService(mockMtdIdLookupConnector)
+    lazy val target = new MtdIdLookupService(mockMtdIdLookupConnector, mockAppConfig, mockNinoAuthService)
   }
 
   "calling .getMtdId" when {
@@ -70,11 +71,33 @@ class MtdIdLookupServiceSpec extends ServiceSpec {
     }
 
     "the downstream service returns a 422 status error" should {
-      "return ClientNotEnrolledError" in new Test {
-        MockedMtdIdLookupConnector.lookup(nino) returns Future.successful(Left(MtdIdLookupConnector.Error(UNPROCESSABLE_ENTITY)))
-        val result: Outcome = await(target.lookup(nino))
+      "return ClientNotEnrolledError" when {
+        "additional-nino-validation is disabled " in new Test {
+          MockedAppConfig.featureSwitchConfig returns play.api.Configuration("additional-nino-validation" -> false)
+          MockedMtdIdLookupConnector.lookup(nino) returns Future.successful(Left(MtdIdLookupConnector.Error(UNPROCESSABLE_ENTITY)))
+          val result: Outcome = await(target.lookup(nino))
 
-        result shouldBe Left(ClientNotEnrolledError)
+          result shouldBe Left(ClientNotEnrolledError)
+        }
+        "additional-nino-validation is enabled and nino is authorised" in new Test {
+          MockedAppConfig.featureSwitchConfig returns play.api.Configuration("additional-nino-validation" -> true)
+          MockedNinoAuthService.checkAuthorisedNino(nino) returns Future.successful(ClientNotEnrolledError)
+          MockedMtdIdLookupConnector.lookup(nino) returns Future.successful(Left(MtdIdLookupConnector.Error(UNPROCESSABLE_ENTITY)))
+          val result: Outcome = await(target.lookup(nino))
+
+          result shouldBe Left(ClientNotEnrolledError)
+        }
+      }
+
+      "return ClientOrAgentNotAuthorisedError" when {
+        "additional-nino-validation is enabled and nino is not authorised" in new Test {
+          MockedAppConfig.featureSwitchConfig returns play.api.Configuration("additional-nino-validation" -> true)
+          MockedNinoAuthService.checkAuthorisedNino(nino) returns Future.successful(ClientOrAgentNotAuthorisedError)
+          MockedMtdIdLookupConnector.lookup(nino) returns Future.successful(Left(MtdIdLookupConnector.Error(UNPROCESSABLE_ENTITY)))
+          val result: Outcome = await(target.lookup(nino))
+
+          result shouldBe Left(ClientOrAgentNotAuthorisedError)
+        }
       }
     }
 

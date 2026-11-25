@@ -104,6 +104,11 @@ object EnrolmentsAuthService {
       (Organisation and mtdEnrolmentPredicate(mtdId)) or
       (Agent and Enrolment("HMRC-AS-AGENT"))
 
+  private[services] def additionalNinoAuthorisationPredicate: Predicate =
+    (Individual and ConfidenceLevel.L250) or
+      (Organisation and ConfidenceLevel.L250) or
+      (Agent and Enrolment("HMRC-AS-AGENT"))
+
   private[services] def authorisationDisabledPredicate(mtdId: String): Predicate =
     mtdEnrolmentPredicate(mtdId) or (Agent and Enrolment("HMRC-AS-AGENT"))
 
