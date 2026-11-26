@@ -19,6 +19,7 @@ package api.connectors
 import api.config.MockAppConfig
 import api.connectors.MtdIdLookupConnector.Outcome
 import api.mocks.MockHttpClient
+import play.api.Configuration
 import uk.gov.hmrc.http.StringContextOps
 
 import scala.concurrent.Future
@@ -36,13 +37,14 @@ class MtdIdLookupConnectorSpec extends ConnectorSpec {
     )
 
     MockedAppConfig.mtdIdBaseUrl returns baseUrl
+    MockedAppConfig.featureSwitchConfig returns Configuration.from(Map("additional-nino-validation" -> "true"))
   }
 
   "getMtdId" should {
     "return an MtdId" when {
       "the http client returns a mtd id" in new Test {
         MockedHttpClient
-          .get[MtdIdLookupConnector.Outcome](url"$baseUrl/mtd-identifier-lookup/nino/$nino?notEnrolledFlag=false", dummyHeaderCarrierConfig)
+          .get[MtdIdLookupConnector.Outcome](url"$baseUrl/mtd-identifier-lookup/nino/$nino?notEnrolledFlag=true", dummyHeaderCarrierConfig)
           .returns(Future.successful(Right(mtdId)))
 
         val result: Outcome = await(connector.getMtdId(nino))
@@ -57,7 +59,7 @@ class MtdIdLookupConnectorSpec extends ConnectorSpec {
 
         MockedHttpClient
           .get[MtdIdLookupConnector.Outcome](
-            url = url"$baseUrl/mtd-identifier-lookup/nino/$nino?notEnrolledFlag=false",
+            url = url"$baseUrl/mtd-identifier-lookup/nino/$nino?notEnrolledFlag=true",
             config = dummyHeaderCarrierConfig
           )
           .returns(Future.successful(Left(MtdIdLookupConnector.Error(statusCode))))

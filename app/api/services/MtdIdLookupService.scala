@@ -16,6 +16,7 @@
 
 package api.services
 
+import api.config.AppConfig
 import api.connectors.MtdIdLookupConnector
 import api.controllers.validators.resolvers.ResolveNino
 import api.models.errors.*
@@ -30,20 +31,25 @@ object MtdIdLookupService {
 }
 
 @Singleton
-class MtdIdLookupService @Inject() (val connector: MtdIdLookupConnector) {
+class MtdIdLookupService @Inject() (val connector: MtdIdLookupConnector, appConfig: AppConfig, ninoAuthService: NinoAuthService) {
 
   def lookup(nino: String)(implicit hc: HeaderCarrier, ec: ExecutionContext): Future[MtdIdLookupService.Outcome] = {
     if (!ResolveNino.isValid(nino)) {
       Future.successful(Left(NinoFormatError))
     } else {
-      connector.getMtdId(nino) map {
-        case Right(mtdId) => Right(mtdId)
+      connector.getMtdId(nino).flatMap {
+        case Right(mtdId) => Future.successful(Right(mtdId))
         case Left(MtdIdLookupConnector.Error(statusCode)) =>
           statusCode match {
-            case FORBIDDEN            => Left(ClientOrAgentNotAuthorisedError)
-            case UNAUTHORIZED         => Left(InvalidBearerTokenError)
-            case UNPROCESSABLE_ENTITY => Left(ClientNotEnrolledError)
-            case _                    => Left(InternalError)
+            case FORBIDDEN    => Future.successful(Left(ClientOrAgentNotAuthorisedError))
+            case UNAUTHORIZED => Future.successful(Left(InvalidBearerTokenError))
+            case UNPROCESSABLE_ENTITY =>
+              if (appConfig.featureSwitchConfig.get[Boolean]("additional-nino-validation")) {
+                ninoAuthService.checkAuthorisedNino(nino).map(Left(_))
+              } else {
+                Future.successful(Left(ClientNotEnrolledError))
+              }
+            case _ => Future.successful(Left(InternalError))
           }
       }
     }
